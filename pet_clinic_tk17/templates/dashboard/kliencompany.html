@@ -45,47 +45,41 @@
     </div>
   
 
-    <!-- Edit Mode -->
-    <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Non-editable Fields -->
-         
-        <div>
-            <p class="text-sm text-gray-600 font-medium">Nomors Identitas</p>
-            <p class="text-gray-800">95af4880-90c7-4749-9f94-05afbe92a196</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 font-medium">Email</p>
-            <p class="text-gray-800">klien_individu_1@gmail.com</p>
+    <div id="company-edit-mode">
+        <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
+      
+          <!-- Nomor Identitas (read-only) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Nomor Identitas</div>
+          <div class="text-gray-800">d7b8e190-6a42-4c3b-9c94-2195be76d198</div>
+      
+          <!-- Email (read-only) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Email</div>
+          <div class="text-gray-800">perusahaan@example.com</div>
+      
+          <!-- Nama Perusahaan (editable) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Nama Perusahaan</div>
+          <input type="text" name="nama_perusahaan" class="border border-gray-300 rounded p-2 text-sm w-full" value="PT. Maju Jaya Sejahtera">
+      
+          <!-- Tanggal Pendaftaran (read-only) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Tanggal Pendaftaran</div>
+          <div class="text-gray-800">15 Februari 2025</div>
+      
+          <!-- Alamat (editable) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Alamat</div>
+          <textarea name="alamat" class="border border-gray-300 rounded p-2 text-sm w-full" rows="2">Jl. Sudirman No. 123, Jakarta Pusat, DKI Jakarta, 10220</textarea>
+      
+          <!-- Nomor Telepon (editable) -->
+          <div class="text-sm font-bold text-gray-800 text-left pr-4">Nomor Telepon</div>
+          <input type="text" name="nomor_telepon" class="border border-gray-300 rounded p-2 text-sm w-full" value="(021) 5678901">
         </div>
-          
-
-        <!-- Editable Fields -->
-        <div>
-          <label class="text-sm font-medium text-gray-600">Nama Depan</label>
-          <input type="text" placeholder="Amanda" class="mt-1 w-full border rounded-lg px-3 py-2">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-600">Nama Tengah</label>
-          <input type="text" placeholder="-" class="mt-1 w-full border rounded-lg px-3 py-2">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-600">Nama Belakang</label>
-          <input type="text" placeholder="Zahra" class="mt-1 w-full border rounded-lg px-3 py-2">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-600">Tanggal Pendaftaran</label>
-          <input type="text" value="26 Januari 2025" disabled class="mt-1 w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-500">
-        </div>
-        <div class="sm:col-span-2">
-          <label class="text-sm font-medium text-gray-600">Alamat</label>
-          <textarea rows="3" placeholder="Alamat lengkap..." class="mt-1 w-full border rounded-lg px-3 py-2"></textarea>
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-600">Nomor Telepon</label>
-          <input type="text" placeholder="081234567896" class="mt-1 w-full border rounded-lg px-3 py-2">
-        </div>
+      
+        <!-- Tombol aksi
+        <div class="mt-6 flex gap-3">
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan</button>
+          <button type="button" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">Batal</button>
+        </div> -->
       </div>
+      
 
       <!-- Action Buttons -->
       <div class="mt-6 flex gap-3">

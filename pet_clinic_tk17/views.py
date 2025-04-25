@@ -4,6 +4,9 @@ from django.shortcuts import render
 def klien_dashboard(request):
     return render(request, 'dashboard/klien.html')
 
+def kliencompany_dashboard(request):
+    return render(request, 'dashboard/kliencompany.html')
+
 def frontdesk_dashboard(request):
     return render(request, 'dashboard/frontdesk.html')
 
@@ -12,5 +15,7 @@ def dokter_dashboard(request):
 
 def perawat_dashboard(request):
     return render(request, 'dashboard/perawat.html')
+
+
 
 # Add other view functions as needed

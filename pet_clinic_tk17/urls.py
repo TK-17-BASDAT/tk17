@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
         # Klien URLs
     path('klien/dashboard/', views.klien_dashboard, name='klien_dashboard'),
+    path('kliencompany/dashboard/', views.kliencompany_dashboard, name='kliencompany_dashboard'),
     # path('klien/hewan/', views.kelola_hewan, name='kelola_hewan'),
     
     # Front Desk URLs
