@@ -1,34 +1,161 @@
-<!-- tk17/pet_clinic_tk17/templates/dashboard/klien.html -->
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Klien Dashboard{% endblock %}
-
-{% block sidebar %}
-    {% include "includes/sidebar_klien.html" %}
-{% endblock %}
-
 {% block content %}
-<div class="header">
-    <h1>Dashboard Klien</h1>
-    <div class="user-profile">
-        <img src="{% static 'images/default-profile.png' %}" alt="Profile">
-        <span>{{ request.user.username }}</span>
-    </div>
-</div>
-
-<div class="dashboard-cards">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Hewan Peliharaan</h3>
-            <div class="card-icon accent1">
-                <i class="fas fa-paw"></i>
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <div class="header-row">
+            <div class="title-section">
+                <h1>Profile</h1>
+                <h1>Front-Desk Officer</h1>
+            </div>
+            <div class="button-section">
+                <button class="btn btn-password">Update Password</button>
+                <button class="btn btn-profile">Update Profile</button>
             </div>
         </div>
-        <div class="card-value">3</div>
-        <p class="card-description">Total hewan peliharaan</p>
+
+        <div class="content-area">
+            <div class="profile-item">
+                <div class="profile-label">Nomor Identitas</div>
+                <div class="profile-value">aacbdde1-feaf-454b-bc7d-0eed3a345907</div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-label">Email</div>
+                <div class="profile">amelia.putri@petclinic.com</div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-label">Tanggal Diterima</div>
+                <div class="profile-value">265Januari 2025</div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-label">Tanggal Akhir Kerja</div>
+                <div class="profile-value">-</div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-label">Alamat</div>
+                <div class="profile-value">Jl. Melati Indah No. 25, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
+            </div>
+            
+            <div class="profile-item">
+                <div class="profile-label">Nomor Telepon</div>
+                <div class="profile-value">081234567895</div>
+            </div>
+        </div>
     </div>
-    
-    <!-- Add more cards as needed -->
 </div>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fafafa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .profile-wrapper {
+        width: 100%;
+        max-width: 850px;
+        padding: 20px;
+    }
+
+    .profile-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+    }
+
+    .title-section h1 {
+        font-size: 24px;
+        margin: 0;
+        font-weight: 600;
+        color: #111;
+    }
+
+    .title-section h2 {
+        font-size: 18px;
+        margin: 4px 0 0;
+        font-weight: 400;
+        color: #333;
+    }
+
+    .button-section {
+        display: flex;
+        gap: 10px;
+    }
+
+    .profile-label {
+        font-weight: 600;
+        color: #111;
+    }
+
+    .profile-value {
+        color: #333;
+    }
+
+    .btn {
+        font-family: 'Poppins';
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .btn-password {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-profile {
+        background-color: #124C5F;
+        color: white;
+    }
+
+    .content-area {
+        margin-bottom: 30px;
+    }
+
+    .profile-item {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        margin-bottom: 18px;
+        align-items: center;
+    }
+
+    @media (max-width: 600px) {
+        .header-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .button-section {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
