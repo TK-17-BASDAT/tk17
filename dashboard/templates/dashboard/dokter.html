@@ -1,230 +1,235 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+<div class="flex">
+  {% include "navbar/sidebar_dokter.html" %}
+  <main class="bg-gray-50 flex-1 ml-64 p-6">
+    <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
 
-  <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-800">Profile Dokter</h1>
+      <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-800">Profile Dokter</h1>
+          </div>
+          <div class="flex gap-3">
+            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</button>
+            <button onclick="toggleEditMode()" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
+          </div>
+        </div>
+    
+        <!-- View Mode -->
+        <div id="view-mode">
+          <div class="space-y-6">
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Nomor Identitas</span>
+                <span class="text-gray-900">c4fd2f14-0202-4526-b1f4-5fcde0c28783</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Nomor Izin Praktik</span>
+                <span class="text-gray-900">SIP-HEWAN-12345</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Email</span>
+                <span class="text-gray-900">bobby.muhammad@petclinic.com</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Tanggal Diterima</span>
+                <span class="text-gray-900">23 Januari 2025</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Tanggal Akhir Kerja</span>
+                <span class="text-gray-900">-</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Alamat</span>
+                <span class="text-gray-900">Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Nomor Telepon</span>
+                <span class="text-gray-900">081234567893</span>
+            </div>
+          </div>
+    
+          <!-- Sertifikat -->
+          <div class="mt-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
+            <table class="w-full table-auto border-collapse">
+                <thead>
+                    <tr class="text-left bg-gray-100">
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nomor Sertifikat</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nama Sertifikat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">123/DH/456</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">BNSP Dokter Hewan Praktis</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">456/DH/456</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">Sertifikat PB PDHI</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">789/DH/789</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">Sertifikat Organisasi Profesi</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+    
+          <!-- Jadwal Praktik -->
+          <div class="mt-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Jadwal Praktik</h2>
+            <table class="w-full table-auto border-collapse">
+                <thead>
+                    <tr class="text-left bg-gray-100">
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Hari</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Jam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">Senin</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">Rabu</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">Jumat</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">14.00 - 16.00</td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+        </div>
+    
+        <!-- Edit Mode -->
+        <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
+          <div class="space-y-6">
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Nomor Identitas</label>
+              <input type="text" value="c4fd2f14-0202-4526-b1f4-5fcde0c28783" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Nomor Izin Praktik</label>
+              <input type="text" value="SIP-HEWAN-12345" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Email</label>
+              <input type="email" value="bobby.muhammad@petclinic.com" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Tanggal Diterima</label>
+              <input type="date" value="2025-01-23" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Tanggal Akhir Kerja</label>
+              <input type="date" value="" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Alamat</label>
+              <input type="text" value="Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
+            </div>
+            <div class="flex justify-between">
+              <label class="font-medium text-gray-700">Nomor Telepon</label>
+              <input type="text" value="081234567893" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
+            </div>
+          </div>
+    
+          <!-- Sertifikat -->
+          <div class="mt-4">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
+            <table class="w-full table-auto border-collapse">
+                <thead>
+                    <tr class="text-left bg-gray-100">
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nomor Sertifikat</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nama Sertifikat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="123/DH/456" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="BNSP Dokter Hewan Praktis" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="456/DH/456" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Sertifikat PB PDHI" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="789/DH/789" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Sertifikat Organisasi Profesi" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+    
+          <!-- Jadwal Praktik -->
+          <div class="mt-4">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Jadwal Praktik</h2>
+            <table class="w-full table-auto border-collapse">
+                <thead>
+                    <tr class="text-left bg-gray-100">
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Hari</th>
+                        <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Jam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Senin" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="13.00 - 15.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Rabu" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="13.00 - 15.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Jumat" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                        <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="14.00 - 16.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
+    
+          <div class="mt-6">
+            <button type="submit" class="bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
+          </div>
+        </form>
       </div>
-      <div class="flex gap-3">
-        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</button>
-        <button onclick="toggleEditMode()" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
-      </div>
+    
+      <script>
+        function toggleEditMode() {
+          const viewMode = document.getElementById('view-mode');
+          const editMode = document.getElementById('edit-mode');
+          viewMode.classList.toggle('hidden');
+          editMode.classList.toggle('hidden');
+        }
+    
+        function saveChanges() {
+          // Logic for saving changes here
+          alert("Perubahan berhasil disimpan!");
+          toggleEditMode(); // Switch back to view mode
+        }
+      </script>
     </div>
-
-    <!-- View Mode -->
-    <div id="view-mode">
-      <div class="space-y-6">
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Nomor Identitas</span>
-            <span class="text-gray-900">c4fd2f14-0202-4526-b1f4-5fcde0c28783</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Nomor Izin Praktik</span>
-            <span class="text-gray-900">SIP-HEWAN-12345</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Email</span>
-            <span class="text-gray-900">bobby.muhammad@petclinic.com</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Tanggal Diterima</span>
-            <span class="text-gray-900">23 Januari 2025</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Tanggal Akhir Kerja</span>
-            <span class="text-gray-900">-</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Alamat</span>
-            <span class="text-gray-900">Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</span>
-        </div>
-        <div class="flex justify-between">
-            <span class="font-medium text-gray-700">Nomor Telepon</span>
-            <span class="text-gray-900">081234567893</span>
-        </div>
-      </div>
-
-      <!-- Sertifikat -->
-      <div class="mt-8">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
-        <table class="w-full table-auto border-collapse">
-            <thead>
-                <tr class="text-left bg-gray-100">
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nomor Sertifikat</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nama Sertifikat</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">123/DH/456</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">BNSP Dokter Hewan Praktis</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">456/DH/456</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">Sertifikat PB PDHI</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">789/DH/789</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">Sertifikat Organisasi Profesi</td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-      <!-- Jadwal Praktik -->
-      <div class="mt-8">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Jadwal Praktik</h2>
-        <table class="w-full table-auto border-collapse">
-            <thead>
-                <tr class="text-left bg-gray-100">
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Hari</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Jam</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">Senin</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">Rabu</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">Jumat</td>
-                    <td class="px-4 py-2 text-sm text-gray-700">14.00 - 16.00</td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Edit Mode -->
-    <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
-      <div class="space-y-6">
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Nomor Identitas</label>
-          <input type="text" value="c4fd2f14-0202-4526-b1f4-5fcde0c28783" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Nomor Izin Praktik</label>
-          <input type="text" value="SIP-HEWAN-12345" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Email</label>
-          <input type="email" value="bobby.muhammad@petclinic.com" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Tanggal Diterima</label>
-          <input type="date" value="2025-01-23" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg" disabled>
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Tanggal Akhir Kerja</label>
-          <input type="date" value="" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Alamat</label>
-          <input type="text" value="Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
-        </div>
-        <div class="flex justify-between">
-          <label class="font-medium text-gray-700">Nomor Telepon</label>
-          <input type="text" value="081234567893" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg">
-        </div>
-      </div>
-
-      <!-- Sertifikat -->
-      <div class="mt-4">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
-        <table class="w-full table-auto border-collapse">
-            <thead>
-                <tr class="text-left bg-gray-100">
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nomor Sertifikat</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Nama Sertifikat</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="123/DH/456" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="BNSP Dokter Hewan Praktis" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="456/DH/456" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Sertifikat PB PDHI" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="789/DH/789" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Sertifikat Organisasi Profesi" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-      <!-- Jadwal Praktik -->
-      <div class="mt-4">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Jadwal Praktik</h2>
-        <table class="w-full table-auto border-collapse">
-            <thead>
-                <tr class="text-left bg-gray-100">
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">No</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Hari</th>
-                    <th class="px-4 py-2 border-b text-sm font-medium text-gray-700">Jam</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Senin" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="13.00 - 15.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Rabu" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="13.00 - 15.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-                <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="Jumat" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                    <td class="px-4 py-2 text-sm text-gray-700"><input type="text" value="14.00 - 16.00" class="text-gray-900 bg-gray-100 border px-3 py-2 rounded-lg"></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
-
-      <div class="mt-6">
-        <button type="submit" class="bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    function toggleEditMode() {
-      const viewMode = document.getElementById('view-mode');
-      const editMode = document.getElementById('edit-mode');
-      viewMode.classList.toggle('hidden');
-      editMode.classList.toggle('hidden');
-    }
-
-    function saveChanges() {
-      // Logic for saving changes here
-      alert("Perubahan berhasil disimpan!");
-      toggleEditMode(); // Switch back to view mode
-    }
-  </script>
+  </main>
 </div>
 {% endblock content %}

@@ -27,4 +27,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboard.urls')),
     path('auth/', include('authentication.urls')),
+    path('jenis-hewan/', include('jenis_hewan.urls')),
 ]

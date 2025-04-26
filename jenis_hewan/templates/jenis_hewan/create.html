@@ -1,0 +1,18 @@
+<form method="post" action="{% url 'jenis_hewan:create' %}">
+    {% csrf_token %}
+    <h2 class="text-xl font-semibold mb-4">Create New Animal Type</h2>
+    <div>
+      <label class="block text-gray-700">Nama Jenis</label>
+      <input name="nama_jenis" type="text"
+             class="w-full border rounded px-3 py-2" placeholder="Nama Jenis" required>
+    </div>
+    <div class="mt-6 flex justify-end space-x-3">
+      <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">
+        Cancel
+      </button>
+      <button type="submit" class="bg-primary text-white px-4 py-2 rounded">
+        Create
+      </button>
+    </div>
+  </form>
+  
