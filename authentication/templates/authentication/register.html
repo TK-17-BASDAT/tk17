@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="bg-gray-100 font-poppins">
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6">
+      <h2 class="text-2xl font-semibold text-center mb-6">Register Akun</h2>
+
+      <!-- Tabs -->
+      <div class="border-b mb-6">
+        <nav class="-mb-px flex space-x-4 overflow-x-auto">
+          <button data-tab="klien_individu" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
+            Klien Individu
+          </button>
+          <button data-tab="klien_perusahaan" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
+            Klien Perusahaan
+          </button>
+          <button data-tab="frontdesk" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
+            Front-Desk Officer
+          </button>
+          <button data-tab="dokter" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
+            Dokter Hewan
+          </button>
+          <button data-tab="perawat" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
+            Perawat Hewan
+          </button>
+        </nav>
+      </div>
+      <!-- Tab Contents -->
+      <div>
+        <!-- 1. Klien Individu -->
+        <form id="klien_individu" class="tab-content space-y-4">
+          <div>
+            <label class="block text-gray-700">Email *</label>
+            <input type="email" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-gray-700">Nama Depan *</label>
+              <input type="text" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div>
+              <label class="block text-gray-700">Nama Tengah</label>
+              <input type="text" class="w-full border rounded px-3 py-2"/>
+            </div>
+            <div>
+              <label class="block text-gray-700">Nama Belakang *</label>
+              <input type="text" class="w-full border rounded px-3 py-2" required/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-700">Password *</label>
+            <input type="password" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nomor Telepon *</label>
+            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Alamat *</label>
+            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+          </div>
+          <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
+            Register
+          </button>
+        </form>
+
+        <!-- 2. Klien Perusahaan -->
+        <form id="klien_perusahaan" class="tab-content hidden space-y-4">
+          <div>
+            <label class="block text-gray-700">Email *</label>
+            <input type="email" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nama Perusahaan *</label>
+            <input type="text" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Password *</label>
+            <input type="password" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nomor Telepon *</label>
+            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Alamat *</label>
+            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+          </div>
+          <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
+            Register
+          </button>
+        </form>
+
+        <!-- 3. Front-Desk Officer -->
+        <form id="frontdesk" class="tab-content hidden space-y-4">
+          <div>
+            <label class="block text-gray-700">Email *</label>
+            <input type="email" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Password *</label>
+            <input type="password" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nomor Telepon *</label>
+            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Tanggal Diterima *</label>
+            <input type="date" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Alamat *</label>
+            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+          </div>
+          <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
+            Register
+          </button>
+        </form>
+
+        <!-- ==== 4. Dokter Hewan ==== -->
+        <form id="dokter" class="tab-content hidden space-y-4">
+            <!-- Informasi Umum -->
+            <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
+              <input type="text" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Email *</label>
+              <input type="email" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Password *</label>
+              <input type="password" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Nomor Telepon *</label>
+              <input type="tel" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Tanggal Diterima *</label>
+              <input type="date" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Alamat *</label>
+              <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+            </div>
+  
+            <!-- Sertifikat -->
+            <div id="dokter-sertifikat-section" class="space-y-2">
+              <h3 class="font-medium">Sertifikat</h3>
+              <button type="button" onclick="addDokterCert()"
+                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                + Tambah Sertifikat
+              </button>
+              <div id="dokter-sertifikat-container" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-gray-700">Nomor Sertifikat *</label>
+                    <input type="text" name="dokter_nomor_sertifikat[]" 
+                      class="w-full border rounded px-3 py-2" required/>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700">Nama Sertifikat *</label>
+                    <input type="text" name="dokter_nama_sertifikat[]" 
+                      class="w-full border rounded px-3 py-2" required/>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Jadwal Praktik -->
+            <div id="dokter-jadwal-section" class="space-y-2">
+              <h3 class="font-medium">Jadwal Praktik</h3>
+              <button type="button" onclick="addDokterSchedule()"
+                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                + Tambah Jadwal
+              </button>
+              <div id="dokter-jadwal-container" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-gray-700">Hari *</label>
+                    <select name="dokter_jadwal_hari[]" 
+                      class="w-full border rounded px-3 py-2" required>
+                      <option>Senin</option><option>Selasa</option>
+                      <option>Rabu</option><option>Kamis</option>
+                      <option>Jumat</option><option>Sabtu</option>
+                      <option>Minggu</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700">Jam *</label>
+                    <input type="text" name="dokter_jadwal_jam[]" 
+                      class="w-full border rounded px-3 py-2" 
+                      placeholder="13:00 - 15:00" required/>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
+              Register
+            </button>
+          </form>
+  
+          <!-- ==== 5. Perawat Hewan ==== -->
+          <form id="perawat" class="tab-content hidden space-y-4">
+            <!-- Informasi Umum -->
+            <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
+              <input type="text" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Email *</label>
+              <input type="email" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Password *</label>
+              <input type="password" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Nomor Telepon *</label>
+              <input type="tel" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Tanggal Diterima *</label>
+              <input type="date" class="w-full border rounded px-3 py-2" required/>
+            </div>
+            <div><label class="block text-gray-700">Alamat *</label>
+              <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+            </div>
+  
+            <!-- Sertifikat -->
+            <div id="perawat-sertifikat-section" class="space-y-2">
+              <h3 class="font-medium">Sertifikat</h3>
+              <button type="button" onclick="addPerawatCert()"
+                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                + Tambah Sertifikat
+              </button>
+              <div id="perawat-sertifikat-container" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-gray-700">Nomor Sertifikat *</label>
+                    <input type="text" name="perawat_nomor_sertifikat[]" 
+                      class="w-full border rounded px-3 py-2" required/>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700">Nama Sertifikat *</label>
+                    <input type="text" name="perawat_nama_sertifikat[]" 
+                      class="w-full border rounded px-3 py-2" required/>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
+              Register
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  
+    <script>
+      // Tab switcher (sama seperti sebelumya)…
+      const tabs = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      function activate(tabKey) {
+        tabs.forEach(b => {
+          if (b.dataset.tab === tabKey) {
+            b.classList.replace('border-transparent','border-accent');
+            b.classList.replace('text-gray-600','text-accent');
+          } else {
+            b.classList.replace('border-accent','border-transparent');
+            b.classList.replace('text-accent','text-gray-600');
+          }
+        });
+        contents.forEach(c => c.id === tabKey
+          ? c.classList.remove('hidden')
+          : c.classList.add('hidden')
+        );
+      }
+      tabs.forEach(b => b.addEventListener('click', () => activate(b.dataset.tab)));
+      activate('klien_individu');
+  
+      // Dokter Sertifikat
+      function addDokterCert(){
+        const container = document.getElementById('dokter-sertifikat-container');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-2 gap-4';
+        row.innerHTML = `
+          <div>
+            <label class="block text-gray-700">Nomor Sertifikat *</label>
+            <input type="text" name="dokter_nomor_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nama Sertifikat *</label>
+            <input type="text" name="dokter_nama_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+          </div>`;
+        container.appendChild(row);
+      }
+      // Dokter Jadwal
+      function addDokterSchedule(){
+        const container = document.getElementById('dokter-jadwal-container');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-2 gap-4';
+        row.innerHTML = `
+          <div>
+            <label class="block text-gray-700">Hari *</label>
+            <select name="dokter_jadwal_hari[]" class="w-full border rounded px-3 py-2" required>
+              <option>Senin</option><option>Selasa</option><option>Rabu</option>
+              <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700">Jam *</label>
+            <input type="text" name="dokter_jadwal_jam[]" class="w-full border rounded px-3 py-2"
+              placeholder="13:00 - 15:00" required/>
+          </div>`;
+        container.appendChild(row);
+      }
+      // Perawat Sertifikat
+      function addPerawatCert(){
+        const container = document.getElementById('perawat-sertifikat-container');
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-2 gap-4';
+        row.innerHTML = `
+          <div>
+            <label class="block text-gray-700">Nomor Sertifikat *</label>
+            <input type="text" name="perawat_nomor_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+          </div>
+          <div>
+            <label class="block text-gray-700">Nama Sertifikat *</label>
+            <input type="text" name="perawat_nama_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+          </div>`;
+        container.appendChild(row);
+      }
+    </script>
+  </div>
+{% endblock content %}
