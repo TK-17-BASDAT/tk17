@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">List Client</h1>
+    </div>
+
+    <div class="mb-4 flex justify-between items-center">
+        <div class="relative">
+            <input type="text" placeholder="Search" class="border rounded pl-10 pr-4 py-2 w-64">
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        </div>
+        <div class="flex items-center gap-2">
+            <span>Client Name</span>
+            <select class="border rounded px-3 py-1">
+                <option>All</option>
+                <option>Individu</option>
+                <option>Perusahaan</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-center border">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4 border">No</th>
+                    <th class="py-2 px-4 border">Email</th>
+                    <th class="py-2 px-4 border">Nama</th>
+                    <th class="py-2 px-4 border">Jenis</th>
+                    <th class="py-2 px-4 border">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border">
+                    <td class="py-2 px-4 border">1</td>
+                    <td class="py-2 px-4 border">client1@example.com</td>
+                    <td class="py-2 px-4 border">Client 1</td>
+                    <td class="py-2 px-4 border">Individu</td>
+                    <td class="py-2 px-4 border">
+                        <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">2</td>
+                    <td class="py-2 px-4 border">client2@example.com</td>
+                    <td class="py-2 px-4 border">Client 2</td>
+                    <td class="py-2 px-4 border">Perusahaan</td>
+                    <td class="py-2 px-4 border">
+                        <button onclick="openDetailModal('perusahaan')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">3</td>
+                    <td class="py-2 px-4 border">client3@example.com</td>
+                    <td class="py-2 px-4 border">Client 3</td>
+                    <td class="py-2 px-4 border">Individu</td>
+                    <td class="py-2 px-4 border">
+                        <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Detail Individu -->
+<div id="detailModalIndividu" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-semibold mb-4">Detail Client</h2>
+        
+        <div class="space-y-4 mb-6">
+            <div>
+                <h3 class="font-semibold">Nomor Identitas</h3>
+                <p>123</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Nama Lengkap</h3>
+                <p>Rizki Maulana</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Alamat</h3>
+                <p>Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Nomor Telepon</h3>
+                <p>081234567890</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Email</h3>
+                <p>rizki.maulana@gmail.com</p>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Daftar Hewan Peliharaan</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-center border">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border">No</th>
+                        <th class="py-2 px-4 border">Nama</th>
+                        <th class="py-2 px-4 border">Jenis</th>
+                        <th class="py-2 px-4 border">Tanggal Lahir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">1</td>
+                        <td class="py-2 px-4 border">Luna</td>
+                        <td class="py-2 px-4 border">Kucing</td>
+                        <td class="py-2 px-4 border">2022-05-14</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">2</td>
+                        <td class="py-2 px-4 border">Max</td>
+                        <td class="py-2 px-4 border">Anjing</td>
+                        <td class="py-2 px-4 border">2021-11-03</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">3</td>
+                        <td class="py-2 px-4 border">Coco</td>
+                        <td class="py-2 px-4 border">Kelinci</td>
+                        <td class="py-2 px-4 border">2023-01-27</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button onclick="closeModal('detailModalIndividu')" class="border border-gray-300 px-4 py-2 rounded">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detail Perusahaan -->
+<div id="detailModalPerusahaan" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-semibold mb-4">Detail Client</h2>
+        
+        <div class="space-y-4 mb-6">
+            <div>
+                <h3 class="font-semibold">Nomor Identitas</h3>
+                <p>123</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Nama Perusahaan</h3>
+                <p>PT Hewan Perkasa</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Alamat</h3>
+                <p>Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Nomor Telepon</h3>
+                <p>081234567890</p>
+            </div>
+            <div>
+                <h3 class="font-semibold">Email</h3>
+                <p>hewan@perkasa.com</p>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-4">Daftar Hewan Peliharaan</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-center border">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="py-2 px-4 border">No</th>
+                        <th class="py-2 px-4 border">Nama</th>
+                        <th class="py-2 px-4 border">Jenis</th>
+                        <th class="py-2 px-4 border">Tanggal Lahir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">1</td>
+                        <td class="py-2 px-4 border">Luna</td>
+                        <td class="py-2 px-4 border">Kucing</td>
+                        <td class="py-2 px-4 border">2022-05-14</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">2</td>
+                        <td class="py-2 px-4 border">Max</td>
+                        <td class="py-2 px-4 border">Anjing</td>
+                        <td class="py-2 px-4 border">2021-11-03</td>
+                    </tr>
+                    <tr class="border">
+                        <td class="py-2 px-4 border">3</td>
+                        <td class="py-2 px-4 border">Coco</td>
+                        <td class="py-2 px-4 border">Kelinci</td>
+                        <td class="py-2 px-4 border">2023-01-27</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button onclick="closeModal('detailModalPerusahaan')" class="border border-gray-300 px-4 py-2 rounded">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDetailModal(type) {
+        if (type === 'individu') {
+            document.getElementById('detailModalIndividu').classList.remove('hidden');
+            document.getElementById('detailModalIndividu').classList.add('flex');
+        } else {
+            document.getElementById('detailModalPerusahaan').classList.remove('hidden');
+            document.getElementById('detailModalPerusahaan').classList.add('flex');
+        }
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+</script>
+
+{% endblock %}

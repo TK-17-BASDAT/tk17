@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dashboard',
     'authentication',
+    'manajemen_vaksin',
+    'datavaksin',
+    'dataklien',
 ]
 
 MIDDLEWARE = [

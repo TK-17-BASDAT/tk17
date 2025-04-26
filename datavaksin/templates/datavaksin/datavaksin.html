@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md font-poppins">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">List Vaccination</h1>
+        <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2">
+            + Add New Vaccination
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-center border">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4 border">No</th>
+                    <th class="py-2 px-4 border">ID Vaksin</th>
+                    <th class="py-2 px-4 border">Nama Vaksin</th>
+                    <th class="py-2 px-4 border">Harga</th>
+                    <th class="py-2 px-4 border">Stok</th>
+                    <th class="py-2 px-4 border">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border">
+                    <td class="py-2 px-4 border">1</td>
+                    <td class="py-2 px-4 border">VAC001</td>
+                    <td class="py-2 px-4 border">Feline Panleukopenia</td>
+                    <td class="py-2 px-4 border">Rp100.000</td>
+                    <td class="py-2 px-4 border">50</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('VAC001')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openStockModal('VAC001')" class="bg-blue-500 text-white px-3 py-1 rounded">Stock Update</button>
+                        <button onclick="openDeleteModal('VAC001', 'Feline Panleukopenia')" class="bg-red-500 text-white px-3 py-1 rounded" disabled>Delete</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">2</td>
+                    <td class="py-2 px-4 border">VAC002</td>
+                    <td class="py-2 px-4 border">Canine Parvovirus</td>
+                    <td class="py-2 px-4 border">Rp200.000</td>
+                    <td class="py-2 px-4 border">30</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('VAC002')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openStockModal('VAC002')" class="bg-blue-500 text-white px-3 py-1 rounded">Stock Update</button>
+                        <button onclick="openDeleteModal('VAC002', 'Canine Parvovirus')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">2</td>
+                    <td class="py-2 px-4 border">VAC003</td>
+                    <td class="py-2 px-4 border">Canine Adenovirus</td>
+                    <td class="py-2 px-4 border">Rp180.000</td>
+                    <td class="py-2 px-4 border">300</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('VAC002')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openStockModal('VAC002')" class="bg-blue-500 text-white px-3 py-1 rounded">Stock Update</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Create -->
+<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 font-poppins">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Create New Vaccine</h2>
+        <div class="mb-4">
+            <label class="block mb-1">Nama Vaksin</label>
+            <input type="text" class="w-full border rounded p-2">
+        </div>
+        <div class="mb-4">
+            <label class="block mb-1">Harga</label>
+            <input type="number" class="w-full border rounded p-2">
+        </div>
+        <div class="mb-6">
+            <label class="block mb-1">Stok Awal</label>
+            <input type="number" class="w-full border rounded p-2">
+        </div>
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-slate-900 text-white px-4 py-2 rounded">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Update -->
+<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 font-poppins">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Update Vaccine</h2>
+        <div class="mb-4">
+            <label class="block mb-1">ID Vaksin</label>
+            <input id="updateIDVaksin" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-1">Nama Vaksin</label>
+            <input type="text" class="w-full border rounded p-2">
+        </div>
+        <div class="mb-6">
+            <label class="block mb-1">Harga</label>
+            <input type="number" class="w-full border rounded p-2">
+        </div>
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-slate-900 text-white px-4 py-2 rounded">Update</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Update Stock -->
+<div id="stockModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 font-poppins">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Update Vaccine Stock</h2>
+        <div class="mb-4">
+            <label class="block mb-1">ID Vaksin</label>
+            <input id="stockIDVaksin" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+        </div>
+        <div class="mb-4">
+            <label class="block mb-1">Nama Vaksin</label>
+            <input id="stockNamaVaksin" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+        </div>
+        <div class="mb-6">
+            <label class="block mb-1">Stok</label>
+            <input type="number" class="w-full border rounded p-2">
+        </div>
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal('stockModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-slate-900 text-white px-4 py-2 rounded">Update</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Delete -->
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 font-poppins">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
+        <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccine</h2>
+        <p class="mb-6">Apakah kamu yakin untuk menghapus vaksin <span id="deleteNamaVaksin" class="font-semibold"></span> dengan ID <span id="deleteIDVaksin" class="font-semibold"></span>?</p>
+        <div class="flex justify-center gap-2">
+            <button onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-red-500 text-white px-4 py-2 rounded">Confirm Deletion</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+        document.getElementById('createModal').classList.add('flex');
+    }
+
+    function openUpdateModal(idVaksin) {
+        document.getElementById('updateIDVaksin').value = idVaksin;
+        document.getElementById('updateModal').classList.remove('hidden');
+        document.getElementById('updateModal').classList.add('flex');
+    }
+
+    function openStockModal(idVaksin) {
+        document.getElementById('stockIDVaksin').value = idVaksin;
+        document.getElementById('stockNamaVaksin').value = "Dummy Name"; // nanti bisa diganti sesuai data
+        document.getElementById('stockModal').classList.remove('hidden');
+        document.getElementById('stockModal').classList.add('flex');
+    }
+
+    function openDeleteModal(idVaksin, namaVaksin) {
+        document.getElementById('deleteIDVaksin').innerText = idVaksin;
+        document.getElementById('deleteNamaVaksin').innerText = namaVaksin;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('deleteModal').classList.add('flex');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+        document.getElementById(modalId).classList.remove('flex');
+    }
+</script>
+{% endblock %}

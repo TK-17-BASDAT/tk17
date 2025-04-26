@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">List Vaccination</h1>
+        <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2">
+            + Create New Vaccination
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-center border">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4 border">No</th>
+                    <th class="py-2 px-4 border">Kunjungan</th>
+                    <th class="py-2 px-4 border">Tanggal Kunjungan</th>
+                    <th class="py-2 px-4 border">Vaksin</th>
+                    <th class="py-2 px-4 border">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border">
+                    <td class="py-2 px-4 border">1</td>
+                    <td class="py-2 px-4 border">KJN001</td>
+                    <td class="py-2 px-4 border">Rabu, 5 Februari 2025</td>
+                    <td class="py-2 px-4 border">VAC001 - Feline Panleukopenia</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('KJN001')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openDeleteModal('KJN001', 'VAC001')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">2</td>
+                    <td class="py-2 px-4 border">KJN002</td>
+                    <td class="py-2 px-4 border">Jumat, 21 Februari 2025</td>
+                    <td class="py-2 px-4 border">VAC002 - Canine Parvovirus</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('KJN002')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openDeleteModal('KJN002', 'VAC002')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </td>
+                </tr>
+                <tr class="border">
+                    <td class="py-2 px-4 border">3</td>
+                    <td class="py-2 px-4 border">KJN003</td>
+                    <td class="py-2 px-4 border">Selasa, 15 Maret 2025</td>
+                    <td class="py-2 px-4 border">VAC003 - Canine Adenovirus</td>
+                    <td class="py-2 px-4 border flex justify-center gap-2">
+                        <button onclick="openUpdateModal('KJN003')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                        <button onclick="openDeleteModal('KJN003', 'VAC003')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Create -->
+<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Create New Vaccination</h2>
+        <div class="mb-4">
+            <label class="block mb-1">Kunjungan</label>
+            <select class="w-full border rounded p-2">
+                <option>KJN001</option>
+                <option>KJN002</option>
+                <option>KJN003</option>
+            </select>
+        </div>
+        <div class="mb-6">
+            <label class="block mb-1">Vaksin</label>
+            <select class="w-full border rounded p-2">
+                <option>VAC001 - Feline Panleukopenia [100]</option>
+                <option>VAC002 - Canine Parvovirus [200]</option>
+                <option>VAC003 - Canine Adenovirus [300]</option>
+            </select>
+        </div>
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-slate-900 text-white px-4 py-2 rounded">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Update -->
+<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Update Vaccination</h2>
+        <div class="mb-4">
+            <label class="block mb-1">Kunjungan</label>
+            <input id="updateKunjungan" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+        </div>
+        <div class="mb-6">
+            <label class="block mb-1">Vaksin</label>
+            <select class="w-full border rounded p-2">
+                <option>VAC001 - Feline Panleukopenia [100]</option>
+                <option>VAC002 - Canine Parvovirus [200]</option>
+                <option>VAC003 - Canine Adenovirus [0]</option>
+            </select>
+        </div>
+        <div class="flex justify-end gap-2">
+            <button onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-slate-900 text-white px-4 py-2 rounded">Update</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Delete -->
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
+        <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccination</h2>
+        <p class="mb-6">Apakah kamu yakin untuk menghapus Vaksinasi untuk Kunjungan <span id="deleteKunjungan" class="font-semibold"></span> dengan Vaksin <span id="deleteVaksin" class="font-semibold"></span>?</p>
+        <div class="flex justify-center gap-2">
+            <button onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button class="bg-red-500 text-white px-4 py-2 rounded">Confirm Deletion</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+        document.getElementById('createModal').classList.add('flex');
+    }
+
+    function openUpdateModal(kunjungan) {
+        document.getElementById('updateKunjungan').value = kunjungan;
+        document.getElementById('updateModal').classList.remove('hidden');
+        document.getElementById('updateModal').classList.add('flex');
+    }
+
+    function openDeleteModal(kunjungan, vaksin) {
+        document.getElementById('deleteKunjungan').innerText = kunjungan;
+        document.getElementById('deleteVaksin').innerText = vaksin;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('deleteModal').classList.add('flex');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+</script>
+
+{% endblock %}
