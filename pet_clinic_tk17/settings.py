@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard'
+    'dashboard',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -56,8 +57,7 @@ ROOT_URLCONF = 'pet_clinic_tk17.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 'DIRS': [os.path.join(BASE_DIR, 'pet_clinic_tk17', 'templates')],
-        'DIRS' : [],
+        'DIRS' :  [ BASE_DIR / "pet_clinic_tk17" / "templates" ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
