@@ -28,4 +28,5 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('auth/', include('authentication.urls')),
     path('jenis-hewan/', include('jenis_hewan.urls')),
+    path('hewan-peliharaan/', include('hewan_peliharaan.urls')),
 ]

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'dashboard',
     'authentication',
     'jenis_hewan',
+    'hewan_peliharaan',
 ]
 
 MIDDLEWARE = [
