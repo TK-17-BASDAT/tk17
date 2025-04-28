@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="flex">
+  {% include "navbar/sidebar_frontdesk.html" %}
+  <main class="bg-gray-50 flex-1 ml-64 p-6">
+    <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+
+      <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-800">Profile Front-Desk Officer</h1>
+          </div>
+          <div class="flex gap-3">
+            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</button>
+            <button onclick="toggleEditMode()" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
+          </div>
+        </div>
+    
+        <!-- View Mode -->
+        <div id="view-mode">
+          <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Identitas</div>
+            <div class="text-gray-800">aacbdde1-feaf-454b-bc7d-0eed3a345907</div>
+        
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Email</div>
+            <div class="text-gray-800">amelia.putri@petclinic.com</div>
+        
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Diterima</div>
+            <div class="text-gray-800">26 Januari 2025</div>
+        
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Akhir Kerja</div>
+            <div class="text-gray-800">-</div>
+        
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Alamat</div>
+            <div class="text-gray-800">Jl. Melati Indah No. 25, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
+        
+            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Telepon</div>
+            <div class="text-gray-800">081234567895</div>
+          </div>
+        </div>
+      
+        <!-- Edit Mode -->
+        <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Non-editable Fields -->
+            <div>
+                <p class="text-sm text-gray-600 font-medium">Nomor Identitas</p>
+                <p class="text-gray-800">aacbdde1-feaf-454b-bc7d-0eed3a345907</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Email</p>
+                <p class="text-gray-800">amelia.putri@petclinic.com</p>
+            </div>
+            
+            <!-- Editable Fields -->
+            <div>
+              <label class="text-sm font-medium text-gray-600">Tanggal Akhir Kerja</label>
+              <input type="text" placeholder="Tanggal Akhir Kerja" class="mt-1 w-full border rounded-lg px-3 py-2">
+            </div>
+    
+            <div class="sm:col-span-2">
+              <label class="text-sm font-medium text-gray-600">Alamat</label>
+              <textarea rows="3" placeholder="Alamat lengkap..." class="mt-1 w-full border rounded-lg px-3 py-2"></textarea>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-600">Nomor Telepon</label>
+              <input type="text" placeholder="081234567895" class="mt-1 w-full border rounded-lg px-3 py-2">
+            </div>
+          </div>
+    
+          <!-- Action Buttons -->
+          <div class="mt-6 flex gap-3">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
+            <button type="button" onclick="toggleEditMode()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
+          </div>
+        </form>
+      </div>
+    
+      <script>
+        function toggleEditMode() {
+          document.getElementById('view-mode').classList.toggle('hidden');
+          document.getElementById('edit-mode').classList.toggle('hidden');
+        }
+    
+        function saveChanges() {
+          alert("Perubahan berhasil disimpan (simulasi saja)!"); 
+          toggleEditMode();
+        }
+      </script>
+    </div>
+  </main>
+</div>
+{% endblock %}

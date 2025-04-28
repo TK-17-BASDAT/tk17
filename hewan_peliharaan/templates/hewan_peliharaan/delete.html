@@ -1,0 +1,15 @@
+<form method="post" action="{% url 'hewan_peliharaan:delete' 1 %}">
+  {% csrf_token %}
+  <h2 class="text-xl font-semibold text-red-600 mb-4">Delete Pet</h2>
+  <p>
+    Apakah kamu yakin untuk menghapus Hewan Peliharaan
+    <strong>Snowy</strong>
+    milik <strong>John Doe</strong>?
+  </p>
+  <div class="mt-6 flex justify-end space-x-3">
+    <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">Cancel</button>
+    <button type="submit" class="bg-accent text-white px-4 py-2 rounded">
+      Confirm Deletion
+    </button>
+  </div>
+</form>
