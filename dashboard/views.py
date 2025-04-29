@@ -11,3 +11,6 @@ def klien_profile(request):
 
 def perawat_profile(request):
     return render(request, 'dashboard/perawat.html')
+
+def kliencompany_profile(request):
+    return render(request, 'dashboard/kliencompany.html')
