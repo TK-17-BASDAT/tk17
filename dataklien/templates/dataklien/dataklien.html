@@ -1,67 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-lg shadow-md">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold">List Client</h1>
+<div class="flex min-h-screen bg-gray-100">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white shadow-md">
+        {% include "navbar/sidebar_frontdesk.html" %}
     </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold">List Client</h1>
+            </div>
 
-    <div class="mb-4 flex justify-between items-center">
-        <div class="relative">
-            <input type="text" placeholder="Search" class="border rounded pl-10 pr-4 py-2 w-64">
-            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-        </div>
-        <div class="flex items-center gap-2">
-            <span>Client Name</span>
-            <select class="border rounded px-3 py-1">
-                <option>All</option>
-                <option>Individu</option>
-                <option>Perusahaan</option>
-            </select>
-        </div>
-    </div>
+            <div class="mb-4 flex justify-between items-center">
+                <div class="relative">
+                    <input type="text" placeholder="Search" class="border rounded pl-10 pr-4 py-2 w-64">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span>Client Name</span>
+                    <select class="border rounded px-3 py-1">
+                        <option>All</option>
+                        <option>Individu</option>
+                        <option>Perusahaan</option>
+                    </select>
+                </div>
+            </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-center border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="py-2 px-4 border">No</th>
-                    <th class="py-2 px-4 border">Email</th>
-                    <th class="py-2 px-4 border">Nama</th>
-                    <th class="py-2 px-4 border">Jenis</th>
-                    <th class="py-2 px-4 border">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="border">
-                    <td class="py-2 px-4 border">1</td>
-                    <td class="py-2 px-4 border">client1@example.com</td>
-                    <td class="py-2 px-4 border">Client 1</td>
-                    <td class="py-2 px-4 border">Individu</td>
-                    <td class="py-2 px-4 border">
-                        <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                    </td>
-                </tr>
-                <tr class="border">
-                    <td class="py-2 px-4 border">2</td>
-                    <td class="py-2 px-4 border">client2@example.com</td>
-                    <td class="py-2 px-4 border">Client 2</td>
-                    <td class="py-2 px-4 border">Perusahaan</td>
-                    <td class="py-2 px-4 border">
-                        <button onclick="openDetailModal('perusahaan')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                    </td>
-                </tr>
-                <tr class="border">
-                    <td class="py-2 px-4 border">3</td>
-                    <td class="py-2 px-4 border">client3@example.com</td>
-                    <td class="py-2 px-4 border">Client 3</td>
-                    <td class="py-2 px-4 border">Individu</td>
-                    <td class="py-2 px-4 border">
-                        <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-center border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-2 px-4 border">No</th>
+                            <th class="py-2 px-4 border">Email</th>
+                            <th class="py-2 px-4 border">Nama</th>
+                            <th class="py-2 px-4 border">Jenis</th>
+                            <th class="py-2 px-4 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border">
+                            <td class="py-2 px-4 border">1</td>
+                            <td class="py-2 px-4 border">client1@example.com</td>
+                            <td class="py-2 px-4 border">Client 1</td>
+                            <td class="py-2 px-4 border">Individu</td>
+                            <td class="py-2 px-4 border">
+                                <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                            </td>
+                        </tr>
+                        <tr class="border">
+                            <td class="py-2 px-4 border">2</td>
+                            <td class="py-2 px-4 border">client2@example.com</td>
+                            <td class="py-2 px-4 border">Client 2</td>
+                            <td class="py-2 px-4 border">Perusahaan</td>
+                            <td class="py-2 px-4 border">
+                                <button onclick="openDetailModal('perusahaan')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                            </td>
+                        </tr>
+                        <tr class="border">
+                            <td class="py-2 px-4 border">3</td>
+                            <td class="py-2 px-4 border">client3@example.com</td>
+                            <td class="py-2 px-4 border">Client 3</td>
+                            <td class="py-2 px-4 border">Individu</td>
+                            <td class="py-2 px-4 border">
+                                <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>        
     </div>
 </div>
 

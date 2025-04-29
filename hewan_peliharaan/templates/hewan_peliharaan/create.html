@@ -1,0 +1,45 @@
+<form method="post" action="{% url 'hewan_peliharaan:create' %}">
+  {% csrf_token %}
+  <h2 class="text-xl font-semibold mb-4">Create New Pet</h2>
+
+  <div class="mb-4">
+    <label class="block text-gray-700">Pemilik</label>
+    <select name="pemilik" class="w-full border rounded px-3 py-2">
+      <option>John Doe</option>
+      <option>PT Pecinta Kucing</option>
+      <option>PT Aku Sayang Hewan</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="block text-gray-700">Jenis Hewan</label>
+    <select name="jenis_hewan" class="w-full border rounded px-3 py-2">
+      <option>Kucing</option>
+      <option>Anjing</option>
+      <option>Hamster</option>
+    </select>
+  </div>
+
+  <div class="mb-4">
+    <label class="block text-gray-700">Nama Hewan Peliharaan</label>
+    <input name="nama_hewan" type="text"
+           class="w-full border rounded px-3 py-2" placeholder="Nama Hewan">
+  </div>
+
+  <div class="mb-4">
+    <label class="block text-gray-700">Tanggal Lahir Hewan</label>
+    <input name="tgl_lahir" type="date"
+           class="w-full border rounded px-3 py-2">
+  </div>
+
+  <div class="mb-6">
+    <label class="block text-gray-700">URL Foto Hewan</label>
+    <input name="url_foto" type="url"
+           class="w-full border rounded px-3 py-2" placeholder="https://example.com/photo.png">
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">Cancel</button>
+    <button type="submit" class="bg-primary text-white px-4 py-2 rounded">Create</button>
+  </div>
+</form>

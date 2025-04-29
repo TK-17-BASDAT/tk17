@@ -1,0 +1,40 @@
+<aside class="fixed inset-y-0 left-0 w-64 bg-white border-r shadow-sm">
+    <div class="px-6 py-4">
+      <h2 class="text-lg font-semibold text-gray-800">Menu Front-Desk</h2>
+    </div>
+    <nav class="px-4 py-2">
+      <ul class="space-y-1">
+        <li>
+          <a href="{% url 'dashboard:frontdesk' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-home w-5"></i><span class="ml-3">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'jenis_hewan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-th-list w-5"></i><span class="ml-3">Kelola Jenis Hewan</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'hewan_peliharaan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-paw w-5"></i><span class="ml-3">Kelola Hewan Peliharaan</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-calendar-check w-5"></i><span class="ml-3">Kelola Kunjungan</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-users w-5"></i><span class="ml-3">Daftar Klien</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-sign-out-alt w-5"></i><span class="ml-3">Logout</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+  

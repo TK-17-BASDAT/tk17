@@ -1,0 +1,23 @@
+<form method="post" action="{% url 'jenis_hewan:update' 1 %}">
+    {% csrf_token %}
+    <h2 class="text-xl font-semibold mb-4">Update Animal Type</h2>
+    <div>
+      <label class="block text-gray-700">ID Jenis Hewan</label>
+      <input type="text" value="HWN001"
+             class="w-full border rounded px-3 py-2 bg-gray-100" disabled>
+    </div>
+    <div class="mt-4">
+      <label class="block text-gray-700">Nama Jenis</label>
+      <input name="nama_jenis" type="text" value="Kucing"
+             class="w-full border rounded px-3 py-2" required>
+    </div>
+    <div class="mt-6 flex justify-end space-x-3">
+      <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">
+        Cancel
+      </button>
+      <button type="submit" class="bg-primary text-white px-4 py-2 rounded">
+        Update
+      </button>
+    </div>
+  </form>
+  

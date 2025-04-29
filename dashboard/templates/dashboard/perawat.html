@@ -1,140 +1,146 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-4">
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <div class="flex justify-between items-start mb-8">
-            <div class="text-2xl font-semibold text-gray-900">
-                <h1>Profile Perawat</h1>
+<div class="flex">
+    {% include "navbar/sidebar_perawat.html" %}
+    <main class="bg-gray-50 flex-1 ml-64 p-6">
+        <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="text-2xl font-semibold text-gray-900">
+                        <h1>Profile Perawat</h1>
+                    </div>
+                    <div class="space-x-4">
+                        <button class="bg-red-500 text-white px-6 py-2 rounded-lg">Update Password</button>
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Update Profile</button>
+                    </div>
+                </div>
+        
+                <div id="view-mode">
+                    <!-- Mode View -->
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
+                            <div class="text-gray-900">1845ad38-ef76-49cd-b46e-350ba3f0ef59</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
+                            <div class="text-gray-900">SIP-PERAWAT-12345</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Email</div>
+                            <div class="text-gray-900">sandy.permata@petclinic.com</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
+                            <div class="text-gray-900">24 Januari 2025</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
+                            <div class="text-gray-900">-</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Alamat</div>
+                            <div class="text-gray-900">Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
+                            <div class="text-gray-900">081234567894</div>
+                        </div>
+                    </div>
+                </div>
+        
+                <div id="edit-mode" class="hidden">
+                    <!-- Mode Edit -->
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="1845ad38-ef76-49cd-b46e-350ba3f0ef59" disabled />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="SIP-PERAWAT-12345" disabled />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Email</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="email" value="sandy.permata@petclinic.com" />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="2025-01-24" disabled />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="" />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Alamat</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914" />
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
+                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="tel" value="081234567894" />
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="mt-10">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
+                    <table class="min-w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="border-b px-6 py-3 text-left text-gray-700">No</th>
+                                <th class="border-b px-6 py-3 text-left text-gray-700">Nomor Sertifikat</th>
+                                <th class="border-b px-6 py-3 text-left text-gray-700">Nama Sertifikat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border-b px-6 py-3 text-gray-800">1</td>
+                                <td class="border-b px-6 py-3 text-gray-800">123/PH/456</td>
+                                <td class="border-b px-6 py-3 text-gray-800">Paraprofesional Kedokteran Hewan</td>
+                            </tr>
+                            <tr>
+                                <td class="border-b px-6 py-3 text-gray-800">2</td>
+                                <td class="border-b px-6 py-3 text-gray-800">456/PH/456</td>
+                                <td class="border-b px-6 py-3 text-gray-800">Keperawatan Hewan Profesional</td>
+                            </tr>
+                            <tr>
+                                <td class="border-b px-6 py-3 text-gray-800">3</td>
+                                <td class="border-b px-6 py-3 text-gray-800">789/PH/789</td>
+                                <td class="border-b px-6 py-3 text-gray-800">Sertifikat Organisasi Profesi</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        
+                <!-- Update Profile Buttons when in Edit Mode -->
+                <div id="edit-mode-actions" class="hidden mt-6 flex justify-between">
+                    <button class="bg-green-600 text-white px-6 py-2 rounded-lg">Save Changes</button>
+                    <button class="bg-red-500 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Cancel</button>
+                </div>
             </div>
-            <div class="space-x-4">
-                <button class="bg-red-500 text-white px-6 py-2 rounded-lg">Update Password</button>
-                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Update Profile</button>
-            </div>
         </div>
-
-        <div id="view-mode">
-            <!-- Mode View -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
-                    <div class="text-gray-900">1845ad38-ef76-49cd-b46e-350ba3f0ef59</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
-                    <div class="text-gray-900">SIP-PERAWAT-12345</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Email</div>
-                    <div class="text-gray-900">sandy.permata@petclinic.com</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
-                    <div class="text-gray-900">24 Januari 2025</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
-                    <div class="text-gray-900">-</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Alamat</div>
-                    <div class="text-gray-900">Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
-                    <div class="text-gray-900">081234567894</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="edit-mode" class="hidden">
-            <!-- Mode Edit -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="1845ad38-ef76-49cd-b46e-350ba3f0ef59" disabled />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="SIP-PERAWAT-12345" disabled />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Email</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="email" value="sandy.permata@petclinic.com" />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="2025-01-24" disabled />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="" />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Alamat</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914" />
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
-                    <input class="border border-gray-300 rounded-lg p-2 w-full" type="tel" value="081234567894" />
-                </div>
-            </div>
-        </div>
-
-        <div class="mt-10">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
-            <table class="min-w-full border-collapse">
-                <thead>
-                    <tr>
-                        <th class="border-b px-6 py-3 text-left text-gray-700">No</th>
-                        <th class="border-b px-6 py-3 text-left text-gray-700">Nomor Sertifikat</th>
-                        <th class="border-b px-6 py-3 text-left text-gray-700">Nama Sertifikat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="border-b px-6 py-3 text-gray-800">1</td>
-                        <td class="border-b px-6 py-3 text-gray-800">123/PH/456</td>
-                        <td class="border-b px-6 py-3 text-gray-800">Paraprofesional Kedokteran Hewan</td>
-                    </tr>
-                    <tr>
-                        <td class="border-b px-6 py-3 text-gray-800">2</td>
-                        <td class="border-b px-6 py-3 text-gray-800">456/PH/456</td>
-                        <td class="border-b px-6 py-3 text-gray-800">Keperawatan Hewan Profesional</td>
-                    </tr>
-                    <tr>
-                        <td class="border-b px-6 py-3 text-gray-800">3</td>
-                        <td class="border-b px-6 py-3 text-gray-800">789/PH/789</td>
-                        <td class="border-b px-6 py-3 text-gray-800">Sertifikat Organisasi Profesi</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Update Profile Buttons when in Edit Mode -->
-        <div id="edit-mode-actions" class="hidden mt-6 flex justify-between">
-            <button class="bg-green-600 text-white px-6 py-2 rounded-lg">Save Changes</button>
-            <button class="bg-red-500 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Cancel</button>
-        </div>
-    </div>
+        
+        <script>
+            function toggleEditMode() {
+                const viewMode = document.getElementById('view-mode');
+                const editMode = document.getElementById('edit-mode');
+                const editModeActions = document.getElementById('edit-mode-actions');
+        
+                // Toggle visibility between view and edit mode
+                if (viewMode.style.display === "none") {
+                    viewMode.style.display = "block";
+                    editMode.style.display = "none";
+                    editModeActions.style.display = "none";
+                } else {
+                    viewMode.style.display = "none";
+                    editMode.style.display = "block";
+                    editModeActions.style.display = "flex";
+                }
+            }
+        </script>
+    </main>
 </div>
 
-<script>
-    function toggleEditMode() {
-        const viewMode = document.getElementById('view-mode');
-        const editMode = document.getElementById('edit-mode');
-        const editModeActions = document.getElementById('edit-mode-actions');
-
-        // Toggle visibility between view and edit mode
-        if (viewMode.style.display === "none") {
-            viewMode.style.display = "block";
-            editMode.style.display = "none";
-            editModeActions.style.display = "none";
-        } else {
-            viewMode.style.display = "none";
-            editMode.style.display = "block";
-            editModeActions.style.display = "flex";
-        }
-    }
-</script>
 {% endblock %}

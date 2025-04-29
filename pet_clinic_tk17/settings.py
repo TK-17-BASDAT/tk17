@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'manajemen_vaksin',
     'datavaksin',
     'dataklien',
+    'jenis_hewan',
+    'hewan_peliharaan',
 ]
 
 MIDDLEWARE = [

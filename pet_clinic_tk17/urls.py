@@ -27,6 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboard.urls')),
     path('auth/', include('authentication.urls')),
+    path('jenis-hewan/', include('jenis_hewan.urls')),
+    path('hewan-peliharaan/', include('hewan_peliharaan.urls')),
     path('manajemenvaksin/', include('manajemen_vaksin.urls')),
     path('datavaksin/', include('datavaksin.urls')),
     path('dataklien/', include('dataklien.urls')),
