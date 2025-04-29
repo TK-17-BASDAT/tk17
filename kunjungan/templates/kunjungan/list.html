@@ -18,7 +18,7 @@
         <button
           type="submit"
           class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition"
-        >+ Create New Kunjungan</button>
+        >+ Buat Kunjungan Baru</button>
       </form>
     </div>
 
@@ -64,7 +64,7 @@
                 type="button"
                 id="delete-btn"
                 class="px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition"
-              >Delete</button>
+              >Hapus</button>
             </td>
           </tr>
         </tbody>
@@ -86,7 +86,7 @@
         id="missing-create"
         onclick="location.href='/rekam_medis/create.html'"
         class="px-6 py-2 bg-primary text-white rounded hover:bg-primary/80 transition"
-      >Create</button>
+      >Buat</button>
       <button
         id="missing-ok"
         class="px-6 py-2 bg-secondary text-primary rounded hover:bg-secondary/80 transition"
@@ -130,7 +130,7 @@
   const missModal = document.getElementById('missing-modal');
   const detModal  = document.getElementById('detail-modal');
 
-  // for demo kita open missing first:
+  // untuk sementara kita open yang missing:
   lihatBtn.addEventListener('click', () => {
     missModal.classList.remove('hidden');
   });
