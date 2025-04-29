@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'dataklien',
     'jenis_hewan',
     'hewan_peliharaan',
+    'perawatan_hewan',
+    'kunjungan',
+    'rekam_medis',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r shadow-sm">
+    {% include "navbar/sidebar_frontdesk.html" %}
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 bg-gray-50 font-poppins p-8">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl font-semibold text-primary mb-6">Buat Kunjungan Baru</h1>
+
+      <form action="#" method="post" class="bg-white rounded-lg shadow p-6 space-y-5">
+        {% csrf_token %}
+        <!-- ID Klien -->
+        <div>
+          <label class="block mb-2 font-medium">ID Klien</label>
+          <select name="id_klien" class="w-full border-gray-300 rounded p-3">
+            <option disabled selected>Pilih ID Klien</option>
+            <option>FDO123</option>
+            <option>KLI123</option>
+            <option>PKE123</option>
+          </select>
+        </div>
+
+        <!-- Nama Hewan -->
+        <div>
+          <label class="block mb-2 font-medium">Nama Hewan</label>
+          <select name="nama_hewan" class="w-full border-gray-300 rounded p-3">
+            <option disabled selected>Pilih Nama Hewan</option>
+            <option>Snowy</option>
+            <option>Blacky</option>
+            <option>Hamseung</option>
+          </select>
+        </div>
+
+        <!-- Metode Kunjungan -->
+        <div>
+          <label class="block mb-2 font-medium">Metode Kunjungan</label>
+          <select name="metode" class="w-full border-gray-300 rounded p-3">
+            <option disabled selected>Pilih Metode</option>
+            <option>Janji Temu</option>
+            <option>Walk-In</option>
+            <option>Darurat</option>
+          </select>
+        </div>
+
+        <!-- Waktu Mulai Penanganan -->
+        <div>
+          <label class="block mb-2 font-medium">Waktu Mulai Penanganan</label>
+          <input type="datetime-local" name="waktu_mulai"
+                 class="w-full border-gray-300 rounded p-3" />
+        </div>
+
+        <!-- Waktu Akhir Penanganan -->
+        <div>
+          <label class="block mb-2 font-medium">Waktu Akhir Penanganan</label>
+          <input type="datetime-local" name="waktu_selesai"
+                 class="w-full border-gray-300 rounded p-3" />
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex space-x-4 pt-4">
+          <button type="submit"
+                  class="px-6 py-2 bg-primary text-white rounded hover:bg-secondary transition">
+            Buat
+          </button>
+          <button type="button"
+                  onclick="window.history.back()"
+                  class="px-6 py-2 bg-secondary text-primary rounded hover:bg-secondary/80 transition">
+            Batal
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+{% endblock %}
