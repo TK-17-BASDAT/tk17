@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex bg-white min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-gray-100 p-4">
+        {% include "navbar/sidebar_dokter.html" %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-semibold">List Vaccination</h1>
+                <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2">
+                    + Create New Vaccination
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-center border">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-2 px-4 border">No</th>
+                            <th class="py-2 px-4 border">Kunjungan</th>
+                            <th class="py-2 px-4 border">Tanggal Kunjungan</th>
+                            <th class="py-2 px-4 border">Vaksin</th>
+                            <th class="py-2 px-4 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if vaccinations %}
+                            {% for vac in vaccinations %}
+                            <tr class="border">
+                                <td class="py-2 px-4 border">{{ forloop.counter }}</td>
+                                <td class="py-2 px-4 border">{{ vac.kunjungan_id }}</td>
+                                <td class="py-2 px-4 border">{{ vac.tanggal_kunjungan_formatted }}</td> {# Use formatted date #}
+                                <td class="py-2 px-4 border">{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}</td>
+                                <td class="py-2 px-4 border flex justify-center gap-2">
+                                    {# Pass relevant IDs to JS functions #}
+                                    {# We might pass vac.id (primary key) later for easier backend handling #}
+                                    <button onclick="openUpdateModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
+                                    <button onclick="openDeleteModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="py-4 px-4 border text-gray-500">No vaccinations found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Create -->
+<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+    {# Add z-index to ensure modals are on top #}
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Create New Vaccination</h2>
+        {# Add form tags later when connecting to backend #}
+        {# <form method="post" action="{% url 'vaccination_create' %}"> {% csrf_token %} ... </form> #}
+        <div class="mb-4">
+            <label for="createKunjungan" class="block mb-1">Kunjungan</label>
+            <select id="createKunjungan" name="kunjungan_id" class="w-full border rounded p-2">
+                <option value="" disabled selected>-- Select Kunjungan --</option>
+                {% for kunjungan in kunjungan_options %}
+                    <option value="{{ kunjungan.id }}">{{ kunjungan.display_text }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-6">
+            <label for="createVaksin" class="block mb-1">Vaksin</label>
+            <select id="createVaksin" name="vaksin_id" class="w-full border rounded p-2">
+                 <option value="" disabled selected>-- Select Vaksin --</option>
+                {% for vaksin in vaksin_options %}
+                    <option value="{{ vaksin.id }}" {% if vaksin.stok <= 0 %}disabled{% endif %}>
+                        {{ vaksin.id }} - {{ vaksin.nama }} [{{ vaksin.stok }}]
+                    </option>
+                {% endfor %}
+            </select>
+            {# Add a small note for disabled options #}
+            <p class="text-xs text-gray-500 mt-1">*Vaccines with [0] stock are unavailable.</p>
+        </div>
+        <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            {# Change type to submit when using a form #}
+            <button type="button" class="bg-slate-900 text-white px-4 py-2 rounded">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Update -->
+<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Update Vaccination</h2>
+        <div class="mb-4">
+            <label class="block mb-1">Kunjungan</label>
+            <input id="updateKunjungan" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+        </div>
+        <div class="mb-6">
+            <label for="updateVaksin" class="block mb-1">Vaksin</label>
+            <select id="updateVaksin" name="vaksin_id" class="w-full border rounded p-2">
+                 <option value="" disabled>-- Select New Vaksin --</option> {# Default/placeholder #}
+                {% for vaksin in vaksin_options %}
+                    {# We might need JS to pre-select the current vaccine #}
+                    <option value="{{ vaksin.id }}" {% if vaksin.stok <= 0 %}disabled{% endif %}>
+                        {{ vaksin.id }} - {{ vaksin.nama }} [{{ vaksin.stok }}]
+                    </option>
+                {% endfor %}
+            </select>
+             <p class="text-xs text-gray-500 mt-1">*Vaccines with [0] stock are unavailable.</p>
+        </div>
+        <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button type="button" class="bg-slate-900 text-white px-4 py-2 rounded">Update</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Delete -->
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
+        {# Add form tags later #}
+         {# <form method="post" action=""> {% csrf_token %} ... </form> #}
+         {# Action URL will be set dynamically or have a base #}
+        <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccination</h2>
+        <p class="mb-6">Apakah kamu yakin untuk menghapus Vaksinasi untuk Kunjungan <span id="deleteKunjungan" class="font-semibold"></span> dengan Vaksin <span id="deleteVaksin" class="font-semibold"></span>?</p>
+        {# Add hidden inputs if needed to pass IDs to the backend on form submission #}
+        {# <input type="hidden" id="deleteKunjunganIdHidden" name="kunjungan_id"> #}
+        {# <input type="hidden" id="deleteVaksinIdHidden" name="vaksin_id"> #}
+        <div class="flex justify-center gap-2">
+            <button type="button" onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
+            <button type="button" class="bg-red-500 text-white px-4 py-2 rounded">Confirm Deletion</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get references to modal elements once
+    const createModal = document.getElementById('createModal');
+    const updateModal = document.getElementById('updateModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const updateKunjunganInput = document.getElementById('updateKunjungan');
+    const updateVaksinSelect = document.getElementById('updateVaksin');
+    const deleteKunjunganSpan = document.getElementById('deleteKunjungan');
+    const deleteVaksinSpan = document.getElementById('deleteVaksin');
+
+    function openCreateModal() {
+        // Reset form fields if needed
+        document.getElementById('createKunjungan').selectedIndex = 0;
+        document.getElementById('createVaksin').selectedIndex = 0;
+        createModal.classList.remove('hidden');
+        createModal.classList.add('flex');
+    }
+
+    function openUpdateModal(kunjunganId, currentVaksinId) {
+        updateKunjunganInput.value = kunjunganId;
+
+        let found = false;
+        for (let i = 0; i < updateVaksinSelect.options.length; i++) {
+            if (updateVaksinSelect.options[i].value === currentVaksinId) {
+                updateVaksinSelect.selectedIndex = i;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+             updateVaksinSelect.selectedIndex = 0;
+        }
+
+        updateModal.classList.remove('hidden');
+        updateModal.classList.add('flex');
+        // e.g., updateModal.querySelector('form').action = `/vaccinations/update/${some_primary_key}/`;
+    }
+
+    function openDeleteModal(kunjunganId, vaksinId) {
+        deleteKunjunganSpan.innerText = kunjunganId;
+        deleteVaksinSpan.innerText = vaksinId;
+        deleteModal.classList.remove('hidden');
+        deleteModal.classList.add('flex');
+         // e.g., deleteModal.querySelector('form').action = `/vaccinations/delete/${some_primary_key}/`;
+         // Or set hidden input values if submitting via form post
+         // document.getElementById('deleteKunjunganIdHidden').value = kunjunganId;
+         // document.getElementById('deleteVaksinIdHidden').value = vaksinId;
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+        document.getElementById(modalId).classList.remove('flex'); // Also remove flex
+    }
+
+     // Optional: Close modal if clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == createModal) {
+            closeModal('createModal');
+        } else if (event.target == updateModal) {
+            closeModal('updateModal');
+        } else if (event.target == deleteModal) {
+            closeModal('deleteModal');
+        }
+    }
+
+</script>
+
+{% endblock %}
