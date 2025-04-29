@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r shadow-sm">
+    {% include 'navbar/sidebar_dokter.html' %}
+  </aside>
+
+  <!-- Main content -->
+  <main class="flex-1 bg-gray-50 font-poppins p-8">
+    <!-- Judul Halaman -->
+    <h1 class="text-3xl font-semibold text-primary mb-6">
+      Update Treatment (KJN001)
+    </h1>
+
+    <!-- Form Update Treatment -->
+    <form action="#" method="post" class="bg-white rounded-lg shadow p-6 space-y-6">
+      {% csrf_token %}
+
+      <!-- Kunjungan (disabled) -->
+      <div>
+        <label class="block mb-2 font-medium">Kunjungan</label>
+        <select disabled
+                class="w-full border-gray-300 rounded p-3 bg-gray-100 cursor-not-allowed">
+          <option>KJN001</option>
+        </select>
+      </div>
+
+      <!-- Jenis Perawatan -->
+      <div>
+        <label class="block mb-2 font-medium">Jenis Perawatan</label>
+        <select name="jenis_perawatan" class="w-full border-gray-300 rounded p-3">
+          <option value="TRM001" selected>TRM001 – Dental Care</option>
+          <option value="TRM002">TRM002 – Parasite Control</option>
+          <option value="TRM003">TRM003 – Flea Treatment</option>
+        </select>
+      </div>
+
+      <!-- Catatan Medis -->
+      <div>
+        <label class="block mb-2 font-medium">Catatan Medis <span class="text-gray-500">(opsional)</span></label>
+        <textarea name="catatan" rows="4"
+                  class="w-full border-gray-300 rounded p-3"
+        >Semua gigi sudah dibersihkan.</textarea>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex space-x-4 pt-4">
+        <button type="submit"
+                class="px-6 py-2 bg-primary text-white rounded hover:bg-secondary transition">
+          Update
+        </button>
+        <button type="button"
+                class="px-6 py-2 bg-secondary text-primary rounded hover:bg-secondary/80 transition"
+                onclick="window.history.back()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock %}

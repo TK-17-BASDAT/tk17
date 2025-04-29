@@ -15,13 +15,18 @@
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <a href="{% url 'perawatan_hewan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
             <i class="fas fa-stethoscope w-5"></i><span class="ml-3">Perawatan Hewan</span>
           </a>
         </li>
         <li>
           <a href="#" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
             <i class="fas fa-file-medical w-5"></i><span class="ml-3">Kelola Rekam Medis</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'kunjungan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+            <i class="fas fa-calendar-check w-5"></i><span class="ml-3">Kelola Kunjungan</span>
           </a>
         </li>
         <li>

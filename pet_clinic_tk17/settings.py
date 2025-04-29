@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'authentication',
     'jenis_hewan',
     'hewan_peliharaan',
+    'perawatan_hewan',
+    'kunjungan',
+    'rekam_medis',
 ]
 
 MIDDLEWARE = [
