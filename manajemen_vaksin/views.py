@@ -3,6 +3,7 @@ from django.shortcuts import render
 from datetime import date
 import locale
 from .models import Vaksin
+from kunjungan.models import Kunjungan
 
 # Optional: Set locale for formatting dates in Indonesian
 try:
@@ -24,38 +25,32 @@ def format_tanggal_indonesia(tanggal_obj):
 
 
 def vaccination_list_view(request):
-    # --- Hardcoded Data (Simulating Database Fetch) ---
+    kunjungan_dengan_vaksin = Kunjungan.objects.filter(kode_vaksin__isnull=False).select_related(
+        'hewan', 'kode_vaksin'
+    )
+    print(kunjungan_dengan_vaksin.count())
     
-    # List of existing vaccinations
-    vaccinations_data = [
-        {
-            "id": 1, # Usually a primary key from the database
-            "kunjungan_id": "KJN001",
-            "tanggal_kunjungan": date(2025, 2, 5),
-            "vaksin_id": "VAC001",
-            "vaksin_nama": "Feline Panleukopenia",
-        },
-        {
-            "id": 2,
-            "kunjungan_id": "KJN002",
-            "tanggal_kunjungan": date(2025, 2, 21),
-            "vaksin_id": "VAC002",
-            "vaksin_nama": "Canine Parvovirus",
-        },
-        {
-            "id": 3,
-            "kunjungan_id": "KJN003",
-            "tanggal_kunjungan": date(2025, 3, 15),
-            "vaksin_id": "VAC003",
-            "vaksin_nama": "Canine Adenovirus",
-        },
-    ]
+    # # List of existing vaccinations
+    vaccinations_data = []
+    # for kun in kunjungan_dengan_vaksin:
+    #     print("kunjungan id" + kun.id_kunjungan)
+    #     vaccinations_data.append({
+    #         "kunjungan_id": str(kun.id_kunjungan), # UUID jadi string jika perlu
+    #         "tanggal_kunjungan": kun.timestamp_awal.date(), # Ambil bagian tanggal saja
+    #         "tanggal_kunjungan_formatted": format_tanggal_indonesia(kun.timestamp_awal.date()),
+    #         "vaksin_id": kun.kode_vaksin.kode,
+    #         "vaksin_nama": kun.kode_vaksin.nama,
+    #         # Tambahkan info hewan jika perlu di list utama
+    #         "nama_hewan": kun.hewan.nama,
+    #         "pemilik_hewan": kun.hewan.no_identitas_klien.email.email # contoh akses relasi
+    #     })
+
 
     # Format the date for display
-    for vac in vaccinations_data:
-        vac['tanggal_kunjungan_formatted'] = format_tanggal_indonesia(vac['tanggal_kunjungan'])
+    # for vac in vaccinations_data:
+    #     vac['tanggal_kunjungan_formatted'] = format_tanggal_indonesia(vac['tanggal_kunjungan'])
 
-    # List of available Kunjungan (Visits) - could be fetched from another model
+    # # List of available Kunjungan (Visits) - could be fetched from another model
     kunjungan_options = [
         {"id": "KJN001", "display_text": "KJN001 - (Info Kunjungan 1)"}, # Add more relevant info if needed
         {"id": "KJN002", "display_text": "KJN002 - (Info Kunjungan 2)"},

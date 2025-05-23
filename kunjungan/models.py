@@ -6,7 +6,7 @@ from django.utils import timezone # Untuk default timestamp_awal
 class Kunjungan(models.Model):
     id_kunjungan = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_column='id_kunjungan')
     # String reference ke model-model di aplikasi lain
-    hewan = models.ForeignKey('hewan_peliharaan.Hewan', on_delete=models.PROTECT)
+    hewan = models.ForeignKey('hewan_peliharaan.Hewan', on_delete=models.PROTECT, db_column='nama_hewan')
     no_front_desk = models.ForeignKey('authentication.FrontDesk', on_delete=models.PROTECT, db_column='no_front_desk')
     no_perawat_hewan = models.ForeignKey('authentication.PerawatHewan', on_delete=models.PROTECT, db_column='no_perawat_hewan')
     no_dokter_hewan = models.ForeignKey('authentication.DokterHewan', on_delete=models.PROTECT, db_column='no_dokter_hewan')
