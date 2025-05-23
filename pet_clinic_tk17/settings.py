@@ -97,6 +97,9 @@ DATABASES = {
         'PASSWORD': tmpPostgres.password,
         'HOST': tmpPostgres.hostname,
         'PORT': 5432,
+        'OPTIONS': {
+        'options': '-c search_path=PETCLINIC,public'
+        }
     }
 }
 

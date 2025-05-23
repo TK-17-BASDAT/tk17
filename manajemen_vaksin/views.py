@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from datetime import date
 import locale
+from .models import Vaksin
 
 # Optional: Set locale for formatting dates in Indonesian
 try:
@@ -24,7 +25,7 @@ def format_tanggal_indonesia(tanggal_obj):
 
 def vaccination_list_view(request):
     # --- Hardcoded Data (Simulating Database Fetch) ---
-
+    
     # List of existing vaccinations
     vaccinations_data = [
         {
@@ -62,15 +63,19 @@ def vaccination_list_view(request):
         {"id": "KJN004", "display_text": "KJN004 - (Info Kunjungan 4)"}, # Example of more visits
     ]
 
-    # List of available Vaksin (Vaccines) with stock - could be fetched from another model
-    vaksin_options = [
-        {"id": "VAC001", "nama": "Feline Panleukopenia", "stok": 100},
-        {"id": "VAC002", "nama": "Canine Parvovirus", "stok": 200},
-        {"id": "VAC003", "nama": "Canine Adenovirus", "stok": 0}, # Example with 0 stock
-        {"id": "VAC004", "nama": "Rabies", "stok": 50}, # Example of another vaccine
-    ]
-    # --- End Hardcoded Data ---
 
+    all_vaksin = Vaksin.objects.all()
+    print("Jumlah vaksin:", all_vaksin.count())
+
+    # List of available Vaksin (Vaccines) with stock - could be fetched from another model
+    vaksin_options = []
+    for v in all_vaksin:
+        print ("Vaksin: " + v.kode + v.nama)
+        vaksin_options.append({
+            "id": v.kode, # PK Vaksin
+            "nama": v.nama,
+            "stok": v.stok
+        })
 
     context = {
         'vaccinations': vaccinations_data,
