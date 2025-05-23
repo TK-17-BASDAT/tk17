@@ -28,38 +28,38 @@
         </nav>
       </div>
       <!-- Tab Contents -->
-      <div>
-        <!-- 1. Klien Individu -->
-        <form id="klien_individu" class="tab-content space-y-4">
+      <div>        <!-- 1. Klien Individu -->
+        <form id="klien_individu" method="post" action="" class="tab-content space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="klien_individu">
           <div>
             <label class="block text-gray-700">Email *</label>
-            <input type="email" class="w-full border rounded px-3 py-2" required/>
+            <input type="email" name="email" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label class="block text-gray-700">Nama Depan *</label>
-              <input type="text" class="w-full border rounded px-3 py-2" required/>
+              <input type="text" name="nama_depan" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div>
               <label class="block text-gray-700">Nama Tengah</label>
-              <input type="text" class="w-full border rounded px-3 py-2"/>
+              <input type="text" name="nama_tengah" class="w-full border rounded px-3 py-2"/>
             </div>
             <div>
               <label class="block text-gray-700">Nama Belakang *</label>
-              <input type="text" class="w-full border rounded px-3 py-2" required/>
+              <input type="text" name="nama_belakang" class="w-full border rounded px-3 py-2" required/>
             </div>
-          </div>
-          <div>
+          </div>          <div>
             <label class="block text-gray-700">Password *</label>
-            <input type="password" class="w-full border rounded px-3 py-2" required/>
+            <input type="password" name="password" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nomor Telepon *</label>
-            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+            <input type="tel" name="nomor_telepon" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Alamat *</label>
-            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+            <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
           </div>
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
@@ -67,26 +67,27 @@
         </form>
 
         <!-- 2. Klien Perusahaan -->
-        <form id="klien_perusahaan" class="tab-content hidden space-y-4">
+        <form id="klien_perusahaan" method="post" action="" class="tab-content hidden space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="klien_perusahaan">
           <div>
             <label class="block text-gray-700">Email *</label>
-            <input type="email" class="w-full border rounded px-3 py-2" required/>
+            <input type="email" name="email" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nama Perusahaan *</label>
-            <input type="text" class="w-full border rounded px-3 py-2" required/>
-          </div>
-          <div>
+            <input type="text" name="nama_perusahaan" class="w-full border rounded px-3 py-2" required/>
+          </div>          <div>
             <label class="block text-gray-700">Password *</label>
-            <input type="password" class="w-full border rounded px-3 py-2" required/>
+            <input type="password" name="password" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nomor Telepon *</label>
-            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+            <input type="tel" name="nomor_telepon" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Alamat *</label>
-            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+            <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
           </div>
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
@@ -94,26 +95,27 @@
         </form>
 
         <!-- 3. Front-Desk Officer -->
-        <form id="frontdesk" class="tab-content hidden space-y-4">
+        <form id="frontdesk" method="post" action="" class="tab-content hidden space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="front_desk">
           <div>
             <label class="block text-gray-700">Email *</label>
-            <input type="email" class="w-full border rounded px-3 py-2" required/>
-          </div>
-          <div>
+            <input type="email" name="email" class="w-full border rounded px-3 py-2" required/>
+          </div>          <div>
             <label class="block text-gray-700">Password *</label>
-            <input type="password" class="w-full border rounded px-3 py-2" required/>
+            <input type="password" name="password" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nomor Telepon *</label>
-            <input type="tel" class="w-full border rounded px-3 py-2" required/>
+            <input type="tel" name="nomor_telepon" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Tanggal Diterima *</label>
-            <input type="date" class="w-full border rounded px-3 py-2" required/>
+            <input type="date" name="tanggal_diterima" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Alamat *</label>
-            <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+            <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
           </div>
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
@@ -121,25 +123,26 @@
         </form>
 
         <!-- ==== 4. Dokter Hewan ==== -->
-        <form id="dokter" class="tab-content hidden space-y-4">
+        <form id="dokter" method="post" action="" class="tab-content hidden space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="dokter_hewan">
             <!-- Informasi Umum -->
             <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
-              <input type="text" class="w-full border rounded px-3 py-2" required/>
-            </div>
-            <div><label class="block text-gray-700">Email *</label>
-              <input type="email" class="w-full border rounded px-3 py-2" required/>
+              <input type="text" name="no_izin_praktik" class="w-full border rounded px-3 py-2" required/>
+            </div>            <div><label class="block text-gray-700">Email *</label>
+              <input type="email" name="email" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Password *</label>
-              <input type="password" class="w-full border rounded px-3 py-2" required/>
+              <input type="password" name="password" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Nomor Telepon *</label>
-              <input type="tel" class="w-full border rounded px-3 py-2" required/>
+              <input type="tel" name="nomor_telepon" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Tanggal Diterima *</label>
-              <input type="date" class="w-full border rounded px-3 py-2" required/>
+              <input type="date" name="tanggal_diterima" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Alamat *</label>
-              <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+              <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
             </div>
   
             <!-- Sertifikat -->
@@ -153,19 +156,17 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-gray-700">Nomor Sertifikat *</label>
-                    <input type="text" name="dokter_nomor_sertifikat[]" 
+                    <input type="text" name="sertifikat_no[]" 
                       class="w-full border rounded px-3 py-2" required/>
                   </div>
                   <div>
                     <label class="block text-gray-700">Nama Sertifikat *</label>
-                    <input type="text" name="dokter_nama_sertifikat[]" 
+                    <input type="text" name="sertifikat_nama[]" 
                       class="w-full border rounded px-3 py-2" required/>
                   </div>
                 </div>
               </div>
-            </div>
-  
-            <!-- Jadwal Praktik -->
+            </div>            <!-- Jadwal Praktik -->
             <div id="dokter-jadwal-section" class="space-y-2">
               <h3 class="font-medium">Jadwal Praktik</h3>
               <button type="button" onclick="addDokterSchedule()"
@@ -174,9 +175,8 @@
               </button>
               <div id="dokter-jadwal-container" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-gray-700">Hari *</label>
-                    <select name="dokter_jadwal_hari[]" 
+                  <div>                    <label class="block text-gray-700">Hari *</label>
+                    <select name="jadwal_hari[]" 
                       class="w-full border rounded px-3 py-2" required>
                       <option>Senin</option><option>Selasa</option>
                       <option>Rabu</option><option>Kamis</option>
@@ -186,7 +186,7 @@
                   </div>
                   <div>
                     <label class="block text-gray-700">Jam *</label>
-                    <input type="text" name="dokter_jadwal_jam[]" 
+                    <input type="text" name="jadwal_jam[]" 
                       class="w-full border rounded px-3 py-2" 
                       placeholder="13:00 - 15:00" required/>
                   </div>
@@ -197,28 +197,27 @@
             <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
               Register
             </button>
-          </form>
-  
-          <!-- ==== 5. Perawat Hewan ==== -->
-          <form id="perawat" class="tab-content hidden space-y-4">
+          </form>          <!-- ==== 5. Perawat Hewan ==== -->
+          <form id="perawat" method="post" action="" class="tab-content hidden space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="perawat_hewan">
             <!-- Informasi Umum -->
             <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
-              <input type="text" class="w-full border rounded px-3 py-2" required/>
+              <input type="text" name="no_izin_praktik" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Email *</label>
-              <input type="email" class="w-full border rounded px-3 py-2" required/>
-            </div>
+              <input type="email" name="email" class="w-full border rounded px-3 py-2" required/>            </div>
             <div><label class="block text-gray-700">Password *</label>
-              <input type="password" class="w-full border rounded px-3 py-2" required/>
+              <input type="password" name="password" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Nomor Telepon *</label>
-              <input type="tel" class="w-full border rounded px-3 py-2" required/>
+              <input type="tel" name="nomor_telepon" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Tanggal Diterima *</label>
-              <input type="date" class="w-full border rounded px-3 py-2" required/>
+              <input type="date" name="tanggal_diterima" class="w-full border rounded px-3 py-2" required/>
             </div>
             <div><label class="block text-gray-700">Alamat *</label>
-              <textarea class="w-full border rounded px-3 py-2" rows="3" required></textarea>
+              <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
             </div>
   
             <!-- Sertifikat -->
@@ -232,12 +231,12 @@
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-gray-700">Nomor Sertifikat *</label>
-                    <input type="text" name="perawat_nomor_sertifikat[]" 
+                    <input type="text" name="sertifikat_no[]" 
                       class="w-full border rounded px-3 py-2" required/>
                   </div>
                   <div>
                     <label class="block text-gray-700">Nama Sertifikat *</label>
-                    <input type="text" name="perawat_nama_sertifikat[]" 
+                    <input type="text" name="sertifikat_nama[]" 
                       class="w-full border rounded px-3 py-2" required/>
                   </div>
                 </div>
@@ -271,9 +270,7 @@
         );
       }
       tabs.forEach(b => b.addEventListener('click', () => activate(b.dataset.tab)));
-      activate('klien_individu');
-  
-      // Dokter Sertifikat
+      activate('klien_individu');      
       function addDokterCert(){
         const container = document.getElementById('dokter-sertifikat-container');
         const row = document.createElement('div');
@@ -281,15 +278,15 @@
         row.innerHTML = `
           <div>
             <label class="block text-gray-700">Nomor Sertifikat *</label>
-            <input type="text" name="dokter_nomor_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+            <input type="text" name="sertifikat_no[]" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nama Sertifikat *</label>
-            <input type="text" name="dokter_nama_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+            <input type="text" name="sertifikat_nama[]" class="w-full border rounded px-3 py-2" required/>
           </div>`;
         container.appendChild(row);
       }
-      // Dokter Jadwal
+      
       function addDokterSchedule(){
         const container = document.getElementById('dokter-jadwal-container');
         const row = document.createElement('div');
@@ -297,19 +294,19 @@
         row.innerHTML = `
           <div>
             <label class="block text-gray-700">Hari *</label>
-            <select name="dokter_jadwal_hari[]" class="w-full border rounded px-3 py-2" required>
+            <select name="jadwal_hari[]" class="w-full border rounded px-3 py-2" required>
               <option>Senin</option><option>Selasa</option><option>Rabu</option>
               <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
             </select>
           </div>
           <div>
             <label class="block text-gray-700">Jam *</label>
-            <input type="text" name="dokter_jadwal_jam[]" class="w-full border rounded px-3 py-2"
+            <input type="text" name="jadwal_jam[]" class="w-full border rounded px-3 py-2"
               placeholder="13:00 - 15:00" required/>
           </div>`;
         container.appendChild(row);
       }
-      // Perawat Sertifikat
+      
       function addPerawatCert(){
         const container = document.getElementById('perawat-sertifikat-container');
         const row = document.createElement('div');
@@ -317,11 +314,11 @@
         row.innerHTML = `
           <div>
             <label class="block text-gray-700">Nomor Sertifikat *</label>
-            <input type="text" name="perawat_nomor_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+            <input type="text" name="sertifikat_no[]" class="w-full border rounded px-3 py-2" required/>
           </div>
           <div>
             <label class="block text-gray-700">Nama Sertifikat *</label>
-            <input type="text" name="perawat_nama_sertifikat[]" class="w-full border rounded px-3 py-2" required/>
+            <input type="text" name="sertifikat_nama[]" class="w-full border rounded px-3 py-2" required/>
           </div>`;
         container.appendChild(row);
       }
