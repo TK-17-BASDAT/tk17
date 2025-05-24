@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %} <!-- Jika menggunakan file statis untuk CSS/JS tambahan -->
+{% load i18n %} <!-- Jika menggunakan terjemahan, opsional -->
 
 {% block content %}
 
@@ -14,74 +16,95 @@
             <h1 class="text-2xl font-semibold text-gray-800">Profile Klien</h1>
           </div>
           <div class="flex gap-3">
-            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</button>
+            <a href="{% url 'dashboard:change_password' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</a>
             <button onclick="toggleEditMode()" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
           </div>
         </div>
+
+        <!-- Display Messages -->
+        {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+              <div class="p-3 rounded-lg
+                {% if message.tags == 'success' %} bg-green-100 border border-green-400 text-green-700
+                {% elif message.tags == 'error' %} bg-red-100 border border-red-400 text-red-700
+                {% elif message.tags == 'warning' %} bg-yellow-100 border border-yellow-400 text-yellow-700
+                {% else %} bg-blue-100 border border-blue-400 text-blue-700
+                {% endif %}" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if error_message %}
+          <div class="mb-4 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700" role="alert">
+            {{ error_message }}
+          </div>
+        {% endif %}
     
+        {% if user_data %}
         <!-- View Mode -->
         <div id="view-mode">
             <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Identitas</div>
-            <div class="text-gray-800">95af4880-90c7-4749-9f94-05afbe92a196</div>
+            <div class="text-gray-800">{{ user_data.no_identitas }}</div>
         
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Email</div>
-            <div class="text-gray-800">klien_individu_1@gmail.com</div>
+            <div class="text-gray-800">{{ user_data.email }}</div>
         
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Nama</div>
-            <div class="text-gray-800">Amanda Zahra</div>
+            <div class="text-gray-800">{{ user_data.nama_lengkap }}</div>
         
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Pendaftaran</div>
-            <div class="text-gray-800">26 Januari 2025</div>
+            <div class="text-gray-800">{{ user_data.tanggal_registrasi|date:"d F Y" }}</div> {# Format tanggal #}
         
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Alamat</div>
-            <div class="text-gray-800">Jl. Melati Indah No. 26, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
+            <div class="text-gray-800">{{ user_data.alamat }}</div>
         
             <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Telepon</div>
-            <div class="text-gray-800">081234567896</div>
+            <div class="text-gray-800">{{ user_data.nomor_telepon }}</div>
             </div>
         </div>
       
     
         <!-- Edit Mode -->
-        <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
+        <form id="edit-mode" class="hidden mt-4" method="POST" action="{% url 'dashboard:klien' %}">
+          {% csrf_token %} {# Jangan lupa CSRF token untuk POST form #}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Non-editable Fields -->
-             
             <div>
-                <p class="text-sm text-gray-600 font-medium">Nomors Identitas</p>
-                <p class="text-gray-800">95af4880-90c7-4749-9f94-05afbe92a196</p>
-              </div>
-              <div>
+                <p class="text-sm text-gray-600 font-medium">Nomor Identitas</p>
+                <p class="text-gray-800">{{ user_data.no_identitas }}</p>
+            </div>
+            <div>
                 <p class="text-sm text-gray-600 font-medium">Email</p>
-                <p class="text-gray-800">klien_individu_1@gmail.com</p>
+                <p class="text-gray-800">{{ user_data.email }}</p>
             </div>
               
-    
             <!-- Editable Fields -->
             <div>
-              <label class="text-sm font-medium text-gray-600">Nama Depan</label>
-              <input type="text" placeholder="Amanda" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="nama_depan" class="text-sm font-medium text-gray-600">Nama Depan</label>
+              <input type="text" id="nama_depan" name="nama_depan" value="{{ user_data.nama_depan }}" class="mt-1 w-full border rounded-lg px-3 py-2" required>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-600">Nama Tengah</label>
-              <input type="text" placeholder="-" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="nama_tengah" class="text-sm font-medium text-gray-600">Nama Tengah</label>
+              <input type="text" id="nama_tengah" name="nama_tengah" value="{{ user_data.nama_tengah }}" class="mt-1 w-full border rounded-lg px-3 py-2">
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-600">Nama Belakang</label>
-              <input type="text" placeholder="Zahra" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="nama_belakang" class="text-sm font-medium text-gray-600">Nama Belakang</label>
+              <input type="text" id="nama_belakang" name="nama_belakang" value="{{ user_data.nama_belakang }}" class="mt-1 w-full border rounded-lg px-3 py-2" required>
             </div>
             <div>
               <label class="text-sm font-medium text-gray-600">Tanggal Pendaftaran</label>
-              <input type="text" value="26 Januari 2025" disabled class="mt-1 w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-500">
+              <input type="text" value="{{ user_data.tanggal_registrasi|date:"d F Y" }}" disabled class="mt-1 w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-500">
             </div>
             <div class="sm:col-span-2">
-              <label class="text-sm font-medium text-gray-600">Alamat</label>
-              <textarea rows="3" placeholder="Alamat lengkap..." class="mt-1 w-full border rounded-lg px-3 py-2"></textarea>
+              <label for="alamat" class="text-sm font-medium text-gray-600">Alamat</label>
+              <textarea id="alamat" name="alamat" rows="3" class="mt-1 w-full border rounded-lg px-3 py-2" required>{{ user_data.alamat }}</textarea>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-600">Nomor Telepon</label>
-              <input type="text" placeholder="081234567896" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="nomor_telepon" class="text-sm font-medium text-gray-600">Nomor Telepon</label>
+              <input type="text" id="nomor_telepon" name="nomor_telepon" value="{{ user_data.nomor_telepon }}" class="mt-1 w-full border rounded-lg px-3 py-2" required>
             </div>
           </div>
     
@@ -91,6 +114,9 @@
             <button type="button" onclick="toggleEditMode()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
           </div>
         </form>
+        {% else %}
+          <p class="text-center text-gray-600">Data profil tidak tersedia atau gagal dimuat.</p>
+        {% endif %}
       </div>
     
       <script>
@@ -99,10 +125,17 @@
           document.getElementById('edit-mode').classList.toggle('hidden');
         }
     
-        function saveChanges() {
-          alert("Perubahan berhasil disimpan (simulasi saja)!");
-          toggleEditMode();
-        }
+        // Hapus fungsi saveChanges() JavaScript karena submit form akan dihandle oleh Django
+        // function saveChanges() {
+        //   alert("Perubahan berhasil disimpan (simulasi saja)!");
+        //   toggleEditMode();
+        // }
+
+        // Jika ada edit mode, dan ada error message dari server setelah submit,
+        // kita mungkin ingin tetap menampilkan edit mode.
+        // Ini bisa dihandle lebih lanjut dengan JavaScript jika diperlukan,
+        // atau dengan mengirimkan variabel context tambahan dari view.
+        // Untuk saat ini, jika ada error, akan kembali ke view mode.
       </script>
     </div>
   </main>
