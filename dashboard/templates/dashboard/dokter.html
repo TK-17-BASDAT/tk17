@@ -23,37 +23,45 @@
           <div class="space-y-6">
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Nomor Identitas</span>
-                <span class="text-gray-900">c4fd2f14-0202-4526-b1f4-5fcde0c28783</span>
+                <span class="text-gray-900">{{ user_data.no_pegawai }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Nomor Izin Praktik</span>
-                <span class="text-gray-900">SIP-HEWAN-12345</span>
+                <span class="text-gray-900">{{ user_data.no_izin_praktik }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Email</span>
-                <span class="text-gray-900">bobby.muhammad@petclinic.com</span>
+                <span class="text-gray-900">{{ user_data.email }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Tanggal Diterima</span>
-                <span class="text-gray-900">23 Januari 2025</span>
+                <span class="text-gray-900">{{ user_data.tanggal_mulai_kerja }}</span>
             </div>
-            <div class="flex justify-between">
-                <span class="font-medium text-gray-700">Tanggal Akhir Kerja</span>
-                <span class="text-gray-900">-</span>
-            </div>
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-700">Tanggal Akhir Kerja</span>
+            <span class="text-gray-900">
+              {% if user_data.tanggal_akhir_kerja %}
+                {{ user_data.tanggal_akhir_kerja|date:"d F Y" }}
+              {% else %}
+                -
+              {% endif %}
+            </span>
+          </div>
+
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Alamat</span>
-                <span class="text-gray-900">Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</span>
+                <span class="text-gray-900">{{ user_data.alamat }}</span>
             </div>
             <div class="flex justify-between">
                 <span class="font-medium text-gray-700">Nomor Telepon</span>
-                <span class="text-gray-900">081234567893</span>
+                <span class="text-gray-900">{{ user_data.nomor_telepon }}</span>
             </div>
           </div>
     
-          <!-- Sertifikat -->
+          <!-- Sertifikat (View Mode) -->
           <div class="mt-8">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
+            {% if user_data.sertifikat_kompetensi %}
             <table class="w-full table-auto border-collapse">
                 <thead>
                     <tr class="text-left bg-gray-100">
@@ -63,28 +71,28 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for sertifikat in user_data.sertifikat_kompetensi %} {# <-- LOOPING DATA SERTIFIKAT #}
                     <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">123/DH/456</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">BNSP Dokter Hewan Praktis</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ sertifikat.no }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ sertifikat.nama }}</td>
                     </tr>
-                    <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">456/DH/456</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">Sertifikat PB PDHI</td>
+                    {% empty %} {# <-- APA YANG DITAMPILKAN JIKA LIST KOSONG #}
+                    <tr>
+                        <td colspan="3" class="px-4 py-2 text-sm text-gray-600 text-center">Tidak ada data sertifikat.</td>
                     </tr>
-                    <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">789/DH/789</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">Sertifikat Organisasi Profesi</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            {% else %} {# <-- JIKA KUNCI 'sertifikat_kompetensi' TIDAK ADA ATAU None #}
+            <p class="text-gray-600">Tidak ada data sertifikat.</p>
+            {% endif %}
           </div>
     
-          <!-- Jadwal Praktik -->
+          <!-- Jadwal Praktik (View Mode) -->
           <div class="mt-8">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Jadwal Praktik</h2>
+            {% if user_data.jadwal_praktik %}
             <table class="w-full table-auto border-collapse">
                 <thead>
                     <tr class="text-left bg-gray-100">
@@ -94,24 +102,25 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for jadwal in user_data.jadwal_praktik %} {# <-- LOOPING DATA JADWAL #}
                     <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">1</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">Senin</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ jadwal.hari }}</td>
+                        <td class="px-4 py-2 text-sm text-gray-700">{{ jadwal.jam }}</td>
                     </tr>
-                    <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">2</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">Rabu</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">13.00 - 15.00</td>
+                    {% empty %} {# <-- APA YANG DITAMPILKAN JIKA LIST KOSONG #}
+                    <tr>
+                        <td colspan="3" class="px-4 py-2 text-sm text-gray-600 text-center">Tidak ada data jadwal praktik.</td>
                     </tr>
-                    <tr class="border-b">
-                        <td class="px-4 py-2 text-sm text-gray-700">3</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">Jumat</td>
-                        <td class="px-4 py-2 text-sm text-gray-700">14.00 - 16.00</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            {% else %} {# <-- JIKA KUNCI 'jadwal_praktik' TIDAK ADA ATAU None #}
+            <p class="text-gray-600">Tidak ada data jadwal praktik.</p>
+            {% endif %}
           </div>
+        </div>
+    
         </div>
     
         <!-- Edit Mode -->

@@ -144,7 +144,7 @@ class KlienProfileView(LoginRequiredMixin, View):
 
 class KlienCompanyProfileView(LoginRequiredMixin, View):
     login_url = LOGIN_URL
-    template_name = 'dashboard/klien_company.html' # Buat template ini
+    template_name = 'dashboard/kliencompany.html' 
 
     def dispatch(self, request, *args, **kwargs):
         if request.session.get('user_role') != 'klien_perusahaan':
@@ -238,7 +238,7 @@ class KlienCompanyProfileView(LoginRequiredMixin, View):
 
 class FrontDeskProfileView(LoginRequiredMixin, View):
     login_url = LOGIN_URL
-    template_name = 'dashboard/front_desk.html' # Buat template ini
+    template_name = 'dashboard/frontdesk.html' # Buat template ini
 
     def dispatch(self, request, *args, **kwargs):
         if request.session.get('user_role') != 'front_desk':
@@ -299,6 +299,7 @@ class FrontDeskProfileView(LoginRequiredMixin, View):
 
         alamat = request.POST.get('alamat')
         nomor_telepon = request.POST.get('nomor_telepon')
+        tanggal_akhir_kerja = request.POST.get('tanggal_akhir_kerja') or None
         # tanggal_mulai_kerja, tanggal_akhir_kerja biasanya tidak diupdate oleh user sendiri
         
         try:
@@ -319,6 +320,14 @@ class FrontDeskProfileView(LoginRequiredMixin, View):
                     WHERE email = %s;
                     """,
                     [alamat, nomor_telepon, pegawai_email]
+                )
+                cursor.execute(
+                    """
+                    UPDATE PETCLINIC.PEGAWAI
+                    SET tanggal_akhir_kerja = %s
+                    WHERE no_pegawai = %s;
+                    """,
+                    [tanggal_akhir_kerja, no_pegawai_str]
                 )
             messages.success(request, "Profil front desk berhasil diperbarui!")
         except Exception as e:
