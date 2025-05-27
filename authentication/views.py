@@ -147,8 +147,6 @@ class RegisterView(View):
                     [no_identitas, nama_depan, nama_tengah, nama_belakang]
                 )
             
-            login(request, user)
-            
             request.session['user_role'] = 'klien_individu'
             request.session['no_identitas'] = str(no_identitas)
             
@@ -191,9 +189,6 @@ class RegisterView(View):
                 )
             
             
-            login(request, user)
-            
-            
             request.session['user_role'] = 'klien_perusahaan'
             request.session['no_identitas'] = str(no_identitas)
             
@@ -234,9 +229,6 @@ class RegisterView(View):
                     'INSERT INTO petclinic.front_desk (no_front_desk) VALUES (%s)',
                     [no_pegawai]
                 )
-            
-            
-            login(request, user)
             
             
             request.session['user_role'] = 'front_desk'
@@ -325,10 +317,6 @@ class RegisterView(View):
                         )
 
             
-            
-            login(request, user)
-            
-            
             request.session['user_role'] = 'dokter_hewan'
             request.session['no_pegawai'] = str(no_pegawai)
             
@@ -399,10 +387,6 @@ class RegisterView(View):
                             'VALUES (%s, %s, %s)',
                             [no_s, no_pegawai, nama_s]
                         )
-                
-            
-            login(request, user)
-            
             
             request.session['user_role'] = 'perawat_hewan'
             request.session['no_pegawai'] = str(no_pegawai)
@@ -415,7 +399,6 @@ class RegisterView(View):
 
 
 def logout_view(request):
-    
     if 'user_role' in request.session:
         del request.session['user_role']
     
@@ -425,6 +408,5 @@ def logout_view(request):
     if 'no_pegawai' in request.session:
         del request.session['no_pegawai']
     
-    
     logout(request)
-    return redirect('authentication:login')
+    return redirect('/')
