@@ -12,20 +12,18 @@ class RoleMiddleware:
         self.get_response = get_response
         
     def __call__(self, request):
-        
-        if request.path.startswith('/auth/'):
+        if request.path == '/':
+            return self.get_response(request)
             
+        if request.path.startswith('/auth/'):
             return self.get_response(request)
         
-        
         if not request.user.is_authenticated:
-            if request.path != reverse('authentication:login'):
+            if request.path != '/':
                 messages.warning(request, "Please log in to access this page")
-                return redirect('authentication:login')
+                return redirect('/')
         else:
-            
             user_role = request.session.get('user_role', None)
-            
             
             role_required_prefixes = {
                 'klien_individu': ['/dashboard/klien-individu/'],
