@@ -1,146 +1,276 @@
 {% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="flex">
     {% include "navbar/sidebar_perawat.html" %}
     <main class="bg-gray-50 flex-1 ml-64 p-6">
         <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
-            <div class="bg-white rounded-lg shadow-lg p-8">
-                <div class="flex justify-between items-start mb-8">
+            <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div class="text-2xl font-semibold text-gray-900">
                         <h1>Profile Perawat</h1>
                     </div>
                     <div class="space-x-4">
-                        <button class="bg-red-500 text-white px-6 py-2 rounded-lg">Update Password</button>
-                        <button class="bg-blue-600 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Update Profile</button>
+                        <a href="{% url 'dashboard:change_password' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg text-sm">Update Password</a>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm" onclick="toggleEditMode(true)">Update Profile</button>
                     </div>
                 </div>
+
+                <!-- Display Messages -->
+                {% if messages %}
+                  <div class="mb-6">
+                    {% for message in messages %}
+                      <div class="bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-100 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-700 px-4 py-3 rounded mb-4">
+                        {{ message }}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                {% if error_message and not user_data %}
+                  <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    {{ error_message }}
+                  </div>
+                {% endif %}
         
+                {% if user_data %}
+                <!-- View Mode -->
                 <div id="view-mode">
-                    <!-- Mode View -->
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
-                            <div class="text-gray-900">1845ad38-ef76-49cd-b46e-350ba3f0ef59</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
-                            <div class="text-gray-900">SIP-PERAWAT-12345</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Email</div>
-                            <div class="text-gray-900">sandy.permata@petclinic.com</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
-                            <div class="text-gray-900">24 Januari 2025</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
-                            <div class="text-gray-900">-</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Alamat</div>
-                            <div class="text-gray-900">Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
-                            <div class="text-gray-900">081234567894</div>
-                        </div>
+                    <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Pegawai</div>
+                    <div class="text-gray-800">{{ user_data.no_pegawai }}</div>
+                
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Izin Praktik</div>
+                    <div class="text-gray-800">{{ user_data.no_izin_praktik }}</div>
+                
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Email</div>
+                    <div class="text-gray-800">{{ user_data.email }}</div>
+                
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Mulai Kerja</div>
+                    <div class="text-gray-800">{{ user_data.tanggal_mulai_kerja|date:"d M Y" }}</div> {# Format tanggal #}
+                
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Akhir Kerja</div>
+                    <div class="text-gray-800">{% if user_data.tanggal_akhir_kerja %}{{ user_data.tanggal_akhir_kerja|date:"d M Y" }}{% else %}Belum ditentukan{% endif %}</div>
+                
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Alamat</div>
+                    <div class="text-gray-800">{{ user_data.alamat }}</div>
+
+                    <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Telepon</div>
+                    <div class="text-gray-800">{{ user_data.nomor_telepon }}</div>
+                    </div>
+                    
+                    <!-- Sertifikat View -->
+                    <div class="mt-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Sertifikat Kompetensi</h2>
+                        {% if user_data.sertifikat_kompetensi %}
+                          <div class="space-y-3">
+                            {% for sertifikat_item in user_data.sertifikat_kompetensi %}
+                              <div class="p-3 border rounded-md bg-gray-50">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  <div>
+                                    <label class="block text-xs font-medium text-gray-600">Nomor Sertifikat</label>
+                                    <p class="text-sm text-gray-900">{{ sertifikat_item.no_sertifikat_kompetensi }}</p>
+                                  </div>
+                                  <div>
+                                    <label class="block text-xs font-medium text-gray-600">Nama Sertifikat</label>
+                                    <p class="text-sm text-gray-900">{{ sertifikat_item.nama_sertifikat }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% else %}
+                          <p class="text-sm text-gray-500">Belum ada sertifikat yang terdaftar.</p>
+                        {% endif %}
                     </div>
                 </div>
         
-                <div id="edit-mode" class="hidden">
-                    <!-- Mode Edit -->
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Identitas</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="1845ad38-ef76-49cd-b46e-350ba3f0ef59" disabled />
+                <!-- Edit Mode -->
+                <form id="edit-mode" class="{% if not open_edit_mode %}hidden{% endif %}" method="POST" action="{% url 'dashboard:perawat' %}"> {# Sesuaikan URL action #}
+                    {% csrf_token %}
+                    <!-- Data Profil Dasar -->
+                    <div class="space-y-4 mb-8">
+                        <div>
+                          <label for="no_pegawai_view_edit_perawat" class="block text-sm font-medium text-gray-700">Nomor Pegawai</label>
+                          <input type="text" id="no_pegawai_view_edit_perawat" value="{{ user_data.no_pegawai }}" class="mt-1 block w-full px-3 py-2 bg-gray-100 rounded-md sm:text-sm" disabled>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Izin Praktik</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="SIP-PERAWAT-12345" disabled />
+                        <div>
+                          <label for="no_izin_praktik_view_edit_perawat" class="block text-sm font-medium text-gray-700">Nomor Izin Praktik</label>
+                          <input type="text" id="no_izin_praktik_view_edit_perawat" value="{{ user_data.no_izin_praktik }}" class="mt-1 block w-full px-3 py-2 bg-gray-100 rounded-md sm:text-sm" disabled>
+                          <p class="mt-1 text-xs text-gray-500">Nomor izin praktik tidak dapat diubah dari halaman ini.</p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Email</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="email" value="sandy.permata@petclinic.com" />
+                        <div>
+                          <label for="email_view_edit_perawat" class="block text-sm font-medium text-gray-700">Email</label>
+                          <input type="email" id="email_view_edit_perawat" value="{{ user_data.email }}" class="mt-1 block w-full px-3 py-2 bg-gray-100 rounded-md sm:text-sm" disabled>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Tanggal Diterima</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="2025-01-24" disabled />
+                        <div>
+                          <label for="tanggal_mulai_kerja_view_edit_perawat" class="block text-sm font-medium text-gray-700">Tanggal Mulai Kerja</label>
+                          <input type="text" id="tanggal_mulai_kerja_view_edit_perawat" value="{{ user_data.tanggal_mulai_kerja|date:"Y-m-d" }}" class="mt-1 block w-full px-3 py-2 bg-gray-100 rounded-md sm:text-sm" disabled>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Tanggal Akhir Kerja</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="date" value="" />
+                        <div>
+                          <label for="edit_tanggal_akhir_kerja_perawat" class="block text-sm font-medium text-gray-700">Tanggal Akhir Kerja</label>
+                          <input type="date" id="edit_tanggal_akhir_kerja_perawat" name="tanggal_akhir_kerja" value="{{ user_data.tanggal_akhir_kerja|date:"Y-m-d"|default:'' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm">
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Alamat</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="text" value="Jl. Melati Indah No. 24, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914" />
+                        <div>
+                          <label for="edit_alamat_perawat" class="block text-sm font-medium text-gray-700">Alamat</label>
+                          <textarea id="edit_alamat_perawat" name="alamat" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm" required>{{ user_data.alamat }}</textarea>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="font-medium text-gray-700 w-48">Nomor Telepon</div>
-                            <input class="border border-gray-300 rounded-lg p-2 w-full" type="tel" value="081234567894" />
+                        <div>
+                          <label for="edit_nomor_telepon_perawat" class="block text-sm font-medium text-gray-700">Nomor Telepon</label>
+                          <input type="text" id="edit_nomor_telepon_perawat" name="nomor_telepon" value="{{ user_data.nomor_telepon }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md sm:text-sm" required>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Formset Sertifikat -->
+                    {% if sertifikat_formset %}
+                    <div class="mt-8">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">Edit Sertifikat</h2>
+                        {{ sertifikat_formset.management_form }}
+                        <div id="sertifikat-form-list-perawat" class="space-y-3"> {# ID unik untuk perawat #}
+                          {% for form_sert in sertifikat_formset %}
+                          <div class="sertifikat-form p-3 border rounded-md {% if form_sert.errors %}border-red-500{% endif %}">
+                            {% for hidden in form_sert.hidden_fields %}{{ hidden }}{% endfor %}
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                              <div class="md:col-span-5">
+                                <label for="{{ form_sert.no_sertifikat_kompetensi.id_for_label }}" class="block text-xs font-medium text-gray-700">{{ form_sert.no_sertifikat_kompetensi.label }}</label>
+                                {{ form_sert.no_sertifikat_kompetensi }}
+                                {% if form_sert.no_sertifikat_kompetensi.errors %}
+                                  <p class="text-red-500 text-xs">{{ form_sert.no_sertifikat_kompetensi.errors|join:", " }}</p>
+                                {% endif %}
+                              </div>
+                              <div class="md:col-span-5">
+                                <label for="{{ form_sert.nama_sertifikat.id_for_label }}" class="block text-xs font-medium text-gray-700">{{ form_sert.nama_sertifikat.label }}</label>
+                                {{ form_sert.nama_sertifikat }}
+                                {% if form_sert.nama_sertifikat.errors %}
+                                  <p class="text-red-500 text-xs">{{ form_sert.nama_sertifikat.errors|join:", " }}</p>
+                                {% endif %}
+                              </div>
+                              <div class="md:col-span-2 flex items-end pt-4">
+                                {% if form_sert.initial %}
+                                  <label for="{{ form_sert.DELETE.id_for_label }}" class="flex items-center cursor-pointer">
+                                    {{ form_sert.DELETE }}
+                                    <span class="ml-1 text-xs text-red-600">Hapus</span>
+                                  </label>
+                                {% endif %}
+                              </div>
+                            </div>
+                            {% if form_sert.non_field_errors %}
+                              <div class="text-red-500 text-xs mt-1">{{ form_sert.non_field_errors|join:", " }}</div>
+                            {% endif %}
+                          </div>
+                          {% endfor %}
+                        </div>
+                        <button type="button" id="add-sertifikat-form-perawat" class="mt-2 text-sm text-teal-600 hover:text-teal-800">+ Tambah Sertifikat</button> {# ID unik #}
+                    </div>
+                    <!-- Template untuk form sertifikat baru -->
+                    <div id="sertifikat-empty-form-perawat" class="hidden"> {# ID unik #}
+                        <div class="sertifikat-form p-3 border rounded-md">
+                          {% for hidden in sertifikat_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                            <div class="md:col-span-5">
+                              <label class="block text-xs font-medium text-gray-700">{{ sertifikat_formset.empty_form.no_sertifikat_kompetensi.label }}</label>
+                              {{ sertifikat_formset.empty_form.no_sertifikat_kompetensi }}
+                            </div>
+                            <div class="md:col-span-5">
+                              <label class="block text-xs font-medium text-gray-700">{{ sertifikat_formset.empty_form.nama_sertifikat.label }}</label>
+                              {{ sertifikat_formset.empty_form.nama_sertifikat }}
+                            </div>
+                            <div class="md:col-span-2 flex items-end pt-4">
+                               <label for="{{ sertifikat_formset.empty_form.DELETE.id_for_label }}" class="flex items-center cursor-pointer">
+                                    {{ sertifikat_formset.empty_form.DELETE }}
+                                    <span class="ml-1 text-xs text-red-600">Hapus</span>
+                                </label>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    {% endif %}
         
-                <div class="mt-10">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Daftar Sertifikat</h2>
-                    <table class="min-w-full border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="border-b px-6 py-3 text-left text-gray-700">No</th>
-                                <th class="border-b px-6 py-3 text-left text-gray-700">Nomor Sertifikat</th>
-                                <th class="border-b px-6 py-3 text-left text-gray-700">Nama Sertifikat</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="border-b px-6 py-3 text-gray-800">1</td>
-                                <td class="border-b px-6 py-3 text-gray-800">123/PH/456</td>
-                                <td class="border-b px-6 py-3 text-gray-800">Paraprofesional Kedokteran Hewan</td>
-                            </tr>
-                            <tr>
-                                <td class="border-b px-6 py-3 text-gray-800">2</td>
-                                <td class="border-b px-6 py-3 text-gray-800">456/PH/456</td>
-                                <td class="border-b px-6 py-3 text-gray-800">Keperawatan Hewan Profesional</td>
-                            </tr>
-                            <tr>
-                                <td class="border-b px-6 py-3 text-gray-800">3</td>
-                                <td class="border-b px-6 py-3 text-gray-800">789/PH/789</td>
-                                <td class="border-b px-6 py-3 text-gray-800">Sertifikat Organisasi Profesi</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-        
-                <!-- Update Profile Buttons when in Edit Mode -->
-                <div id="edit-mode-actions" class="hidden mt-6 flex justify-between">
-                    <button class="bg-green-600 text-white px-6 py-2 rounded-lg">Save Changes</button>
-                    <button class="bg-red-500 text-white px-6 py-2 rounded-lg" onclick="toggleEditMode()">Cancel</button>
-                </div>
+                    <!-- Tombol Aksi Edit Mode -->
+                    <div id="edit-mode-actions" class="mt-6 flex justify-end gap-3">
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg text-sm" onclick="toggleEditMode(false)">Batal</button>
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm">Simpan Perubahan</button>
+                    </div>
+                </form>
+                {% else %}
+                  <div class="text-center py-8">
+                    <p class="text-gray-500">Data profil tidak dapat dimuat. Silakan coba lagi atau hubungi administrator.</p>
+                  </div>
+                {% endif %}
             </div>
         </div>
         
         <script>
-            function toggleEditMode() {
+            // Fungsi toggleEditMode dan addForm (gunakan yang sudah ada, pastikan ID unik jika perlu)
+            function toggleEditMode(forceOpen) {
                 const viewMode = document.getElementById('view-mode');
                 const editMode = document.getElementById('edit-mode');
-                const editModeActions = document.getElementById('edit-mode-actions');
-        
-                // Toggle visibility between view and edit mode
-                if (viewMode.style.display === "none") {
-                    viewMode.style.display = "block";
-                    editMode.style.display = "none";
-                    editModeActions.style.display = "none";
+                // const editModeActions = document.getElementById('edit-mode-actions'); // Tombol ini sekarang di dalam form edit-mode
+
+                if (viewMode && editMode) {
+                    if (forceOpen) {
+                        viewMode.classList.add('hidden');
+                        editMode.classList.remove('hidden');
+                        // if (editModeActions) editModeActions.classList.remove('hidden'); // Tidak perlu jika tombol di dalam form
+                    } else {
+                        viewMode.classList.toggle('hidden');
+                        editMode.classList.toggle('hidden');
+                        // if (editModeActions) editModeActions.classList.toggle('hidden'); // Tidak perlu
+                    }
                 } else {
-                    viewMode.style.display = "none";
-                    editMode.style.display = "block";
-                    editModeActions.style.display = "flex";
+                    console.error("Elemen view-mode atau edit-mode tidak ditemukan.");
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var shouldOpenEditMode = '{{ open_edit_mode|yesno:"true,false" }}' === 'true';
+                if (shouldOpenEditMode) {
+                    toggleEditMode(true);
+                }
+
+                var addSertifikatBtnPerawat = document.getElementById('add-sertifikat-form-perawat');
+                if (addSertifikatBtnPerawat) {
+                    addSertifikatBtnPerawat.addEventListener('click', function() {
+                        addForm('sertifikat', 'sertifikat-form-list-perawat', 'sertifikat-empty-form-perawat');
+                    });
+                }
+            });
+
+            function addForm(formsetTypePrefix, containerId, emptyFormContainerId) {
+                var totalFormsInput = document.querySelector('#id_' + formsetTypePrefix + '-TOTAL_FORMS');
+                if (!totalFormsInput) {
+                    console.error('Input TOTAL_FORMS untuk prefix ' + formsetTypePrefix + ' tidak ditemukan.');
+                    return;
+                }
+                var formIdx = parseInt(totalFormsInput.value);
+                
+                var emptyFormContainer = document.querySelector('#' + emptyFormContainerId);
+                if (!emptyFormContainer) {
+                    console.error('Container empty form ' + emptyFormContainerId + ' tidak ditemukan.');
+                    return;
+                }
+                
+                var emptyFormContentHtml = emptyFormContainer.innerHTML;
+                var newFormHtml = emptyFormContentHtml.replace(new RegExp('__prefix__', 'g'), formIdx);
+                
+                var formList = document.querySelector('#' + containerId);
+                if (!formList) {
+                    console.error('Container list form ' + containerId + ' tidak ditemukan.');
+                    return;
+                }
+
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = newFormHtml.trim();
+                
+                if (tempDiv.firstElementChild) {
+                    formList.appendChild(tempDiv.firstElementChild);
+                    totalFormsInput.value = formIdx + 1;
+                } else {
+                    console.error("Gagal membuat elemen form baru dari template empty form.");
                 }
             }
         </script>
     </main>
 </div>
-
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% load static %} <!-- Jika menggunakan file statis untuk CSS/JS tambahan -->
-{% load i18n %} <!-- Jika menggunakan terjemahan, opsional -->
+{% load static %} 
+{% load i18n %}
 
 {% block content %}
 
@@ -115,18 +115,6 @@
           document.getElementById('view-mode').classList.toggle('hidden');
           document.getElementById('edit-mode').classList.toggle('hidden');
         }
-    
-        // Hapus fungsi saveChanges() JavaScript karena submit form akan dihandle oleh Django
-        // function saveChanges() {
-        //   alert("Perubahan berhasil disimpan (simulasi saja)!");
-        //   toggleEditMode();
-        // }
-
-        // Jika ada edit mode, dan ada error message dari server setelah submit,
-        // kita mungkin ingin tetap menampilkan edit mode.
-        // Ini bisa dihandle lebih lanjut dengan JavaScript jika diperlukan,
-        // atau dengan mengirimkan variabel context tambahan dari view.
-        // Untuk saat ini, jika ada error, akan kembali ke view mode.
       </script>
     </div>
   </main>

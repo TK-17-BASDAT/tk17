@@ -72,3 +72,49 @@ class CustomPasswordChangeForm(forms.Form):
             print(f"CRITICAL: Failed to update password in PETCLINIC.USER for {self.user.email}: {e}")
             # Depending on policy, you might re-raise or handle to inform admin
             raise
+
+class SertifikatForm(forms.Form):
+    no_sertifikat_kompetensi = forms.CharField(
+        max_length=10, # Sesuaikan dengan skema DB
+        widget=forms.TextInput(attrs={'class': 'w-full border px-2 py-1 rounded-md text-sm', 'placeholder': 'No. Sertifikat'})
+    )
+    nama_sertifikat = forms.CharField(
+        max_length=100, # Sesuaikan dengan skema DB
+        widget=forms.TextInput(attrs={'class': 'w-full border px-2 py-1 rounded-md text-sm', 'placeholder': 'Nama Sertifikat'})
+    )
+    # Tambahkan field tersembunyi untuk menandai apakah akan dihapus
+    DELETE = forms.BooleanField(required=False, widget=forms.HiddenInput())
+    # Tambahkan field untuk PK asli jika kita mengedit, agar tahu mana yang diupdate
+    # Ini bisa menjadi 'id' dari entri tabel sertifikat jika ada.
+    # Untuk skema Anda, no_sertifikat_kompetensi adalah PK, jadi ini mungkin sudah cukup.
+    # Jika Anda ingin mengizinkan perubahan no_sertifikat_kompetensi, Anda perlu cara lain untuk identifikasi.
+    # Kita asumsikan no_sertifikat_kompetensi bisa berubah, jadi kita perlu PK asli (jika ada) atau cara lain.
+    # Untuk sementara, kita akan mengandalkan `no_sertifikat_kompetensi` yang ada saat load untuk identifikasi
+    # dan jika diubah, akan dianggap sebagai entri baru dan yang lama dihapus jika DELETE dicentang.
+    # Atau, lebih baik, PK tidak boleh diubah. Jika no_sertifikat diubah, itu berarti entri baru.
+
+# Buat formset factory
+from django.forms import formset_factory
+SertifikatFormSet = formset_factory(SertifikatForm, extra=1, can_delete=True)
+# extra=1 berarti selalu ada satu form kosong untuk entri baru.
+# can_delete=True akan menambahkan checkbox untuk menandai form yang akan dihapus.
+
+# (Nanti, buat JadwalForm dan JadwalFormSet dengan cara yang sama)
+class JadwalPraktikForm(forms.Form):
+    hari = forms.CharField(
+        max_length=10,
+        widget=forms.TextInput(attrs={'class': 'w-full border px-2 py-1 rounded-md text-sm', 'placeholder': 'Hari (e.g., Senin)'})
+    )
+    jam = forms.CharField(
+        max_length=20,
+        widget=forms.TextInput(attrs={'class': 'w-full border px-2 py-1 rounded-md text-sm', 'placeholder': 'Jam (e.g., 09:00 - 12:00)'})
+    )
+    DELETE = forms.BooleanField(required=False, widget=forms.HiddenInput())
+    # Untuk jadwal, PK adalah (no_dokter_hewan, hari, jam).
+    # Jika hari atau jam diubah, itu entri baru, dan yang lama harus dihapus jika DELETE.
+    # Kita perlu menyimpan hari dan jam asli untuk identifikasi update/delete.
+    original_hari = forms.CharField(widget=forms.HiddenInput(), required=False)
+    original_jam = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+
+JadwalPraktikFormSet = formset_factory(JadwalPraktikForm, extra=1, can_delete=True)
