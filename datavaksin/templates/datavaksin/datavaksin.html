@@ -4,7 +4,7 @@
 <div class="flex min-h-screen bg-white">
     <!-- Sidebar -->
     <div class="w-64 bg-gray-100 p-4 flex-shrink-0">
-        {% include "navbar/sidebar_perawat.html" %}
+        {% include "navbar/sidebar_perawat.html" %} {# Pastikan sidebar benar #}
     </div>
     
     <!-- Main Content -->
@@ -26,13 +26,13 @@
 
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold">Data Vaksin</h1>
-                <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2">
+                <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2 text-sm">
                     + Add New Vaccine
                 </button>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="min-w-full text-center border">
+                <table class="min-w-full text-sm text-center border">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-4 border">No</th>
@@ -50,12 +50,12 @@
                                 <td class="py-2 px-4 border">{{ forloop.counter }}</td>
                                 <td class="py-2 px-4 border">{{ vaksin.kode }}</td>
                                 <td class="py-2 px-4 border">{{ vaksin.nama }}</td>
-                                <td class="py-2 px-4 border">Rp{{ vaksin.harga }}</td> <!-- Format harga -->
+                                <td class="py-2 px-4 border">Rp{{ vaksin.harga|floatformat:0 }}</td> {# Format harga tanpa desimal jika integer #}
                                 <td class="py-2 px-4 border">{{ vaksin.stok }}</td>
-                                <td class="py-2 px-4 border flex justify-center gap-2">
-                                    <button onclick="openUpdateModal('{{ vaksin.kode }}')" class="bg-slate-900 text-white px-3 py-1 rounded">Update Info</button>
-                                    <button onclick="openStockModal('{{ vaksin.kode }}', '{{ vaksin.nama }}', '{{ vaksin.stok }}')" class="bg-blue-500 text-white px-3 py-1 rounded">Stock Update</button>
-                                    <button onclick="openDeleteModal('{{ vaksin.kode }}', '{{ vaksin.nama }}')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                                <td class="py-2 px-4 border flex justify-center gap-1 md:gap-2">
+                                    <button onclick="openUpdateModal('{{ vaksin.kode }}')" class="bg-slate-900 text-white px-3 py-1 rounded text-xs md:text-sm">Update Info</button>
+                                    <button onclick="openStockModal('{{ vaksin.kode }}', '{{ vaksin.nama }}', '{{ vaksin.stok }}')" class="bg-blue-500 text-white px-3 py-1 rounded text-xs md:text-sm">Stock Update</button>
+                                    <button onclick="openDeleteModal('{{ vaksin.kode }}', '{{ vaksin.nama }}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs md:text-sm">Delete</button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -72,146 +72,147 @@
 </div>
 
 <!-- Modal Create -->
-<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Create New Vaccine</h2>
         <form method="POST" action="{% url 'datavaksin:vaccine_data_create' %}" id="createVaksinForm">
             {% csrf_token %}
             <div class="mb-4">
-                <label for="{{ form_create.kode.id_for_label }}" class="block mb-1">{{ form_create.kode.label }}</label>
-                {{ form_create.kode }}
-                {% if form_create.kode.errors %}<p class="text-red-500 text-xs mt-1">{{ form_create.kode.errors|join:", " }}</p>{% endif %}
+                <label for="create_kode_vaksin" class="block text-sm font-medium text-gray-700 mb-1">ID Vaksin</label>
+                <input type="text" name="kode" id="create_kode_vaksin" class="w-full border border-gray-300 rounded p-2 text-sm" required placeholder="e.g., VAC001">
             </div>
             <div class="mb-4">
-                <label for="{{ form_create.nama.id_for_label }}" class="block mb-1">{{ form_create.nama.label }}</label>
-                {{ form_create.nama }}
-                {% if form_create.nama.errors %}<p class="text-red-500 text-xs mt-1">{{ form_create.nama.errors|join:", " }}</p>{% endif %}
+                <label for="create_nama_vaksin" class="block text-sm font-medium text-gray-700 mb-1">Nama Vaksin</label>
+                <input type="text" name="nama" id="create_nama_vaksin" class="w-full border border-gray-300 rounded p-2 text-sm" required placeholder="Nama Vaksin">
             </div>
             <div class="mb-4">
-                <label for="{{ form_create.harga.id_for_label }}" class="block mb-1">{{ form_create.harga.label }}</label>
-                {{ form_create.harga }}
-                {% if form_create.harga.errors %}<p class="text-red-500 text-xs mt-1">{{ form_create.harga.errors|join:", " }}</p>{% endif %}
+                <label for="create_harga_vaksin" class="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                <input type="number" name="harga" id="create_harga_vaksin" class="w-full border border-gray-300 rounded p-2 text-sm" required min="0" placeholder="Harga (angka)">
             </div>
             <div class="mb-6">
-                <label for="{{ form_create.stok.id_for_label }}" class="block mb-1">{{ form_create.stok.label }}</label>
-                {{ form_create.stok }}
-                {% if form_create.stok.errors %}<p class="text-red-500 text-xs mt-1">{{ form_create.stok.errors|join:", " }}</p>{% endif %}
+                <label for="create_stok_vaksin" class="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                <input type="number" name="stok" id="create_stok_vaksin" class="w-full border border-gray-300 rounded p-2 text-sm" required min="0" placeholder="Jumlah Stok">
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded">Create</button>
+                <button type="button" onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded text-sm">Cancel</button>
+                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded text-sm">Create</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Update Info -->
-<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Update Vaccine Info</h2>
         <form method="POST" action="" id="updateVaksinForm"> <!-- Action akan diisi JS -->
             {% csrf_token %}
             <div class="mb-4">
-                <label class="block mb-1">ID Vaksin</label>
-                <input id="updateIDVaksin" name="kode_vaksin_display" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ID Vaksin</label>
+                <input id="updateIDVaksin" name="kode_vaksin_display" type="text" class="w-full border rounded p-2 bg-gray-100 text-sm" disabled>
             </div>
             <div class="mb-4">
-                <label for="id_update_nama" class="block mb-1">Nama Vaksin</label>
-                <input id="id_update_nama" name="nama" type="text" class="w-full border rounded p-2">
+                <label for="id_update_nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Vaksin</label>
+                <input id="id_update_nama" name="nama" type="text" class="w-full border rounded p-2 text-sm" required>
             </div>
             <div class="mb-6">
-                <label for="id_update_harga" class="block mb-1">Harga (Rp)</label>
-                <input id="id_update_harga" name="harga" type="number" class="w-full border rounded p-2">
+                <label for="id_update_harga" class="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                <input id="id_update_harga" name="harga" type="number" class="w-full border rounded p-2 text-sm" required min="0">
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded">Update Info</button>
+                <button type="button" onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded text-sm">Cancel</button>
+                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded text-sm">Update Info</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Update Stock -->
-<div id="stockModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+<div id="stockModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Update Vaccine Stock</h2>
         <form method="POST" action="" id="stockUpdateForm"> <!-- Action akan diisi JS -->
             {% csrf_token %}
             <div class="mb-4">
-                <label class="block mb-1">ID Vaksin</label>
-                <input id="stockIDVaksin" name="kode_vaksin_display_stock" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+                <label class="block text-sm font-medium text-gray-700 mb-1">ID Vaksin</label>
+                <input id="stockIDVaksin" name="kode_vaksin_display_stock" type="text" class="w-full border rounded p-2 bg-gray-100 text-sm" disabled>
             </div>
             <div class="mb-4">
-                <label class="block mb-1">Nama Vaksin</label>
-                <input id="stockNamaVaksin" name="nama_vaksin_display_stock" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama Vaksin</label>
+                <input id="stockNamaVaksin" name="nama_vaksin_display_stock" type="text" class="w-full border rounded p-2 bg-gray-100 text-sm" disabled>
             </div>
             <div class="mb-6">
-                <label for="id_stock_value" class="block mb-1">Stok Baru</label>
-                <input id="id_stock_value" name="stok" type="number" class="w-full border rounded p-2">
+                <label for="id_stock_value" class="block text-sm font-medium text-gray-700 mb-1">Stok Baru</label>
+                <input id="id_stock_value" name="stok" type="number" class="w-full border rounded p-2 text-sm" required min="0">
             </div>
             <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal('stockModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded">Update Stock</button>
+                <button type="button" onclick="closeModal('stockModal')" class="border border-gray-300 px-4 py-2 rounded text-sm">Cancel</button>
+                <button type="submit" class="bg-slate-900 text-white px-4 py-2 rounded text-sm">Update Stock</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal Delete -->
-<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
         <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccine</h2>
         <form method="POST" action="" id="deleteVaksinForm"> <!-- Action akan diisi JS -->
             {% csrf_token %}
-            <p class="mb-6">Apakah kamu yakin untuk menghapus vaksin <span id="deleteNamaVaksin" class="font-semibold"></span> dengan ID <span id="deleteIDVaksin" class="font-semibold"></span>?</p>
+            <p class="mb-6 text-sm">Apakah kamu yakin untuk menghapus vaksin <span id="deleteNamaVaksin" class="font-semibold"></span> dengan ID <span id="deleteIDVaksin" class="font-semibold"></span>?</p>
             <div class="flex justify-center gap-2">
-                <button type="button" onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">Confirm Deletion</button>
+                <button type="button" onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded text-sm">Cancel</button>
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded text-sm">Confirm Deletion</button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    // URL dasar dari Django template (lebih aman dan dinamis)
+    // URL dasar dari Django template
     const baseUpdateURL = "{% url 'datavaksin:vaccine_data_update' 'KODE_PLACEHOLDER' %}";
     const baseStockUpdateURL = "{% url 'datavaksin:vaccine_stock_update' 'KODE_PLACEHOLDER' %}";
     const baseDeleteURL = "{% url 'datavaksin:vaccine_data_delete' 'KODE_PLACEHOLDER' %}";
     const baseDetailJsonURL = "{% url 'datavaksin:get_vaccine_details_json' 'KODE_PLACEHOLDER' %}";
 
-
     function openCreateModal() {
-        document.getElementById('createVaksinForm').reset(); // Reset form
-        document.getElementById('createModal').classList.remove('hidden');
-        document.getElementById('createModal').classList.add('flex');
+        document.getElementById('createVaksinForm').reset();
+        const modal = document.getElementById('createModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function openUpdateModal(kodeVaksin) {
         const modal = document.getElementById('updateModal');
         const form = document.getElementById('updateVaksinForm');
-        
-        // Set action URL
         form.action = baseUpdateURL.replace('KODE_PLACEHOLDER', kodeVaksin);
         
-        // Ambil data via AJAX (opsional, tapi lebih baik untuk pre-fill)
         fetch(baseDetailJsonURL.replace('KODE_PLACEHOLDER', kodeVaksin))
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
-                    alert(data.error);
+                    alert(data.error); // Tampilkan error jika ada dari JSON response
                     return;
                 }
-                document.getElementById('updateIDVaksin').value = data.kode;
-                document.getElementById('id_update_nama').value = data.nama;
-                document.getElementById('id_update_harga').value = data.harga;
+                document.getElementById('updateIDVaksin').value = data.kode || '';
+                document.getElementById('id_update_nama').value = data.nama || '';
+                document.getElementById('id_update_harga').value = data.harga || '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             })
-            .catch(error => console.error('Error fetching vaccine details:', error));
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+            .catch(error => {
+                console.error('Error fetching vaccine details:', error);
+                alert('Gagal memuat detail vaksin. Coba lagi.');
+            });
     }
 
     function openStockModal(kodeVaksin, namaVaksin, currentStock) {
+        const modal = document.getElementById('stockModal');
         const form = document.getElementById('stockUpdateForm');
         form.action = baseStockUpdateURL.replace('KODE_PLACEHOLDER', kodeVaksin);
 
@@ -219,34 +220,37 @@
         document.getElementById('stockNamaVaksin').value = namaVaksin;
         document.getElementById('id_stock_value').value = currentStock;
         
-        document.getElementById('stockModal').classList.remove('hidden');
-        document.getElementById('stockModal').classList.add('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function openDeleteModal(kodeVaksin, namaVaksin) {
+        const modal = document.getElementById('deleteModal');
         const form = document.getElementById('deleteVaksinForm');
         form.action = baseDeleteURL.replace('KODE_PLACEHOLDER', kodeVaksin);
 
         document.getElementById('deleteIDVaksin').innerText = kodeVaksin;
         document.getElementById('deleteNamaVaksin').innerText = namaVaksin;
-        document.getElementById('deleteModal').classList.remove('hidden');
-        document.getElementById('deleteModal').classList.add('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.getElementById(modalId).classList.remove('flex');
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.classList.add('hidden');
+            modalElement.classList.remove('flex');
+        }
     }
 
-    // Hapus fungsi updateStock() JS karena submit form akan menangani update
-    // function updateStock() { ... }
+    // Tidak ada flag open_create_modal_on_load lagi karena kita redirect dan tampilkan message global
+    // document.addEventListener('DOMContentLoaded', function() { ... });
 
-    // Optional: Close modal if clicking outside of it
     window.onclick = function(event) {
         const modals = ['createModal', 'updateModal', 'stockModal', 'deleteModal'];
         for (const modalId of modals) {
             const modalElement = document.getElementById(modalId);
-            if (event.target == modalElement) {
+            if (modalElement && event.target == modalElement) { // Pastikan modalElement ada
                 closeModal(modalId);
             }
         }
