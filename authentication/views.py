@@ -138,7 +138,7 @@ class RegisterView(View):
                 no_identitas = uuid.uuid4()
                 
                 cursor.execute(
-                    'INSERT INTO petclinic.klien (no_identitas, tanggal_registrasi, email) VALUES (%s, CURRENT_DATE, %s)',
+                    'INSERT INTO petclinic.klien (no_identitas, tanggal_registrasi, email) VALUES (%s, NOW(), %s)',
                     [no_identitas, email]
                 )
                 
@@ -181,7 +181,7 @@ class RegisterView(View):
                 no_identitas = uuid.uuid4()
                 
                 cursor.execute(
-                    'INSERT INTO petclinic.klien (no_identitas, tanggal_registrasi, email) VALUES (%s, CURRENT_DATE, %s)',
+                    'INSERT INTO petclinic.klien (no_identitas, tanggal_registrasi, email) VALUES (%s, NOW(), %s)',
                     [no_identitas, email]
                 )
                 
@@ -258,12 +258,12 @@ class RegisterView(View):
         no_izin_praktik = request.POST.get('no_izin_praktik')
         
         
-        sertifikat_numbers = request.POST.getlist('sertifikat_no')
-        sertifikat_names = request.POST.getlist('sertifikat_nama')
+        sertifikat_numbers = request.POST.getlist('sertifikat_no[]')
+        sertifikat_names = request.POST.getlist('sertifikat_nama[]')
         
         
-        jadwal_hari = request.POST.getlist('jadwal_hari')
-        jadwal_jam = request.POST.getlist('jadwal_jam')
+        jadwal_hari = request.POST.getlist('jadwal_hari[]')
+        jadwal_jam = request.POST.getlist('jadwal_jam[]')
         
         try:
             
@@ -348,8 +348,8 @@ class RegisterView(View):
         no_izin_praktik = request.POST.get('no_izin_praktik')
         
         
-        sertifikat_numbers = request.POST.getlist('sertifikat_no')
-        sertifikat_names = request.POST.getlist('sertifikat_nama')
+        sertifikat_numbers = request.POST.getlist('sertifikat_no[]')
+        sertifikat_names = request.POST.getlist('sertifikat_nama[]')
         
         try:
             
