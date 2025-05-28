@@ -4,14 +4,9 @@
 
 {% block content %}
 <div class="flex min-h-screen bg-gray-100">
-    <!-- Sidebar (Gunakan sidebar yang sesuai untuk klien) -->
-    {% if request.session.user_role == 'klien_individu' %}
-        {% include "navbar/sidebar.html" %}
-    {% elif request.session.user_role == 'klien_perusahaan' %}
-        {% include "navbar/sidebar_klien_company.html" %} 
-    {% else %}
-        {% include "navbar/sidebar.html" %} {# Fallback atau sidebar umum jika klien tidak teridentifikasi #}
-    {% endif %}
+
+    {% include "navbar/sidebar.html" %} 
+
     <!-- Main Content - Added ml-64 to give space for fixed sidebar -->
     <div class="flex-1 ml-64 p-6 overflow-auto">
         <div class="bg-white rounded-lg shadow-md p-6">
