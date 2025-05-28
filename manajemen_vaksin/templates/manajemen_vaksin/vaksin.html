@@ -1,52 +1,68 @@
 {% extends "base.html" %}
+{% load static %} 
+{% load i18n %}
 
 {% block content %}
-<div class="flex bg-white min-h-screen">
+<div class="flex bg-gray-100 min-h-screen"> {# Ubah bg utama ke gray-100 untuk kontras #}
     <!-- Sidebar -->
-    <div class="w-64 bg-gray-100 p-4">
-        {% include "navbar/sidebar.html" %}
+    <div class="w-64 bg-white shadow-md p-4 flex-shrink-0"> {# Sidebar dengan bg putih #}
+        {% include "navbar/sidebar.html" %} {# Pastikan nama file sidebar benar #}
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 p-6">
+    <div class="flex-1 p-6 overflow-auto">
         <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Pesan Feedback -->
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg 
+                        {% if message.tags == 'success' %} bg-green-100 text-green-700 border border-green-300 {% endif %}
+                        {% if message.tags == 'error' %} bg-red-100 text-red-700 border border-red-300 {% endif %}
+                        {% if message.tags == 'warning' %} bg-yellow-100 text-yellow-700 border border-yellow-300 {% endif %}
+                        {% if message.tags == 'info' %} bg-blue-100 text-blue-700 border border-blue-300 {% endif %}"
+                        role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold">List Vaccination</h1>
-                <button onclick="openCreateModal()" class="bg-slate-900 text-white px-4 py-2 rounded flex items-center gap-2">
-                    + Create New Vaccination
+                <h1 class="text-2xl font-semibold text-gray-800">List Data Vaksinasi Kunjungan</h1>
+                <button onclick="openCreateModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm">
+                    <i class="fas fa-plus-circle"></i> Tambah Vaksinasi
                 </button>
             </div>
 
             <div class="overflow-x-auto">
-                <table class="min-w-full text-center border">
-                    <thead class="bg-gray-100">
+                <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-2 px-4 border">No</th>
-                            <th class="py-2 px-4 border">Kunjungan</th>
-                            <th class="py-2 px-4 border">Tanggal Kunjungan</th>
-                            <th class="py-2 px-4 border">Vaksin</th>
-                            <th class="py-2 px-4 border">Action</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">No</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Kunjungan (ID - Hewan)</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Tanggal Kunjungan</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Vaksin Diberikan</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white">
                         {% if vaccinations %}
                             {% for vac in vaccinations %}
-                            <tr class="border">
-                                <td class="py-2 px-4 border">{{ forloop.counter }}</td>
-                                <td class="py-2 px-4 border">{{ vac.kunjungan_id }}</td>
-                                <td class="py-2 px-4 border">{{ vac.tanggal_kunjungan_formatted }}</td> {# Use formatted date #}
-                                <td class="py-2 px-4 border">{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}</td>
-                                <td class="py-2 px-4 border flex justify-center gap-2">
-                                    {# Pass relevant IDs to JS functions #}
-                                    {# We might pass vac.id (primary key) later for easier backend handling #}
-                                    <button onclick="openUpdateModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-slate-900 text-white px-3 py-1 rounded">Update</button>
-                                    <button onclick="openDeleteModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                            <tr class="hover:bg-gray-50" id="vaccination-row-{{ vac.kunjungan_id }}">
+                                <td class="py-3 px-4 border-b border-gray-200">{{ forloop.counter }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.display_kunjungan }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.tanggal_kunjungan_formatted }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200 text-center flex justify-center gap-1 md:gap-2">
+                                    <button onclick="openUpdateModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-md text-xs font-medium">Update</button>
+                                    <button onclick="openDeleteModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">Delete</button>
                                 </td>
                             </tr>
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="5" class="py-4 px-4 border text-gray-500">No vaccinations found.</td>
+                                <td colspan="5" class="py-4 px-4 border-b border-gray-200 text-center text-gray-500">Belum ada data vaksinasi.</td>
                             </tr>
                         {% endif %}
                     </tbody>
@@ -57,154 +73,206 @@
 </div>
 
 <!-- Modal Create -->
-<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-    {# Add z-index to ensure modals are on top #}
-    <div class="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 class="text-xl font-semibold mb-4">Create New Vaccination</h2>
-        {# Add form tags later when connecting to backend #}
-        {# <form method="post" action="{% url 'vaccination_create' %}"> {% csrf_token %} ... </form> #}
-        <div class="mb-4">
-            <label for="createKunjungan" class="block mb-1">Kunjungan</label>
-            <select id="createKunjungan" name="kunjungan_id" class="w-full border rounded p-2">
-                <option value="" disabled selected>-- Select Kunjungan --</option>
-                {% for kunjungan in kunjungan_options %}
-                    <option value="{{ kunjungan.id }}">{{ kunjungan.display_text }}</option>
-                {% endfor %}
-            </select>
+<div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50 p-4 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300 ease-in-out scale-95 opacity-0" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Tambah Vaksinasi ke Kunjungan</h2>
+            <button onclick="closeModal('createModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times fa-lg"></i></button>
         </div>
-        <div class="mb-6">
-            <label for="createVaksin" class="block mb-1">Vaksin</label>
-            <select id="createVaksin" name="vaksin_id" class="w-full border rounded p-2">
-                 <option value="" disabled selected>-- Select Vaksin --</option>
-                {% for vaksin in vaksin_options %}
-                    <option value="{{ vaksin.id }}" {% if vaksin.stok <= 0 %}disabled{% endif %}>
-                        {{ vaksin.id }} - {{ vaksin.nama }} [{{ vaksin.stok }}]
-                    </option>
-                {% endfor %}
-            </select>
-            {# Add a small note for disabled options #}
-            <p class="text-xs text-gray-500 mt-1">*Vaccines with [0] stock are unavailable.</p>
-        </div>
-        <div class="flex justify-end gap-2">
-            <button type="button" onclick="closeModal('createModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-            {# Change type to submit when using a form #}
-            <button type="button" class="bg-slate-900 text-white px-4 py-2 rounded">Create</button>
-        </div>
+        <form method="POST" action="{% url 'manajemen_vaksin:vaccination_create' %}" id="createVaccinationForm">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="createKunjungan" class="block text-sm font-medium text-gray-700 mb-1">Pilih Kunjungan (yang belum divaksin)</label>
+                <select id="createKunjungan" name="kunjungan_id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" required>
+                    <option value="" disabled selected>-- Pilih Kunjungan --</option>
+                    {% for kunjungan in kunjungan_options_for_create %}
+                        <option value="{{ kunjungan.id }}">{{ kunjungan.display_text }}</option>
+                    {% endfor %}
+                    {% if not kunjungan_options_for_create %}
+                        <option value="" disabled>Tidak ada kunjungan tersedia untuk vaksinasi baru.</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="mb-6">
+                <label for="createVaksin" class="block text-sm font-medium text-gray-700 mb-1">Pilih Vaksin</label>
+                <select id="createVaksin" name="vaksin_id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" required>
+                     <option value="" disabled selected>-- Pilih Vaksin --</option>
+                    {% for vaksin_opt in vaksin_options %} {# Ganti nama variabel loop agar tidak konflik #}
+                        <option value="{{ vaksin_opt.id }}" {% if vaksin_opt.stok <= 0 %}disabled title="Stok habis"{% endif %}>
+                            {{ vaksin_opt.id }} - {{ vaksin_opt.nama }} [Stok: {{ vaksin_opt.stok }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-gray-500 mt-1">*Vaksin dengan stok [0] tidak dapat dipilih.</p>
+            </div>
+            <div class="flex justify-end gap-2 pt-4 border-t">
+                <button type="button" onclick="closeModal('createModal')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Batal</button>
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium">Simpan Vaksinasi</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Modal Update -->
-<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 class="text-xl font-semibold mb-4">Update Vaccination</h2>
-        <div class="mb-4">
-            <label class="block mb-1">Kunjungan</label>
-            <input id="updateKunjungan" type="text" class="w-full border rounded p-2 bg-gray-100" disabled>
+<div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50 p-4 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300 ease-in-out scale-95 opacity-0" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Update Vaksinasi Kunjungan</h2>
+            <button onclick="closeModal('updateModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times fa-lg"></i></button>
         </div>
-        <div class="mb-6">
-            <label for="updateVaksin" class="block mb-1">Vaksin</label>
-            <select id="updateVaksin" name="vaksin_id" class="w-full border rounded p-2">
-                 <option value="" disabled>-- Select New Vaksin --</option> {# Default/placeholder #}
-                {% for vaksin in vaksin_options %}
-                    {# We might need JS to pre-select the current vaccine #}
-                    <option value="{{ vaksin.id }}" {% if vaksin.stok <= 0 %}disabled{% endif %}>
-                        {{ vaksin.id }} - {{ vaksin.nama }} [{{ vaksin.stok }}]
-                    </option>
-                {% endfor %}
-            </select>
-             <p class="text-xs text-gray-500 mt-1">*Vaccines with [0] stock are unavailable.</p>
-        </div>
-        <div class="flex justify-end gap-2">
-            <button type="button" onclick="closeModal('updateModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-            <button type="button" class="bg-slate-900 text-white px-4 py-2 rounded">Update</button>
-        </div>
+        <form method="POST" action="" id="updateVaccinationForm"> <!-- Action akan diisi JS -->
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kunjungan (ID)</label>
+                <input id="updateKunjunganIdDisplay" type="text" class="w-full border rounded-md p-2 bg-gray-100 text-sm" disabled>
+            </div>
+            <div class="mb-6">
+                <label for="updateVaksin" class="block text-sm font-medium text-gray-700 mb-1">Pilih Vaksin Baru</label>
+                <select id="updateVaksin" name="vaksin_id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" required>
+                     <option value="" disabled>-- Pilih Vaksin Baru --</option>
+                    {% for vaksin_opt_upd in vaksin_options %} {# Ganti nama variabel loop #}
+                        <option value="{{ vaksin_opt_upd.id }}" {% if vaksin_opt_upd.stok <= 0 %}disabled title="Stok habis"{% endif %}>
+                            {{ vaksin_opt_upd.id }} - {{ vaksin_opt_upd.nama }} [Stok: {{ vaksin_opt_upd.stok }}]
+                        </option>
+                    {% endfor %}
+                </select>
+                 <p class="text-xs text-gray-500 mt-1">*Vaksin dengan stok [0] tidak dapat dipilih.</p>
+            </div>
+            <div class="flex justify-end gap-2 pt-4 border-t">
+                <button type="button" onclick="closeModal('updateModal')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Batal</button>
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md text-sm font-medium">Update Vaksinasi</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Modal Delete -->
-<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
-        {# Add form tags later #}
-         {# <form method="post" action=""> {% csrf_token %} ... </form> #}
-         {# Action URL will be set dynamically or have a base #}
-        <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccination</h2>
-        <p class="mb-6">Apakah kamu yakin untuk menghapus Vaksinasi untuk Kunjungan <span id="deleteKunjungan" class="font-semibold"></span> dengan Vaksin <span id="deleteVaksin" class="font-semibold"></span>?</p>
-        {# Add hidden inputs if needed to pass IDs to the backend on form submission #}
-        {# <input type="hidden" id="deleteKunjunganIdHidden" name="kunjungan_id"> #}
-        {# <input type="hidden" id="deleteVaksinIdHidden" name="vaksin_id"> #}
-        <div class="flex justify-center gap-2">
-            <button type="button" onclick="closeModal('deleteModal')" class="border border-gray-300 px-4 py-2 rounded">Cancel</button>
-            <button type="button" class="bg-red-500 text-white px-4 py-2 rounded">Confirm Deletion</button>
+<div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50 p-4 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-center transform transition-all duration-300 ease-in-out scale-95 opacity-0" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-xl font-semibold text-red-600">Hapus Data Vaksinasi</h2>
+            <button onclick="closeModal('deleteModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times fa-lg"></i></button>
         </div>
+        <form method="POST" action="" id="deleteVaccinationForm"> <!-- Action akan diisi JS -->
+            {% csrf_token %}
+            <p class="mb-6 text-sm">Apakah Anda yakin ingin menghapus data vaksinasi untuk Kunjungan <strong id="deleteKunjunganIdDisplay" class="font-medium"></strong> (Vaksin: <span id="deleteVaksinInfoDisplay" class="font-medium"></span>)?<br> Tindakan ini akan mengosongkan data vaksin pada kunjungan tersebut.</p>
+            <div class="flex justify-center gap-2 pt-4">
+                <button type="button" onclick="closeModal('deleteModal')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Batal</button>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">Ya, Hapus</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
-    // Get references to modal elements once
-    const createModal = document.getElementById('createModal');
-    const updateModal = document.getElementById('updateModal');
-    const deleteModal = document.getElementById('deleteModal');
-    const updateKunjunganInput = document.getElementById('updateKunjungan');
-    const updateVaksinSelect = document.getElementById('updateVaksin');
-    const deleteKunjunganSpan = document.getElementById('deleteKunjungan');
-    const deleteVaksinSpan = document.getElementById('deleteVaksin');
+    // Generate base URL templates using a valid UUID
+    const dummyUUID = "00000000-0000-0000-0000-000000000000";
+    const baseUpdateVaccinationURLTemplate = "{% url 'manajemen_vaksin:vaccination_update_view' '00000000-0000-0000-0000-000000000000' %}";
+    const baseDeleteVaccinationURLTemplate = "{% url 'manajemen_vaksin:vaccination_delete' '00000000-0000-0000-0000-000000000000' %}";
+
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            void modal.offsetWidth; // Trigger reflow untuk animasi
+            const modalContent = modal.querySelector('.bg-white');
+            if (modalContent) {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }
+        }
+    }
+
+    function hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            const modalContent = modal.querySelector('.bg-white');
+            if (modalContent) {
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300); 
+        }
+    }
 
     function openCreateModal() {
-        // Reset form fields if needed
-        document.getElementById('createKunjungan').selectedIndex = 0;
-        document.getElementById('createVaksin').selectedIndex = 0;
-        createModal.classList.remove('hidden');
-        createModal.classList.add('flex');
+        const form = document.getElementById('createVaccinationForm');
+        if (form) form.reset();
+        
+        const createKunjunganSelect = document.getElementById('createKunjungan');
+        if(createKunjunganSelect && createKunjunganSelect.options.length <= 1 && createKunjunganSelect.options[0].disabled){
+             alert("Tidak ada kunjungan yang tersedia untuk ditambahkan vaksinasi baru. Pastikan ada kunjungan yang belum divaksin.");
+             return;
+        }
+        showModal('createModal');
     }
 
     function openUpdateModal(kunjunganId, currentVaksinId) {
-        updateKunjunganInput.value = kunjunganId;
+        const modal = document.getElementById('updateModal');
+        const form = modal.querySelector('form');
+        const kunjunganIdDisplay = document.getElementById('updateKunjunganIdDisplay');
+        const vaksinSelect = document.getElementById('updateVaksin');
+
+        if (!form || !kunjunganIdDisplay || !vaksinSelect) {
+            console.error("Elemen form update modal tidak ditemukan semua.");
+            return;
+        }
+        
+        // Replace the dummy UUID with the actual kunjunganId
+        form.action = baseUpdateVaccinationURLTemplate.replace("00000000-0000-0000-0000-000000000000", kunjunganId);
+        
+        kunjunganIdDisplay.value = kunjunganId;
 
         let found = false;
-        for (let i = 0; i < updateVaksinSelect.options.length; i++) {
-            if (updateVaksinSelect.options[i].value === currentVaksinId) {
-                updateVaksinSelect.selectedIndex = i;
+        for (let i = 0; i < vaksinSelect.options.length; i++) {
+            if (vaksinSelect.options[i].value === currentVaksinId) {
+                vaksinSelect.selectedIndex = i;
                 found = true;
                 break;
             }
         }
-
         if (!found) {
-             updateVaksinSelect.selectedIndex = 0;
+             vaksinSelect.selectedIndex = 0; 
         }
-
-        updateModal.classList.remove('hidden');
-        updateModal.classList.add('flex');
-        // e.g., updateModal.querySelector('form').action = `/vaccinations/update/${some_primary_key}/`;
+        showModal('updateModal');
     }
 
-    function openDeleteModal(kunjunganId, vaksinId) {
-        deleteKunjunganSpan.innerText = kunjunganId;
-        deleteVaksinSpan.innerText = vaksinId;
-        deleteModal.classList.remove('hidden');
-        deleteModal.classList.add('flex');
-         // e.g., deleteModal.querySelector('form').action = `/vaccinations/delete/${some_primary_key}/`;
-         // Or set hidden input values if submitting via form post
-         // document.getElementById('deleteKunjunganIdHidden').value = kunjunganId;
-         // document.getElementById('deleteVaksinIdHidden').value = vaksinId;
+    function openDeleteModal(kunjunganId, vaksinInfoForDisplay) {
+        const modal = document.getElementById('deleteModal');
+        const form = modal.querySelector('form');
+        const kunjunganIdDisplay = document.getElementById('deleteKunjunganIdDisplay');
+        const vaksinInfoDisplay = document.getElementById('deleteVaksinInfoDisplay');
+
+        if (!form || !kunjunganIdDisplay || !vaksinInfoDisplay) {
+            console.error("Elemen form delete modal tidak ditemukan semua.");
+            return;
+        }
+
+        // Replace the dummy UUID with the actual kunjunganId
+        form.action = baseDeleteVaccinationURLTemplate.replace("00000000-0000-0000-0000-000000000000", kunjunganId);
+        
+        kunjunganIdDisplay.textContent = kunjunganId; // Tampilkan ID Kunjungan yang akan di-pass ke URL
+        vaksinInfoDisplay.textContent = vaksinInfoForDisplay;
+        
+        showModal('deleteModal');
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.getElementById(modalId).classList.remove('flex'); // Also remove flex
+        hideModal(modalId);
     }
 
-     // Optional: Close modal if clicking outside of it
-    window.onclick = function(event) {
-        if (event.target == createModal) {
-            closeModal('createModal');
-        } else if (event.target == updateModal) {
-            closeModal('updateModal');
-        } else if (event.target == deleteModal) {
-            closeModal('deleteModal');
+    window.addEventListener('click', function(event) {
+        const modals = ['createModal', 'updateModal', 'deleteModal'];
+        for (const modalId of modals) {
+            const modalElement = document.getElementById(modalId);
+            if (modalElement && event.target === modalElement) { 
+                hideModal(modalId);
+            }
         }
-    }
-
+    });
 </script>
-
 {% endblock %}
