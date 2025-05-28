@@ -1,14 +1,14 @@
-<form method="post" action="{% url 'hewan_peliharaan:delete' 1 %}">
+<form method="post" action="{% url 'hewan_peliharaan:delete' id %}">
   {% csrf_token %}
   <h2 class="text-xl font-semibold text-red-600 mb-4">Delete Pet</h2>
   <p>
-    Apakah kamu yakin untuk menghapus Hewan Peliharaan
-    <strong>Snowy</strong>
-    milik <strong>John Doe</strong>?
+    Apakah kamu yakin untuk menghapus Hewan Peliharaan <strong>{{ nama_hewan }}</strong> milik <strong>{{ nama_pemilik }}</strong>?
   </p>
   <div class="mt-6 flex justify-end space-x-3">
-    <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">Cancel</button>
-    <button type="submit" class="bg-accent text-white px-4 py-2 rounded">
+    <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">
+      Cancel
+    </button>
+    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
       Confirm Deletion
     </button>
   </div>
