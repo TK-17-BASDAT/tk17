@@ -1,40 +1,46 @@
-<form method="post" action="{% url 'hewan_peliharaan:update' 1 %}">
+<form method="post" action="{% url 'hewan_peliharaan:update' id %}">
   {% csrf_token %}
   <h2 class="text-xl font-semibold mb-4">Update Pet</h2>
 
+  {% if user_role == 'front_desk' %}
+  <!-- Only front desk can see and change owner -->
   <div class="mb-4">
     <label class="block text-gray-700">Pemilik</label>
-    <select name="pemilik" class="w-full border rounded px-3 py-2">
-      <option selected>John Doe</option>
-      <option>PT Pecinta Kucing</option>
-      <option>PT Aku Sayang Hewan</option>
+    <select name="pemilik" class="w-full border rounded px-3 py-2" required>
+      {% for client in clients %}
+      <option value="{{ client.id }}" {% if client.id == no_identitas_klien %}selected{% endif %}>{{ client.name }}</option>
+      {% endfor %}
     </select>
   </div>
+  {% else %}
+  <!-- Client users get a hidden field to maintain their owner ID -->
+  <input type="hidden" name="pemilik" value="{{ no_identitas_klien }}">
+  {% endif %}
 
   <div class="mb-4">
     <label class="block text-gray-700">Jenis Hewan</label>
-    <select name="jenis_hewan" class="w-full border rounded px-3 py-2">
-      <option selected>Kucing</option>
-      <option>Anjing</option>
-      <option>Hamster</option>
+    <select name="jenis_hewan" class="w-full border rounded px-3 py-2" required>
+      {% for jenis in jenis_hewan_list %}
+      <option value="{{ jenis.id }}" {% if jenis.id == id_jenis %}selected{% endif %}>{{ jenis.nama }}</option>
+      {% endfor %}
     </select>
   </div>
 
   <div class="mb-4">
     <label class="block text-gray-700">Nama Hewan Peliharaan</label>
-    <input name="nama_hewan" type="text" value="Snowy"
-           class="w-full border rounded px-3 py-2">
+    <input name="nama_hewan" type="text" value="{{ nama_hewan }}"
+           class="w-full border rounded px-3 py-2" required>
   </div>
 
   <div class="mb-4">
     <label class="block text-gray-700">Tanggal Lahir Hewan</label>
-    <input name="tgl_lahir" type="date" value="2020-02-09"
-           class="w-full border rounded px-3 py-2">
+    <input name="tgl_lahir" type="date" value="{{ tanggal_lahir }}"
+           class="w-full border rounded px-3 py-2" required>
   </div>
 
   <div class="mb-6">
     <label class="block text-gray-700">URL Foto Hewan</label>
-    <input name="url_foto" type="url" value="https://kucingsaya.com"
+    <input name="url_foto" type="url" value="{{ url_foto }}"
            class="w-full border rounded px-3 py-2">
   </div>
 

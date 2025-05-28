@@ -1,32 +1,11 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from . import views
 
 app_name = 'hewan_peliharaan'
 
 urlpatterns = [
-    path(
-        '',
-        TemplateView.as_view(template_name='hewan_peliharaan/list.html'),
-        name='list'
-    ),
-    path(
-        'create/',
-        TemplateView.as_view(template_name='hewan_peliharaan/create.html'),
-        name='create'
-    ),
-    path(
-        'create/error/',
-        TemplateView.as_view(template_name='hewan_peliharaan/error.html'),
-        name='error'
-    ),
-    path(
-        'update/<int:pk>/',
-        TemplateView.as_view(template_name='hewan_peliharaan/update.html'),
-        name='update'
-    ),
-    path(
-        'delete/<int:pk>/',
-        TemplateView.as_view(template_name='hewan_peliharaan/delete.html'),
-        name='delete'
-    ),
+    path('', views.list_hewan_peliharaan, name='list'),
+    path('create/', views.create_hewan_peliharaan, name='create'),
+    path('update/<str:id>/', views.update_hewan_peliharaan, name='update'),
+    path('delete/<str:id>/', views.delete_hewan_peliharaan, name='delete'),
 ]
