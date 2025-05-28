@@ -132,7 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(json.success){
                     location.reload();
                 } else {
+                    // Error occurred, display the updated form with errors
                     content.innerHTML = json.html;
+                    
+                    // Highlight error messages
+                    const errorDiv = content.querySelector('.bg-red-100');
+                    if (errorDiv) {
+                      errorDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    }
                 }
             });
         });

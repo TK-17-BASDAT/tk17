@@ -58,7 +58,7 @@
                             data-url="{% url 'hewan_peliharaan:update' hewan.id %}">
                       Update
                     </button>
-                    {% if request.session.user_role == 'front_desk' and hewan.can_delete %}
+                    {% if request.session.user_role == 'front_desk' %}
                     <button class="btn-delete bg-accent text-white px-4 py-1 rounded hover:bg-accent2 transition"
                             data-url="{% url 'hewan_peliharaan:delete' hewan.id %}">
                       Delete
