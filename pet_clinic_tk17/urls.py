@@ -32,8 +32,6 @@ urlpatterns = [
     path('manajemenvaksin/', include('manajemen_vaksin.urls')),
     path('datavaksin/', include('datavaksin.urls')),
     path('dataklien/', include('dataklien.urls')),
-    
     path('perawatan-hewan/', include('perawatan_hewan.urls')),
     path('kunjungan/', include('kunjungan.urls')),
-    path('rekam-medis/', include('rekam_medis.urls')),
 ]
