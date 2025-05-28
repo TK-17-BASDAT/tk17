@@ -1,0 +1,140 @@
+<aside class="fixed inset-y-0 left-0 w-64 bg-white border-r shadow-sm">
+  <div class="px-6 py-4">
+    {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
+      <h2 class="text-lg font-semibold text-gray-800">Menu Klien</h2>
+    {% elif request.session.user_role == 'front_desk' %}
+      <h2 class="text-lg font-semibold text-gray-800">Menu Front-Desk</h2>
+    {% elif request.session.user_role == 'dokter_hewan' %}
+      <h2 class="text-lg font-semibold text-gray-800">Menu Dokter Hewan</h2>
+    {% elif request.session.user_role == 'perawat_hewan' %}
+      <h2 class="text-lg font-semibold text-gray-800">Menu Perawat Hewan</h2>
+    {% endif %}
+  </div>
+  
+  <nav class="px-4 py-2">
+    <ul class="space-y-1">
+      <!-- Dashboard - different URL for each role -->
+      <li>
+        {% if request.session.user_role == 'klien_individu' %}
+          <a href="{% url 'dashboard:klien' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        {% elif request.session.user_role == 'klien_perusahaan' %}
+          <a href="{% url 'dashboard:kliencompany' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        {% elif request.session.user_role == 'front_desk' %}
+          <a href="{% url 'dashboard:frontdesk' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        {% elif request.session.user_role == 'dokter_hewan' %}
+          <a href="{% url 'dashboard:dokter' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        {% elif request.session.user_role == 'perawat_hewan' %}
+          <a href="{% url 'dashboard:perawat' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        {% endif %}
+          <i class="fas fa-home w-5"></i>
+          <span class="ml-3">Dashboard</span>
+        </a>
+      </li>
+      
+      <!-- Kelola/Daftar Jenis Hewan -->
+      {% if request.session.user_role == 'front_desk' %}
+      <li>
+        <a href="{% url 'jenis_hewan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-th-list w-5"></i>
+          <span class="ml-3">Kelola Jenis Hewan</span>
+        </a>
+      </li>
+      {% elif request.session.user_role == 'dokter_hewan' %}
+      <li>
+        <a href="{% url 'jenis_hewan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-th-list w-5"></i>
+          <span class="ml-3">Daftar Jenis Hewan</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Perawatan Hewan (dokter only) -->
+      {% if request.session.user_role == 'dokter_hewan' %}
+      <li>
+        <a href="{% url 'perawatan_hewan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-stethoscope w-5"></i>
+          <span class="ml-3">Perawatan Hewan</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Hewan Peliharaan -->
+      {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' or request.session.user_role == 'front_desk' %}
+      <li>
+        <a href="{% url 'hewan_peliharaan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-paw w-5"></i>
+          <span class="ml-3">
+            {% if request.session.user_role == 'front_desk' %}Kelola{% else %}Kelola{% endif %} Hewan Peliharaan
+          </span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Kunjungan -->
+      {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
+      <li>
+        <a href="{% url 'kunjungan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-calendar-alt w-5"></i>
+          <span class="ml-3">Daftar Kunjungan</span>
+        </a>
+      </li>
+      {% elif request.session.user_role == 'front_desk' %}
+      <li>
+        <a href="{% url 'kunjungan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-calendar-check w-5"></i>
+          <span class="ml-3">Kelola Kunjungan</span>
+        </a>
+      </li>
+      {% elif request.session.user_role == 'dokter_hewan' %}
+      <li>
+        <a href="{% url 'kunjungan:list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-calendar-alt w-5"></i>
+          <span class="ml-3">Daftar Kunjungan</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Vaksinasi/Vaksin -->
+      {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
+      <li>
+        <a href="{% url 'data_vaksin:data_vaksin' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-syringe w-5"></i>
+          <span class="ml-3">Daftar Vaksinasi</span>
+        </a>
+      </li>
+      {% elif request.session.user_role == 'dokter_hewan' %}
+      <li>
+        <a href="{% url 'manajemen_vaksin:vaccination_list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-syringe w-5"></i>
+          <span class="ml-3">Manajemen Vaksinasi Hewan</span>
+        </a>
+      </li>
+      {% elif request.session.user_role == 'perawat_hewan' %}
+      <li>
+        <a href="{% url 'manajemen_vaksin:vaccination_list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-syringe w-5"></i>
+          <span class="ml-3">Manajemen Vaksin</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      <!-- Daftar Klien (front-desk only) -->
+      {% if request.session.user_role == 'front_desk' %}
+      <li>
+        <a href="{% url 'dataklien:client_list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-users w-5"></i>
+          <span class="ml-3">Daftar Klien</span>
+        </a>
+      </li>
+      {% endif %}
+
+      <!-- Logout - common for all users -->
+      <li>
+        <a href="{% url 'authentication:logout' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+          <i class="fas fa-sign-out-alt w-5"></i>
+          <span class="ml-3">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</aside>

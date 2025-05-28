@@ -147,8 +147,7 @@ STATICFILES_DIRS = [BASE_DIR / "pet_clinic_tk17" / "static",]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Authentication settings
-LOGIN_URL = 'authentication:login'
+
 
 # Logging Configuration
 LOGGING = {
@@ -189,6 +188,8 @@ LOGGING = {
         },
     },
 }
+
+LOGIN_URL = '/' 
 LOGIN_REDIRECT_URL = 'dashboard:index'
-LOGOUT_REDIRECT_URL = 'authentication:login'
-SESSION_COOKIE_AGE = 86400  # 1 day in seconds
+LOGOUT_REDIRECT_URL = '/'  
+SESSION_COOKIE_AGE = 86400  
