@@ -1,30 +1,30 @@
 from django.urls import path
-from django.views.generic import TemplateView
+from . import views
 
 app_name = 'jenis_hewan'
 
 urlpatterns = [
     path(
         '',
-        TemplateView.as_view(template_name='jenis_hewan/list.html'),
+        views.list_jenis_hewan,
         name='list'
     ),
 
     path(
         'create/',
-        TemplateView.as_view(template_name='jenis_hewan/create.html'),
+        views.create_jenis_hewan,
         name='create'
     ),
 
     path(
-        'update/<int:pk>/',
-        TemplateView.as_view(template_name='jenis_hewan/update.html'),
+        'update/<uuid:id>/',  
+        views.update_jenis_hewan,
         name='update'
     ),
 
     path(
-        'delete/<int:pk>/',
-        TemplateView.as_view(template_name='jenis_hewan/delete.html'),
+        'delete/<uuid:id>/',  
+        views.delete_jenis_hewan,
         name='delete'
     ),
 ]

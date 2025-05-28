@@ -1,10 +1,10 @@
-<form method="post" action="{% url 'jenis_hewan:delete' 1 %}">
+<form method="post" action="{% url 'jenis_hewan:delete' id %}">
     {% csrf_token %}
     <h2 class="text-xl font-semibold text-red-600 mb-4">Delete Animal Type</h2>
     <p>
       Apakah kamu yakin untuk menghapus Jenis Hewan
-      <strong>Kucing</strong>
-      dengan kode <strong>HWN001</strong>?
+      <strong>{{ nama_jenis }}</strong>
+      dengan kode <strong>{{ id }}</strong>?
     </p>
     <div class="mt-6 flex justify-end space-x-3">
       <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">
@@ -14,5 +14,4 @@
         Confirm Deletion
       </button>
     </div>
-  </form>
-  
+</form>
