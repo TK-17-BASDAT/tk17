@@ -5,6 +5,8 @@ from django.urls import reverse
 from datetime import date, datetime
 import locale
 import uuid
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View 
 
 # --- Pengaturan Locale (Opsional) ---
 try:
@@ -304,3 +306,111 @@ def vaccination_delete_view(request, kunjungan_id):  # <- Ubah dari kunjungan_id
         return redirect('manajemen_vaksin:vaccination_list')
 
     return redirect('manajemen_vaksin:vaccination_list')
+
+class ClientPetVaccinationHistoryView(LoginRequiredMixin, View):
+    login_url = '/auth/login/'
+    template_name = 'manajemen_vaksin/vaksin_klien.html' # Template baru
+
+    def get(self, request):
+        no_identitas_klien_str = request.session.get('no_identitas')
+        user_role = request.session.get('user_role')
+
+        if not no_identitas_klien_str or user_role not in ['klien_individu', 'klien_perusahaan']:
+            messages.error(request, "Akses ditolak. Anda harus login sebagai klien untuk melihat halaman ini.")
+            return redirect('dashboard:index') # Arahkan ke dashboard umum atau login
+
+        # Ambil parameter filter dari GET request
+        filter_pet_name = request.GET.get('pet_name', '').strip()
+        filter_vaccine_kode = request.GET.get('vaccine_kode', '').strip() # Kita akan filter berdasarkan KODE vaksin
+
+        vaccination_history_list = []
+        pet_options_for_filter = [] 
+        vaccine_options_for_filter = []
+
+        try:
+            with connection.cursor() as cursor:
+                # 1. Ambil daftar hewan peliharaan unik milik klien ini untuk filter
+                query_client_pets = """
+                    SELECT DISTINCT h.nama
+                    FROM PETCLINIC.HEWAN h
+                    WHERE h.no_identitas_klien = %s
+                    ORDER BY h.nama;
+                """
+                cursor.execute(query_client_pets, [no_identitas_klien_str])
+                for row in cursor.fetchall():
+                    pet_options_for_filter.append(row[0])
+
+                # 2. Ambil daftar vaksin unik (kode dan nama) yang pernah digunakan oleh hewan klien ini untuk filter
+                query_client_used_vaccines = """
+                    SELECT DISTINCT v.kode, v.nama
+                    FROM PETCLINIC.VAKSIN v
+                    JOIN PETCLINIC.KUNJUNGAN k ON v.kode = k.kode_vaksin
+                    WHERE k.no_identitas_klien = %s AND k.kode_vaksin IS NOT NULL
+                    ORDER BY v.nama;
+                """
+                cursor.execute(query_client_used_vaccines, [no_identitas_klien_str])
+                for row in dictfetchall(cursor):
+                    vaccine_options_for_filter.append({'kode': row['kode'], 'nama': row['nama']})
+
+                # 3. Query utama untuk mengambil riwayat vaksinasi klien dengan filter
+                base_query_history = """
+                    SELECT
+                        h.nama AS nama_hewan,
+                        v.nama AS nama_vaksin,
+                        v.kode AS kode_vaksin, /* ID Vaksin */
+                        v.harga AS harga_vaksin, 
+                        k.timestamp_awal AS tanggal_vaksinasi /* Time and Date */
+                    FROM
+                        PETCLINIC.KUNJUNGAN k
+                    JOIN
+                        PETCLINIC.HEWAN h ON k.nama_hewan = h.nama AND k.no_identitas_klien = h.no_identitas_klien
+                    JOIN
+                        PETCLINIC.VAKSIN v ON k.kode_vaksin = v.kode
+                    WHERE
+                        k.no_identitas_klien = %s AND k.kode_vaksin IS NOT NULL
+                """
+                params_history = [no_identitas_klien_str]
+                conditions_history = []
+
+                if filter_pet_name:
+                    conditions_history.append("h.nama = %s")
+                    params_history.append(filter_pet_name)
+                
+                if filter_vaccine_kode: # filter_vaccine_kode akan berisi kode vaksin dari dropdown
+                    conditions_history.append("v.kode = %s") 
+                    params_history.append(filter_vaccine_kode)
+
+                if conditions_history:
+                    base_query_history += " AND " + " AND ".join(conditions_history)
+                
+                base_query_history += " ORDER BY k.timestamp_awal DESC, h.nama;"
+                
+                cursor.execute(base_query_history, params_history)
+                for row_hist in dictfetchall(cursor):
+                    # Format tanggal dan waktu
+                    tanggal_formatted = format_tanggal_indonesia(row_hist['tanggal_vaksinasi'])
+                    waktu_formatted = row_hist['tanggal_vaksinasi'].strftime("%H:%M") # Ambil jam:menit
+
+                    vaccination_history_list.append({
+                        'nama_hewan': row_hist['nama_hewan'],
+                        'nama_vaksin': row_hist['nama_vaksin'],
+                        'kode_vaksin': row_hist['kode_vaksin'],
+                        'harga_vaksin': row_hist['harga_vaksin'],
+                        'tanggal_waktu_vaksinasi_formatted': f"{tanggal_formatted} {waktu_formatted}" # Gabungkan
+                    })
+        
+        except Exception as e:
+            messages.error(request, f"Gagal memuat riwayat vaksinasi hewan Anda: {e}")
+            print(f"Error in ClientPetVaccinationHistoryView: {e}")
+            vaccination_history_list = []
+            pet_options_for_filter = []
+            vaccine_options_for_filter = []
+
+        context = {
+            'vaccination_history_list': vaccination_history_list,
+            'pet_options_for_filter': pet_options_for_filter,
+            'vaccine_options_for_filter': vaccine_options_for_filter,
+            'current_filter_pet_name': filter_pet_name,
+            'current_filter_vaccine_kode': filter_vaccine_kode,
+        }
+        return render(request, self.template_name, context)

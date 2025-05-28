@@ -11,4 +11,5 @@ urlpatterns = [
     path('delete/<str:kode_vaksin>/', views.vaccine_data_delete_view, name='vaccine_data_delete'),
     # Opsional: URL untuk AJAX
     path('details/<str:kode_vaksin>/json/', views.get_vaccine_details_json, name='get_vaccine_details_json'),
+    
 ]
