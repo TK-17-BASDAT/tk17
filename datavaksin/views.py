@@ -17,18 +17,62 @@ def dictfetchone(cursor):
     return None
 
 def vaccine_data_list_view(request):
-    vaksin_list = []
+    vaksin_list_processed = [] # Ubah nama variabel agar jelas
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT kode, nama, harga, stok FROM PETCLINIC.VAKSIN ORDER BY kode")
-            vaksin_list = dictfetchall(cursor)
+            # Query untuk mengambil data vaksin DAN informasi apakah sudah digunakan
+            # Menggunakan LEFT JOIN dan COUNT untuk mengecek penggunaan
+            query_vaksin_usage = """
+                SELECT
+                    v.kode,
+                    v.nama,
+                    v.harga,
+                    v.stok,
+                    CASE
+                        WHEN COUNT(k.kode_vaksin) > 0 THEN TRUE
+                        ELSE FALSE
+                    END AS sudah_digunakan
+                FROM
+                    PETCLINIC.VAKSIN v
+                LEFT JOIN
+                    PETCLINIC.KUNJUNGAN k ON v.kode = k.kode_vaksin
+                GROUP BY
+                    v.kode, v.nama, v.harga, v.stok
+                ORDER BY
+                    v.kode;
+            """
+            # Alternatif menggunakan EXISTS (seringkali lebih efisien untuk cek keberadaan)
+            # query_vaksin_usage = """
+            #     SELECT
+            #         v.kode,
+            #         v.nama,
+            #         v.harga,
+            #         v.stok,
+            #         EXISTS (SELECT 1 FROM PETCLINIC.KUNJUNGAN k WHERE k.kode_vaksin = v.kode) AS sudah_digunakan
+            #     FROM
+            #         PETCLINIC.VAKSIN v
+            #     ORDER BY
+            #         v.kode;
+            # """
+            cursor.execute(query_vaksin_usage)
+            vaksin_list_raw = dictfetchall(cursor)
+
+            for vaksin_data in vaksin_list_raw:
+                vaksin_list_processed.append({
+                    'kode': vaksin_data['kode'],
+                    'nama': vaksin_data['nama'],
+                    'harga': vaksin_data['harga'],
+                    'stok': vaksin_data['stok'],
+                    'sudah_digunakan': vaksin_data['sudah_digunakan'] # Boolean True/False
+                })
+
     except DatabaseError as e:
         messages.error(request, f"Gagal mengambil data vaksin: {e}")
+        print(f"Database error in vaccine_data_list_view: {e}")
+
 
     context = {
-        'vaksin_list': vaksin_list,
-        # Tidak ada form_create dari Django Forms yang dikirim
-        # Jika ada error dari create, kita akan mengandalkan messages framework saja
+        'vaksin_list': vaksin_list_processed, 
     }
     return render(request, 'datavaksin/datavaksin.html', context)
 
@@ -41,8 +85,8 @@ def vaccine_data_create_view(request):
 
         errors = []
         if not kode: errors.append("ID Vaksin tidak boleh kosong.")
+        # ... (validasi lainnya) ...
         if not nama: errors.append("Nama Vaksin tidak boleh kosong.")
-        
         harga = None
         if not harga_str:
             errors.append("Harga tidak boleh kosong.")
@@ -52,7 +96,6 @@ def vaccine_data_create_view(request):
                 if harga < 0: errors.append("Harga tidak boleh negatif.")
             except ValueError:
                 errors.append("Harga harus berupa angka.")
-        
         stok = None
         if not stok_str:
             errors.append("Stok tidak boleh kosong.")
@@ -63,13 +106,10 @@ def vaccine_data_create_view(request):
             except ValueError:
                 errors.append("Stok harus berupa angka.")
 
+
         if errors:
             for error in errors:
                 messages.error(request, error)
-            # Untuk mengisi kembali form di modal dengan data yang salah, dan membuka modal,
-            # kita bisa mengirim data input kembali via context.
-            # Namun, karena modalnya sederhana, kita redirect dan user input ulang.
-            # Pesan error akan ditampilkan di atas tabel.
             return redirect('datavaksin:vaccine_data_list')
 
         try:
@@ -109,7 +149,6 @@ def vaccine_data_update_view(request, kode_vaksin):
 
         errors = []
         if not nama_baru: errors.append("Nama Vaksin tidak boleh kosong.")
-        
         harga_baru = None
         if not harga_baru_str:
             errors.append("Harga tidak boleh kosong.")
@@ -123,7 +162,7 @@ def vaccine_data_update_view(request, kode_vaksin):
         if errors:
             for error in errors:
                 messages.error(request, error)
-            return redirect('datavaksin:vaccine_data_list') # User harus buka modal dan input ulang
+            return redirect('datavaksin:vaccine_data_list')
 
         try:
             with connection.cursor() as cursor:
@@ -137,11 +176,11 @@ def vaccine_data_update_view(request, kode_vaksin):
         
         return redirect('datavaksin:vaccine_data_list')
     
-    # Jika GET, kita tidak melakukan apa-apa karena modal diisi JS via AJAX
     return redirect('datavaksin:vaccine_data_list')
 
 
 def vaccine_stock_update_view(request, kode_vaksin):
+    # ... (sama seperti versi SQL langsung sebelumnya) ...
     current_vaksin = None
     try:
         with connection.cursor() as cursor:
@@ -157,7 +196,6 @@ def vaccine_stock_update_view(request, kode_vaksin):
 
     if request.method == 'POST':
         stok_baru_str = request.POST.get('stok', '').strip()
-        
         stok_baru = None
         if not stok_baru_str:
             messages.error(request, "Stok tidak boleh kosong.")
@@ -188,24 +226,34 @@ def vaccine_stock_update_view(request, kode_vaksin):
 
 
 def vaccine_data_delete_view(request, kode_vaksin):
+    # ... (sama seperti versi SQL langsung sebelumnya) ...
+    # Pengecekan apakah vaksin digunakan di KUNJUNGAN sebelum delete akan lebih baik dilakukan di sini juga,
+    # selain hanya mengandalkan IntegrityError.
     if request.method == 'POST':
         nama_vaksin_temp = kode_vaksin
         try:
-            with connection.cursor() as cursor_select:
-                cursor_select.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
-                vaksin_row = cursor_select.fetchone()
+            with connection.cursor() as cursor:
+                # Cek dulu apakah vaksin digunakan
+                cursor.execute("SELECT 1 FROM PETCLINIC.KUNJUNGAN WHERE kode_vaksin = %s LIMIT 1", [kode_vaksin])
+                is_used = cursor.fetchone()
+                if is_used:
+                    messages.error(request, f"Vaksin dengan ID '{kode_vaksin}' tidak dapat dihapus karena sudah digunakan dalam data kunjungan.")
+                    return redirect('datavaksin:vaccine_data_list')
+
+                # Jika tidak digunakan, baru delete
+                cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
+                vaksin_row = cursor.fetchone()
                 if vaksin_row:
                     nama_vaksin_temp = vaksin_row[0]
             
-            with connection.cursor() as cursor_delete:
-                cursor_delete.execute("DELETE FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
-                if cursor_delete.rowcount == 0:
+                cursor.execute("DELETE FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
+                if cursor.rowcount == 0:
                     messages.warning(request, f"Vaksin dengan ID '{kode_vaksin}' tidak ditemukan untuk dihapus.")
                 else:
                     messages.success(request, f"Vaksin '{nama_vaksin_temp}' (ID: {kode_vaksin}) berhasil dihapus.")
         
-        except IntegrityError as e:
-             messages.error(request, f"Gagal menghapus vaksin '{nama_vaksin_temp}'. Vaksin ini mungkin masih digunakan dalam data kunjungan. Detail: {e}")
+        except IntegrityError as e: # Seharusnya tidak terjadi jika pengecekan 'is_used' sudah dilakukan
+             messages.error(request, f"Gagal menghapus vaksin '{nama_vaksin_temp}'. Constraint violation. Detail: {e}")
         except DatabaseError as e:
             messages.error(request, f"Gagal menghapus vaksin '{nama_vaksin_temp}': {e}")
         
@@ -215,6 +263,7 @@ def vaccine_data_delete_view(request, kode_vaksin):
 
 
 def get_vaccine_details_json(request, kode_vaksin):
+    # ... (sama seperti versi SQL langsung sebelumnya) ...
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT kode, nama, harga, stok FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])

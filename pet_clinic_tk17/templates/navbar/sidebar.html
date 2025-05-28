@@ -111,7 +111,7 @@
       </li>
       {% elif request.session.user_role == 'perawat_hewan' %}
       <li>
-        <a href="{% url 'manajemen_vaksin:vaccination_list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
+        <a href="{% url 'datavaksin:vaccine_data_list' %}" class="flex items-center px-3 py-2 text-gray-700 rounded hover:bg-gray-100">
           <i class="fas fa-syringe w-5"></i>
           <span class="ml-3">Manajemen Vaksin</span>
         </a>
