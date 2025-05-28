@@ -1,14 +1,14 @@
-<form method="post" action="{% url 'jenis_hewan:update' 1 %}">
+<form method="post" action="{% url 'jenis_hewan:update' id %}">
     {% csrf_token %}
     <h2 class="text-xl font-semibold mb-4">Update Animal Type</h2>
     <div>
       <label class="block text-gray-700">ID Jenis Hewan</label>
-      <input type="text" value="HWN001"
+      <input type="text" value="{{ id }}"
              class="w-full border rounded px-3 py-2 bg-gray-100" disabled>
     </div>
     <div class="mt-4">
       <label class="block text-gray-700">Nama Jenis</label>
-      <input name="nama_jenis" type="text" value="Kucing"
+      <input name="nama_jenis" type="text" value="{{ nama_jenis }}"
              class="w-full border rounded px-3 py-2" required>
     </div>
     <div class="mt-6 flex justify-end space-x-3">
@@ -19,5 +19,4 @@
         Update
       </button>
     </div>
-  </form>
-  
+</form>
