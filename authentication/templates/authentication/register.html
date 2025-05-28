@@ -64,6 +64,12 @@
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
           </button>
+          <p class="text-center text-gray-600 mt-4">
+            Already have an account?
+            <a href="{% url 'authentication:login' %}" class="text-accent font-medium hover:underline">
+              Log in
+            </a>
+          </p>
         </form>
 
         <!-- 2. Klien Perusahaan -->
@@ -92,6 +98,12 @@
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
           </button>
+          <p class="text-center text-gray-600 mt-4">
+            Already have an account?
+            <a href="{% url 'authentication:login' %}" class="text-accent font-medium hover:underline">
+              Log in
+            </a>
+          </p>
         </form>
 
         <!-- 3. Front-Desk Officer -->
@@ -120,6 +132,12 @@
           <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
             Register
           </button>
+          <p class="text-center text-gray-600 mt-4">
+            Already have an account?
+            <a href="{% url 'authentication:login' %}" class="text-accent font-medium hover:underline">
+              Log in
+            </a>
+          </p>
         </form>
 
         <!-- ==== 4. Dokter Hewan ==== -->
@@ -149,7 +167,7 @@
             <div id="dokter-sertifikat-section" class="space-y-2">
               <h3 class="font-medium">Sertifikat</h3>
               <button type="button" onclick="addDokterCert()"
-                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                class="text-sm bg-primary text-white px-2 py-1 rounded">
                 + Tambah Sertifikat
               </button>
               <div id="dokter-sertifikat-container" class="space-y-4">
@@ -170,7 +188,7 @@
             <div id="dokter-jadwal-section" class="space-y-2">
               <h3 class="font-medium">Jadwal Praktik</h3>
               <button type="button" onclick="addDokterSchedule()"
-                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                class="text-sm bg-primary text-white px-2 py-1 rounded">
                 + Tambah Jadwal
               </button>
               <div id="dokter-jadwal-container" class="space-y-4">
@@ -197,7 +215,14 @@
             <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
               Register
             </button>
-          </form>          <!-- ==== 5. Perawat Hewan ==== -->
+            <p class="text-center text-gray-600 mt-4">
+              Already have an account?
+              <a href="{% url 'authentication:login' %}" class="text-accent font-medium hover:underline">
+                Log in
+              </a>
+            </p>
+          </form>          
+          <!-- ==== 5. Perawat Hewan ==== -->
           <form id="perawat" method="post" action="" class="tab-content hidden space-y-4">
             {% csrf_token %}
             <input type="hidden" name="form_type" value="perawat_hewan">
@@ -224,7 +249,7 @@
             <div id="perawat-sertifikat-section" class="space-y-2">
               <h3 class="font-medium">Sertifikat</h3>
               <button type="button" onclick="addPerawatCert()"
-                class="text-sm bg-secondary text-white px-2 py-1 rounded">
+                class="text-sm bg-primary text-white px-2 py-1 rounded">
                 + Tambah Sertifikat
               </button>
               <div id="perawat-sertifikat-container" class="space-y-4">
@@ -246,6 +271,12 @@
             <button class="w-full bg-primary text-white py-2 rounded hover:bg-secondary transition">
               Register
             </button>
+            <p class="text-center text-gray-600 mt-4">
+              Already have an account?
+              <a href="{% url 'authentication:login' %}" class="text-accent font-medium hover:underline">
+                Log in
+              </a>
+            </p>
           </form>
         </div>
       </div>
