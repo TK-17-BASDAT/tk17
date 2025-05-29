@@ -5,16 +5,17 @@
 {% block content %}
 <div class="flex">
     {% include "navbar/sidebar.html" %}
-    <main class="bg-gray-50 flex-1 ml-64 p-6">
-        <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+    <main class="bg-gray-300 flex-1 ml-64 p-6">
+        <div class="bg-gray-300 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
             <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
+                <!-- Headers and buttons -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                    <div class="text-2xl font-semibold text-gray-900">
+                    <div class="text-2xl font-semibold text-primary">
                         <h1>Profile Perawat</h1>
                     </div>
                     <div class="space-x-4">
-                        <a href="{% url 'dashboard:change_password' %}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg text-sm">Update Password</a>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm" onclick="toggleEditMode(true)">Update Profile</button>
+                        <a href="{% url 'dashboard:change_password' %}" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</a>
+                        <button class="bg-accent hover:bg-accent2 text-white px-4 py-2 rounded-lg text-sm font-medium" onclick="toggleEditMode(true)">Update Profile</button>
                     </div>
                 </div>
 
@@ -62,7 +63,7 @@
                     
                     <!-- Sertifikat View -->
                     <div class="mt-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Sertifikat Kompetensi</h2>
+                        <h2 class="text-xl font-semibold text-primary mb-4">Sertifikat Kompetensi</h2>
                         {% if user_data.sertifikat_kompetensi %}
                           <div class="space-y-3">
                             {% for sertifikat_item in user_data.sertifikat_kompetensi %}
@@ -125,7 +126,7 @@
                     <!-- Formset Sertifikat -->
                     {% if sertifikat_formset %}
                     <div class="mt-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-2">Edit Sertifikat</h2>
+                        <h2 class="text-xl font-semibold text-primary mb-2">Edit Sertifikat</h2>
                         {{ sertifikat_formset.management_form }}
                         <div id="sertifikat-form-list-perawat" class="space-y-3"> {# ID unik untuk perawat #}
                           {% for form_sert in sertifikat_formset %}
@@ -161,7 +162,7 @@
                           </div>
                           {% endfor %}
                         </div>
-                        <button type="button" id="add-sertifikat-form-perawat" class="mt-2 text-sm text-teal-600 hover:text-teal-800">+ Tambah Sertifikat</button> {# ID unik #}
+                        <button type="button" id="add-sertifikat-form-perawat" class="mt-2 text-sm text-accent hover:text-accent2">+ Tambah Sertifikat</button> {# ID unik #}
                     </div>
                     <!-- Template untuk form sertifikat baru -->
                     <div id="sertifikat-empty-form-perawat" class="hidden"> {# ID unik #}
@@ -189,8 +190,8 @@
         
                     <!-- Tombol Aksi Edit Mode -->
                     <div id="edit-mode-actions" class="mt-6 flex justify-end gap-3">
-                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded-lg text-sm" onclick="toggleEditMode(false)">Batal</button>
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm">Simpan Perubahan</button>
+                        <button type="button" class="bg-gray-300 hover:bg-gray-400 text-primary px-4 py-2 rounded-lg text-sm font-medium" onclick="toggleEditMode(false)">Batal</button>
+                        <button type="submit" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
                     </div>
                 </form>
                 {% else %}

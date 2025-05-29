@@ -5,17 +5,17 @@
 {% block content %}
 <div class="flex">
   {% include "navbar/sidebar.html" %}
-  <main class="bg-gray-50 flex-1 ml-64 p-6">
-    <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+  <main class="bg-gray-300 flex-1 ml-64 p-6">
+    <div class="bg-gray-300 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
       <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 class="text-2xl font-semibold text-gray-800">Profile Dokter</h1>
+            <h1 class="text-2xl font-semibold text-primary">Profile Dokter</h1>
           </div>
           <div class="flex gap-3">
-            <a href="{% url 'dashboard:change_password' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</a>
-            <button onclick="toggleEditMode(true)" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
+            <a href="{% url 'dashboard:change_password' %}" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</a>
+            <button onclick="toggleEditMode(true)" class="bg-accent hover:bg-accent2 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
           </div>
         </div>
 
@@ -39,32 +39,32 @@
 
             <div id="view-mode">
             <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Pegawai</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nomor Pegawai</div>
             <div class="text-gray-800">{{ user_data.no_pegawai }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Izin Praktik</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nomor Izin Praktik</div>
             <div class="text-gray-800">{{ user_data.no_izin_praktik }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Email</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Email</div>
             <div class="text-gray-800">{{ user_data.email }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Mulai Kerja</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Tanggal Mulai Kerja</div>
             <div class="text-gray-800">{{ user_data.tanggal_mulai_kerja|date:"d M Y" }}</div> {# Format tanggal #}
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Akhir Kerja</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Tanggal Akhir Kerja</div>
             <div class="text-gray-800">{% if user_data.tanggal_akhir_kerja %}{{ user_data.tanggal_akhir_kerja|date:"d M Y" }}{% else %}Belum ditentukan{% endif %}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Alamat</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Alamat</div>
             <div class="text-gray-800">{{ user_data.alamat }}</div>
 
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Telepon</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nomor Telepon</div>
             <div class="text-gray-800">{{ user_data.nomor_telepon }}</div>
             </div>
         
 
           <!-- Sertifikat View -->
           <div class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Sertifikat Kompetensi</h2>
+            <h2 class="text-xl font-semibold text-primary mb-4">Sertifikat Kompetensi</h2>
             {% if user_data.sertifikat_kompetensi %}
               <div class="space-y-3">
                 {% for sertifikat_item in user_data.sertifikat_kompetensi %} {# Ganti nama variabel loop agar tidak konflik #}
@@ -89,7 +89,7 @@
 
           <!-- Jadwal Praktik View -->
           <div class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Jadwal Praktik</h2>
+            <h2 class="text-xl font-semibold text-primary mb-4">Jadwal Praktik</h2>
             {% if user_data.jadwal_praktik %}
               <div class="space-y-3">
                 {% for jadwal_item in user_data.jadwal_praktik %} {# Ganti nama variabel loop #}
@@ -154,7 +154,7 @@
           <!-- Formset Sertifikat -->
           {% if sertifikat_formset %}
           <div class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">Edit Sertifikat</h2>
+            <h2 class="text-xl font-semibold text-primary mb-2">Edit Sertifikat</h2>
             {{ sertifikat_formset.management_form }}
             <div id="sertifikat-form-list" class="space-y-3">
               {% for form_sert in sertifikat_formset %} {# Ganti nama variabel loop #}
@@ -190,7 +190,7 @@
               </div>
               {% endfor %}
             </div>
-            <button type="button" id="add-sertifikat-form" class="mt-2 text-sm text-teal-600 hover:text-teal-800">+ Tambah Sertifikat</button>
+            <button type="button" id="add-sertifikat-form" class="mt-2 text-sm text-accent hover:text-accent2">+ Tambah Sertifikat</button>
           </div>
 
           <!-- Template untuk form sertifikat baru -->
@@ -224,7 +224,7 @@
           <!-- Formset Jadwal Praktik -->
           {% if jadwal_formset %}
           <div class="mt-8">
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">Edit Jadwal Praktik</h2>
+            <h2 class="text-xl font-semibold text-primary mb-2">Edit Jadwal Praktik</h2>
             {{ jadwal_formset.management_form }}
             <div id="jadwal-form-list" class="space-y-3">
               {% for form_jdw in jadwal_formset %}
@@ -260,7 +260,7 @@
               </div>
               {% endfor %}
             </div>
-            <button type="button" id="add-jadwal-form" class="mt-2 text-sm text-teal-600 hover:text-teal-800">+ Tambah Jadwal</button>
+            <button type="button" id="add-jadwal-form" class="mt-2 text-sm text-accent hover:text-accent2">+ Tambah Jadwal</button>
           </div>
 
           <!-- Template untuk form jadwal baru -->
@@ -288,8 +288,8 @@
           {% endif %}
 
           <div class="mt-6 flex gap-3">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan Profil</button>
-            <button type="button" onclick="toggleEditMode(false)" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
+            <button type="submit" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan Profil</button>
+            <button type="button" onclick="toggleEditMode(false)" class="bg-gray-300 hover:bg-gray-400 text-primary px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
           </div>
         </form>
         {% else %}
