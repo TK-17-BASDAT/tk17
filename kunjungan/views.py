@@ -224,8 +224,10 @@ def rekam_medis_check(request, id_kunjungan):
             result = cursor.fetchone()
             print(f"Query result: {result}")
             if result:
+                # Periksa apakah rekam medis sudah ada (suhu dan berat_badan tidak null)
+                exists = result[0] is not None and result[1] is not None
                 return JsonResponse({
-                    'exists': True,
+                    'exists': exists,
                     'suhu': result[0],
                     'berat_badan': result[1],
                     'catatan': result[2] or ''
@@ -237,81 +239,90 @@ def rekam_medis_check(request, id_kunjungan):
 
 @login_required
 def rekam_medis_create(request, id_kunjungan):
+    # Gunakan session role untuk otorisasi
+    if request.session.get('user_role') != 'dokter_hewan':
+        return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat membuat rekam medis!'}, status=403)
+
     if request.method == 'POST':
-        if request.user.groups.filter(name='DokterHewan').exists():
-            try:
-                with connection.cursor() as cursor:
-                    # Cek apakah rekam medis sudah ada
-                    cursor.execute(
-                        "SELECT suhu, berat_badan FROM KUNJUNGAN WHERE id_kunjungan = %s",
-                        (id_kunjungan)
-                    )
-                    result = cursor.fetchone()
-                    if not result:
-                        return JsonResponse({'status': 'error', 'message': 'Kunjungan tidak ditemukan!'}, status=404)
-                    if result[0] is not None and result[1] is not None:  # Jika suhu dan berat_badan sudah ada
-                        return JsonResponse({'status': 'error', 'message': 'Rekam medis untuk kunjungan ini sudah ada!'}, status=400)
+        try:
+            with connection.cursor() as cursor:
+                # Cek apakah rekam medis sudah ada
+                cursor.execute(
+                    "SELECT suhu, berat_badan FROM KUNJUNGAN WHERE id_kunjungan = %s",
+                    [id_kunjungan]
+                )
+                result = cursor.fetchone()
+                if not result:
+                    return JsonResponse({'status': 'error', 'message': 'Kunjungan tidak ditemukan!'}, status=404)
+                if result[0] is not None and result[1] is not None:  # Jika suhu dan berat_badan sudah ada
+                    return JsonResponse({'status': 'error', 'message': 'Rekam medis untuk kunjungan ini sudah ada!'}, status=400)
 
-                    # Ambil data dari form
-                    try:
-                        suhu = float(request.POST.get('suhu'))
-                        berat_badan = float(request.POST.get('berat_badan'))
-                        if suhu <= 0 or berat_badan <= 0:
-                            return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus lebih dari 0!'}, status=400)
-                    except (ValueError, TypeError):
-                        return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus berupa angka!'}, status=400)
-                    catatan = request.POST.get('catatan', '')
+                # Ambil data dari form
+                try:
+                    suhu = float(request.POST.get('suhu'))
+                    berat_badan = float(request.POST.get('berat_badan'))
+                    if suhu <= 0 or berat_badan <= 0:
+                        return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus lebih dari 0!'}, status=400)
+                except (ValueError, TypeError):
+                    return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus berupa angka!'}, status=400)
+                catatan = request.POST.get('catatan', '')
 
-                    # Validasi data
-                    if not all([suhu, berat_badan]):
-                        return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
+                # Validasi data
+                if not all([suhu, berat_badan]):
+                    return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
 
-                    # Simpan ke tabel REKAM_MEDIS
-                    cursor.execute(
-                        "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
-                        [suhu, berat_badan, catatan, id_kunjungan]
-                    )
-                    return JsonResponse({'status': 'success', 'message': 'Rekam medis berhasil dibuat!'}, status=200)
-            except Exception as e:
-                return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat membuat rekam medis!'}, status=403)
+                # Simpan ke tabel KUNJUNGAN (sesuai skema)
+                cursor.execute(
+                    "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
+                    [suhu, berat_badan, catatan, id_kunjungan]
+                )
+                return JsonResponse({'status': 'success', 'message': 'Rekam medis berhasil dibuat!'}, status=200)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Metode tidak diizinkan!'}, status=405)
 
 @login_required
 def rekam_medis_update(request, id_kunjungan):
+    # Gunakan session role untuk otorisasi
+    if request.session.get('user_role') != 'dokter_hewan':
+        return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat memperbarui rekam medis!'}, status=403)
+
     if request.method == 'POST':
-        if request.user.groups.filter(name='DokterHewan').exists():
-            try:
-                with connection.cursor() as cursor:
-                    # Cek apakah rekam medis ada
-                    cursor.execute(
-                        "SELECT 1 FROM KUNJUNGAN WHERE id_kunjungan = %s",
-                        [id_kunjungan]
-                    )
-                    if not cursor.fetchone():
-                        return JsonResponse({'status': 'error', 'message': 'Rekam medis tidak ditemukan!'}, status=400)
+        try:
+            with connection.cursor() as cursor:
+                # Cek apakah rekam medis ada
+                cursor.execute(
+                    "SELECT suhu, berat_badan FROM KUNJUNGAN WHERE id_kunjungan = %s",
+                    [id_kunjungan]
+                )
+                result = cursor.fetchone()
+                if not result or result[0] is None or result[1] is None:
+                    return JsonResponse({'status': 'error', 'message': 'Rekam medis tidak ditemukan!'}, status=400)
 
-                    # Ambil data dari form
-                    suhu = request.POST.get('suhu')
-                    berat_badan = request.POST.get('berat_badan')
-                    catatan = request.POST.get('catatan', '')
+                # Ambil data dari form
+                try:
+                    suhu = float(request.POST.get('suhu'))
+                    berat_badan = float(request.POST.get('berat_badan'))
+                    if suhu <= 0 or berat_badan <= 0:
+                        return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus lebih dari 0!'}, status=400)
+                except (ValueError, TypeError):
+                    return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus berupa angka!'}, status=400)
+                catatan = request.POST.get('catatan', '')
 
-                    # Validasi data
-                    if not all([suhu, berat_badan]):
-                        return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
+                # Validasi data
+                if not all([suhu, berat_badan]):
+                    return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
 
-                    # Update data di tabel REKAM_MEDIS
-                    cursor.execute(
-                        "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
-                        [suhu, berat_badan, catatan, id_kunjungan]
-                    )
-                    return JsonResponse({'status': 'success', 'message': 'Rekam medis berhasil diperbarui!'}, status=200)
-            except Exception as e:
-                return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat memperbarui rekam medis!'}, status=403)
+                # Update data di tabel KUNJUNGAN
+                cursor.execute(
+                    "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
+                    [suhu, berat_badan, catatan, id_kunjungan]
+                )
+                return JsonResponse({'status': 'success', 'message': 'Rekam medis berhasil diperbarui!'}, status=200)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     return JsonResponse({'status': 'error', 'message': 'Metode tidak diizinkan!'}, status=405)
+
 
 # AJAX untuk dropdown dinamis Nama Hewan
 def get_hewan_by_klien(request):
