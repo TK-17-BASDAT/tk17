@@ -1,14 +1,15 @@
 {
     "builds": [
         {
-        "src": "pet_clinic_tk17/wsgi.py",
-        "use": "@vercel/python"
+            "src": "pet_clinic_tk17/wsgi.py",
+            "use": "@vercel/python",
+            "config": { "maxLambdaSize": "15mb", "runtime": "python3.11.3" }
         }
     ],
     "routes": [
         {
-        "src": "/(.*)",
-        "dest": "pet_clinic_tk17/wsgi.py"
+            "src": "/(.*)",
+            "dest": "pet_clinic_tk17/wsgi.py"
         }
     ]
 }
