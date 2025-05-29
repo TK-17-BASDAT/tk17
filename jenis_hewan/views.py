@@ -69,9 +69,7 @@ def create_jenis_hewan(request):
             return render(request, 'jenis_hewan/create.html')
         
         try:
-            
             id_jenis = uuid.uuid4()
-            
             with connection.cursor() as cursor:
                 cursor.execute(
                     "INSERT INTO petclinic.jenis_hewan (id, nama_jenis) VALUES (%s, %s)",
@@ -80,16 +78,22 @@ def create_jenis_hewan(request):
             
             messages.success(request, f"Jenis hewan {nama_jenis} berhasil ditambahkan!")
             
-            
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': True})
             return redirect('jenis_hewan:list')
             
         except Exception as e:
-            messages.error(request, f"Gagal menambahkan jenis hewan: {str(e)}")
+            error_message = str(e)
+            # Check if this is custom trigger error about duplicate jenis
+            if "Jenis hewan" in error_message and "sudah terdaftar dengan ID" in error_message:
+                # trigger error, extract it directly
+                messages.error(request, error_message)
+            else:
+                # Generic database error
+                messages.error(request, f"Gagal menambahkan jenis hewan: {error_message}")
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                html = render_to_string('jenis_hewan/create.html', request=request)
+                html = render_to_string('jenis_hewan/create.html', {'error': error_message}, request)
                 return JsonResponse({'success': False, 'html': html})
     
     
