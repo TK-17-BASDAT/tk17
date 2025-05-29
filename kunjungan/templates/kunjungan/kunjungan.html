@@ -26,14 +26,16 @@
                 </div>
             {% endif %}
 
+            <!-- Show 'Tambah Kunjungan' button only for front_desk -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 class="text-2xl font-semibold text-gray-800">Daftar Kunjungan Pasien</h1>
-                <!-- Tambahkan tombol 'Tambah Kunjungan' -->
+                {% if request.session.user_role == 'front_desk' %}
                 <button type="button" 
                         class="tambah-kunjungan-btn bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm"
                         data-url="{% url 'kunjungan:tambah_kunjungan' %}">
                     Tambah Kunjungan Baru
                 </button>
+                {% endif %}
             </div>
 
             <!-- Filter Form (Opsional, jika kamu mau menambahkan filter untuk kunjungan) -->
@@ -100,6 +102,29 @@
                                             data-url="{% url 'kunjungan:rekam_medis_detail' id_kunjungan=item_kunjungan.id_kunjungan nama_hewan=item_kunjungan.nama_hewan no_identitas_klien=item_kunjungan.no_identitas_klien no_front_desk=item_kunjungan.no_front_desk no_perawat_hewan=item_kunjungan.no_perawat_hewan no_dokter_hewan=item_kunjungan.no_dokter_hewan %}">
                                         Lihat Rekam Medis
                                     </button>
+                                    
+                                    {% if request.session.user_role == 'front_desk' %}
+                                    <button type="button"
+                                            class="update-kunjungan-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs ml-2"
+                                            data-id="{{ item_kunjungan.id_kunjungan }}"
+                                            data-nama="{{ item_kunjungan.nama_hewan }}"
+                                            data-tipe="{{ item_kunjungan.tipe_kunjungan }}"
+                                            data-awal="{{ item_kunjungan.timestamp_awal|date:'Y-m-d\TH:i' }}" 
+                                            data-akhir="{{ item_kunjungan.timestamp_akhir|date:'Y-m-d\TH:i' }}"
+                                            data-klien="{{ item_kunjungan.no_identitas_klien }}"
+                                            data-frontdesk="{{ item_kunjungan.no_front_desk }}"
+                                            data-perawat="{{ item_kunjungan.no_perawat_hewan }}"
+                                            data-dokter="{{ item_kunjungan.no_dokter_hewan }}">
+                                        Update
+                                    </button>
+                                    
+                                    <button type="button"
+                                            class="delete-kunjungan-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-xs ml-2"
+                                            data-id="{{ item_kunjungan.id_kunjungan }}"
+                                            data-nama="{{ item_kunjungan.nama_hewan }}">
+                                        Hapus
+                                    </button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
@@ -128,6 +153,81 @@
         <div id="modalBodyContent" class="mt-3">
             <!-- Konten akan dimuat di sini oleh JavaScript -->
             <p class="text-center text-gray-500">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Add delete confirmation modal -->
+<div id="deleteKunjunganModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden">
+    <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="absolute top-0 right-0 pt-4 pr-4">
+            <button type="button" class="modal-close-button text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        <div id="deleteModalContent" class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-5">Konfirmasi Hapus Kunjungan</h3>
+            <p class="text-gray-500 mb-5">Apakah Anda yakin ingin menghapus kunjungan ini?</p>
+            <form id="deleteKunjunganForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="delete_id_kunjungan" name="id_kunjungan">
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="modal-close-button-secondary bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm">
+                        Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Kunjungan Modal -->
+<div id="updateKunjunganModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden">
+    <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="absolute top-0 right-0 pt-4 pr-4">
+            <button type="button" class="modal-close-button text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-5">Update Kunjungan</h3>
+            <form id="updateKunjunganForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" id="update_id_kunjungan" name="id_kunjungan">
+                
+                <div class="mb-4">
+                    <label for="update_tipe_kunjungan" class="block text-sm font-medium text-gray-700 mb-1">Tipe Kunjungan</label>
+                    <select id="update_tipe_kunjungan" name="tipe_kunjungan" class="w-full border border-gray-300 rounded-md p-2 text-sm" required>
+                        <option value="Pemeriksaan Rutin">Pemeriksaan Rutin</option>
+                        <option value="Vaksinasi">Vaksinasi</option>
+                        <option value="Konsultasi">Konsultasi</option>
+                        <option value="Operasi">Operasi</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="update_waktu_mulai" class="block text-sm font-medium text-gray-700 mb-1">Waktu Mulai</label>
+                    <input type="datetime-local" id="update_waktu_mulai" name="waktu_mulai" class="w-full border border-gray-300 rounded-md p-2 text-sm" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="update_waktu_akhir" class="block text-sm font-medium text-gray-700 mb-1">Waktu Akhir</label>
+                    <input type="datetime-local" id="update_waktu_akhir" name="waktu_akhir" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                </div>
+                
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" class="modal-close-button-secondary bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+                        Update
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -359,6 +459,229 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Add this to your existing DOMContentLoaded function
+    document.querySelectorAll('.delete-kunjungan-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nama = this.dataset.nama;
+            
+            document.getElementById('delete_id_kunjungan').value = id;
+            document.getElementById('deleteModalContent').querySelector('p').textContent = 
+                `Apakah Anda yakin ingin menghapus kunjungan untuk ${nama}?`;
+            
+            document.getElementById('deleteKunjunganModal').classList.remove('hidden');
+        });
+    });
+
+    document.getElementById('deleteKunjunganForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        const id = document.getElementById('delete_id_kunjungan').value;
+        
+        fetch(`/kunjungan/delete/${id}/`, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                throw new Error('Gagal menghapus kunjungan');
+            }
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    });
+
+    // Update kunjungan functionality
+    document.querySelectorAll('.update-kunjungan-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nama = this.dataset.nama;
+            const tipe = this.dataset.tipe;
+            const waktuAwal = this.dataset.awal;
+            const waktuAkhir = this.dataset.akhir || '';
+            const noIdentitasKlien = this.dataset.klien;
+            const noFrontDesk = this.dataset.frontdesk;
+            const noPerawatHewan = this.dataset.perawat;
+            const noDokterHewan = this.dataset.dokter;
+            
+            // Use the same modal as for creating new records
+            modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
+            openModal();
+            
+            // Load the full tambah_kunjungan form
+            fetch('{% url "kunjungan:tambah_kunjungan" %}')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Get the form container
+                    const formContainer = doc.querySelector('.container');
+                    if (formContainer) {
+                        modalBody.innerHTML = formContainer.innerHTML;
+                        
+                        // Update the title
+                        const titleElement = modalBody.querySelector('h2');
+                        if (titleElement) {
+                            titleElement.textContent = 'Update Kunjungan';
+                        }
+                        
+                        // Update the form to point to the update endpoint
+                        const form = modalBody.querySelector('form');
+                        if (form) {
+                            form.id = 'updateKunjunganForm';
+                            
+                            // Add hidden field for the kunjungan ID
+                            const idField = document.createElement('input');
+                            idField.type = 'hidden';
+                            idField.name = 'id_kunjungan';
+                            idField.value = id;
+                            form.appendChild(idField);
+                            
+                            // Update form submit logic
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                
+                                fetch(`/kunjungan/update/${id}/`, {
+                                    method: 'POST',
+                                    body: new FormData(form),
+                                    headers: {
+                                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                                    }
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        window.location.reload();
+                                    } else {
+                                        return response.json().then(data => {
+                                            throw new Error(data.message || 'Failed to update kunjungan');
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    alert(error.message);
+                                });
+                            });
+                        }
+                        
+                        // Fetch the kunjungan details to populate the form
+                        fetch(`/kunjungan/get-details/${id}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                // Pre-select the client first
+                                const klienSelect = modalBody.querySelector('#klien');
+                                if (klienSelect) {
+                                    klienSelect.value = data.no_identitas_klien;
+                                    
+                                    // Make sure we have the proper event handler to load all animals when client changes
+                                    klienSelect.addEventListener('change', function() {
+                                        loadAnimalsForClient(this.value);
+                                    });
+                                    
+                                    // Load all animals for this client immediately
+                                    loadAnimalsForClient(data.no_identitas_klien, data.nama_hewan);
+                                }
+                                
+                                // Pre-select doctors and nurses
+                                const dokterSelect = modalBody.querySelector('#dokter');
+                                if (dokterSelect) dokterSelect.value = data.no_dokter_hewan;
+                                
+                                const perawatSelect = modalBody.querySelector('#perawat');
+                                if (perawatSelect) perawatSelect.value = data.no_perawat_hewan;
+                                
+                                // Pre-select front desk
+                                const frontDeskSelect = modalBody.querySelector('#front_desk');
+                                if (frontDeskSelect) frontDeskSelect.value = data.no_front_desk;
+                                
+                                // Set tipe kunjungan
+                                const tipeSelect = modalBody.querySelector('#tipe_kunjungan');
+                                if (tipeSelect) tipeSelect.value = data.tipe_kunjungan;
+                                
+                                // Set dates
+                                const waktuMulaiInput = modalBody.querySelector('#waktu_mulai');
+                                if (waktuMulaiInput) waktuMulaiInput.value = waktuAwal;
+                                
+                                const waktuAkhirInput = modalBody.querySelector('#waktu_akhir');
+                                if (waktuAkhirInput) waktuAkhirInput.value = waktuAkhir;
+                                
+                                // Update submit button text
+                                const submitButton = modalBody.querySelector('button[type="submit"]');
+                                if (submitButton) {
+                                    submitButton.textContent = 'Update Kunjungan';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching kunjungan details:', error);
+                            });
+                    } else {
+                        modalBody.innerHTML = '<p class="text-center text-red-500">Failed to load form</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    modalBody.innerHTML = `<p class="text-center text-red-500">Error: ${error.message}</p>`;
+                });
+        });
+    });
+
+    // Close button handlers for update modal
+    document.querySelectorAll('#updateKunjunganModal .modal-close-button, #updateKunjunganModal .modal-close-button-secondary').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('updateKunjunganModal').classList.add('hidden');
+        });
+    });
 });
+
+// Helper function to load animals for a client
+function loadAnimalsForClient(clientId, selectedAnimal = null) {
+    if (!clientId) return;
+    
+    const hewanSelect = document.querySelector('#nama_hewan') || 
+                        document.querySelector('#updateKunjunganForm #nama_hewan');
+    
+    if (hewanSelect) {
+        hewanSelect.disabled = true;
+        hewanSelect.innerHTML = '<option value="">Loading...</option>';
+        
+        fetch(`{% url 'kunjungan:tambah_kunjungan' %}?klien_id=${clientId}`)
+            .then(response => response.json())
+            .then(data => {
+                hewanSelect.innerHTML = '<option value="">Pilih Hewan</option>';
+                
+                // Add all animals owned by this client
+                data.hewan_list.forEach(hewan => {
+                    const option = document.createElement('option');
+                    option.value = hewan.nama;
+                    option.textContent = hewan.nama;
+                    
+                    // Pre-select the animal if it matches
+                    if (selectedAnimal && hewan.nama === selectedAnimal) {
+                        option.selected = true;
+                    }
+                    
+                    hewanSelect.appendChild(option);
+                });
+                
+                hewanSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error loading animals:', error);
+                hewanSelect.innerHTML = '<option value="">Error loading animals</option>';
+                hewanSelect.disabled = false;
+            });
+    }
+}
 </script>
 {% endblock %}
