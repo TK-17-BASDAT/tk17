@@ -48,11 +48,11 @@
                             <td class="px-4 py-3">{{ perawatan.perawat_email }}</td>
                             <td class="px-4 py-3">{{ perawatan.dokter_email }}</td>
                             <td class="px-4 py-3">{{ perawatan.front_desk_email }}</td>
-                            <td class="px-4 py-3">{{ perawatan.jenis_perawatan|default:'N/A' }}</td>
-                            <td class="px-4 py-3">{{ perawatan.catatan_medis|default:'-' }}</td>
+                            <td class="px-4 py-3">{{ perawatan.nama_perawatan|default:'N/A' }}</td>
+                            <td class="px-4 py-3">{{ perawatan.catatan|default:'-' }}</td>
                             {% if request.session.user_role == 'dokter_hewan' %}
                                 <td class="px-4 py-3 space-x-2">
-                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" data-jenis-perawatan="{{ perawatan.jenis_perawatan|default:'N/A' }}" data-catatan-medis="{{ perawatan.catatan_medis|default:'' }}" class="update-perawatan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" data-jenis-perawatan="{{ perawatan.nama_perawatan|default:'N/A' }}" data-catatan-medis="{{ perawatan.catatan|default:'' }}" class="update-perawatan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
                                         Update
                                     </button>
                                     <button type="button" data-id="{{ perawatan.id_kunjungan }}" class="delete-perawatan-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
@@ -115,17 +115,22 @@
                             <input type="text" id="perawat_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
                         </div>
                         <div>
+                            <label for="create_catatan_lama" class="block text-sm font-medium text-gray-700">Catatan Lama (dari Kunjungan)</label>
+                            <textarea id="create_catatan_lama" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly></textarea>
+                        </div>
+                        <div>
                             <label for="jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
                             <select name="jenis_perawatan" id="jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                                 <option value="" disabled selected>Pilih Jenis Perawatan</option>
-                                <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
-                                <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
-                                <option value="TRM003 - Surgery">TRM003 - Surgery</option>
-                                <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
+                                <option value="TRM001 - Dental Care">TRM001 - Pemeriksaan Umum</option>
+                                <option value="TRM002 - Vaccination">TRM002 - Vaksinasi</option>
+                                <option value="TRM003 - Surgery">TRM003 - Dental Care</option>
+                                <option value="TRM004 - Check-Up">TRM004 - Grooming</option>
+                                <option value="TRM005 - Sterilisasi">TRM005 - Sterilisasi</option>
                             </select>
                         </div>
                         <div>
-                            <label for="catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis</label>
+                            <label for="catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis Baru</label>
                             <textarea name="catatan_medis" id="catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
                         </div>
                         <div class="flex justify-end space-x-4">
@@ -223,11 +228,12 @@
             document.getElementById('front_desk_display').value = '';
             document.getElementById('dokter_display').value = '';
             document.getElementById('perawat_display').value = '';
+            document.getElementById('create_catatan_lama').value = ''; // Reset catatan lama
             document.getElementById('jenis_perawatan').value = '';
             document.getElementById('catatan_medis').value = '';
         });
 
-        document.getElementById('id_kunjungan')?.addEventListener('change', (e) => {
+        document.getElementById('id_kunjungan')?.addEventListener('change', async (e) => {
             const selectedOption = e.target.options[e.target.selectedIndex];
             const idKunjungan = selectedOption.value;
             const idKlien = selectedOption.getAttribute('data-id-klien');
@@ -235,11 +241,30 @@
             const dokterEmail = selectedOption.getAttribute('data-dokter-email');
             const perawatEmail = selectedOption.getAttribute('data-perawat-email');
 
+            // Update display fields
             document.getElementById('id_kunjungan_display').value = idKunjungan || 'N/A';
             document.getElementById('id_klien_display').value = idKlien || 'N/A';
             document.getElementById('front_desk_display').value = frontDeskEmail || 'N/A';
             document.getElementById('dokter_display').value = dokterEmail || 'N/A';
             document.getElementById('perawat_display').value = perawatEmail || 'N/A';
+
+            // Fetch catatan lama dari kunjungan
+            if (idKunjungan) {
+                try {
+                    const response = await fetch(`/perawatan-hewan/data/${idKunjungan}/`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        document.getElementById('create_catatan_lama').value = data.catatan || '-';
+                    } else {
+                        document.getElementById('create_catatan_lama').value = '-';
+                    }
+                } catch (error) {
+                    document.getElementById('create_catatan_lama').value = '-';
+                    console.error('Error fetching catatan:', error);
+                }
+            } else {
+                document.getElementById('create_catatan_lama').value = '-';
+            }
         });
 
         document.getElementById('create-perawatan-form')?.addEventListener('submit', async (e) => {
@@ -247,9 +272,8 @@
             const form = e.target;
             const jenisPerawatan = document.getElementById('jenis_perawatan').value;
             const catatanMedis = document.getElementById('catatan_medis').value.trim();
-            const catatan = jenisPerawatan ? `Jenis: ${jenisPerawatan}; Catatan: ${catatanMedis || '-'}` : `Jenis: N/A; Catatan: ${catatanMedis || '-'}`;
             const formData = new FormData(form);
-            formData.set('catatan', catatan);
+            formData.set('catatan', catatanMedis || '-');
 
             try {
                 const response = await fetch('/perawatan-hewan/create/', {
@@ -276,7 +300,6 @@
             button.addEventListener('click', async () => {
                 const idKunjungan = button.getAttribute('data-id');
                 const jenisPerawatan = button.getAttribute('data-jenis-perawatan');
-                const catatanMedis = button.getAttribute('data-catatan-medis');
                 try {
                     const response = await fetch(`/perawatan-hewan/data/${idKunjungan}/`);
                     const data = await response.json();
@@ -284,7 +307,7 @@
                         document.getElementById('update_id_kunjungan').value = idKunjungan;
                         document.getElementById('update_id_kunjungan_display').value = idKunjungan;
                         document.getElementById('update_jenis_perawatan').value = jenisPerawatan;
-                        document.getElementById('update_catatan_medis').value = catatanMedis;
+                        document.getElementById('update_catatan_medis').value = data.catatan || '';
                         document.getElementById('update-perawatan-modal').classList.remove('hidden');
                     } else {
                         alert('Gagal mengambil data catatan.');
@@ -305,9 +328,8 @@
             const idKunjungan = document.getElementById('update_id_kunjungan').value;
             const jenisPerawatan = document.getElementById('update_jenis_perawatan').value;
             const catatanMedis = document.getElementById('update_catatan_medis').value.trim();
-            const catatan = jenisPerawatan ? `Jenis: ${jenisPerawatan}; Catatan: ${catatanMedis || '-'}` : `Jenis: N/A; Catatan: ${catatanMedis || '-'}`;
             const formData = new FormData(form);
-            formData.set('catatan', catatan);
+            formData.set('catatan', catatanMedis || '-');
 
             try {
                 const response = await fetch(`/perawatan-hewan/update/${idKunjungan}/`, {

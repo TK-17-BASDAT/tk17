@@ -3,13 +3,11 @@
 {% load i18n %}
 
 {% block content %}
-<div class="flex min-h-screen bg-gray-100">
-
-    {% include "navbar/sidebar.html" %} 
-
-    <!-- Main Content - Added ml-64 to give space for fixed sidebar -->
-    <div class="flex-1 ml-64 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
             <!-- Pesan Feedback -->
             {% if messages %}
                 <div class="mb-6">
@@ -102,6 +100,6 @@
                 </table>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 {% endblock %}

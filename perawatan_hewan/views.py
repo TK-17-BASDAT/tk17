@@ -12,14 +12,10 @@ def is_klien(user):
 
 @login_required
 def perawatan_view(request):
-    # Coba ambil role dari session (jika dashboard menyimpannya)
     user_role = request.session.get('role')  # Ganti 'role' dengan kunci session yang benar jika diketahui
-
-    # Jika tidak ada di session, tentukan role berdasarkan tabel PEGAWAI
     if not user_role:
         try:
             with connection.cursor() as cursor:
-                # Cek apakah pengguna adalah dokter
                 cursor.execute(
                     "SELECT 1 FROM PEGAWAI p JOIN DOKTER_HEWAN d ON p.no_pegawai = d.no_dokter_hewan WHERE p.email_user = %s",
                     [request.user.email]
@@ -28,7 +24,6 @@ def perawatan_view(request):
                 if is_dokter:
                     user_role = 'dokter_hewan'
                 else:
-                    # Cek apakah pengguna adalah front desk
                     cursor.execute(
                         "SELECT 1 FROM PEGAWAI p JOIN FRONT_DESK f ON p.no_pegawai = f.no_front_desk WHERE p.email_user = %s",
                         [request.user.email]
@@ -37,7 +32,6 @@ def perawatan_view(request):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Default ke klien
                         user_role = 'klien'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
@@ -62,7 +56,7 @@ def perawatan_view(request):
                     p1.email_user AS perawat_email,
                     p2.email_user AS dokter_email,
                     p3.email_user AS front_desk_email,
-                    kp.kode_perawatan,
+                    pr.nama_perawatan,
                     k.catatan
                 FROM KUNJUNGAN_KEPERAWATAN kp
                 JOIN KUNJUNGAN k ON kp.id_kunjungan = k.id_kunjungan
@@ -74,6 +68,7 @@ def perawatan_view(request):
                 LEFT JOIN PEGAWAI p1 ON kp.no_perawat_hewan = p1.no_pegawai
                 LEFT JOIN PEGAWAI p2 ON kp.no_dokter_hewan = p2.no_pegawai
                 LEFT JOIN PEGAWAI p3 ON kp.no_front_desk = p3.no_pegawai
+                JOIN PERAWATAN pr ON kp.kode_perawatan = pr.kode_perawatan
                 WHERE kp.kode_perawatan IS NOT NULL
                 """
             )
@@ -87,7 +82,7 @@ def perawatan_view(request):
                     'perawat_email': row[3].capitalize() if row[3] else 'N/A',
                     'dokter_email': f"dr. {row[4].capitalize()}" if row[4] else 'N/A',
                     'front_desk_email': row[5].capitalize() if row[5] else 'N/A',
-                    'tipe_kunjungan': row[6] if row[6] else 'N/A',  # Kode perawatan sebagai tipe kunjungan sementara
+                    'nama_perawatan': row[6] if row[6] else 'N/A',  
                     'catatan': row[7] if row[7] else 'N/A'
                 } for row in rows
             ]
@@ -113,7 +108,8 @@ def perawatan_view(request):
                     k.no_front_desk,
                     k.no_dokter_hewan,
                     k.no_perawat_hewan,
-                    k.tipe_kunjungan
+                    k.tipe_kunjungan,
+                    k.catatan
                 FROM KUNJUNGAN k
                 LEFT JOIN KUNJUNGAN_KEPERAWATAN kp ON k.id_kunjungan = kp.id_kunjungan
                     AND k.nama_hewan = kp.nama_hewan
@@ -132,7 +128,8 @@ def perawatan_view(request):
                     'no_front_desk': row[3],
                     'no_dokter_hewan': row[4],
                     'no_perawat_hewan': row[5],
-                    'tipe_kunjungan': row[6]
+                    'tipe_kunjungan': row[6],
+                    'catatan': row[7]
                 } for row in cursor.fetchall()
             ]
 
@@ -148,14 +145,10 @@ def perawatan_view(request):
 
 @login_required
 def perawatan_create(request):
-    # Coba ambil role dari session (jika dashboard menyimpannya)
     user_role = request.session.get('role')  # Ganti 'role' dengan kunci session yang benar jika diketahui
-
-    # Jika tidak ada di session, tentukan role berdasarkan tabel PEGAWAI
     if not user_role:
         try:
             with connection.cursor() as cursor:
-                # Cek apakah pengguna adalah dokter
                 cursor.execute(
                     "SELECT 1 FROM PEGAWAI p JOIN DOKTER_HEWAN d ON p.no_pegawai = d.no_dokter_hewan WHERE p.email_user = %s",
                     [request.user.email]
@@ -164,7 +157,6 @@ def perawatan_create(request):
                 if is_dokter:
                     user_role = 'dokter_hewan'
                 else:
-                    # Cek apakah pengguna adalah front desk
                     cursor.execute(
                         "SELECT 1 FROM PEGAWAI p JOIN FRONT_DESK f ON p.no_pegawai = f.no_front_desk WHERE p.email_user = %s",
                         [request.user.email]
@@ -173,7 +165,6 @@ def perawatan_create(request):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Default ke klien
                         user_role = 'klien'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
@@ -186,15 +177,15 @@ def perawatan_create(request):
     try:
         with connection.cursor() as cursor:
             id_kunjungan = request.POST.get('id_kunjungan')
-            catatan = request.POST.get('catatan', '')
+            catatan_input = request.POST.get('catatan', '')  # Catatan yang diinput pengguna
             jenis_perawatan = request.POST.get('jenis_perawatan', 'N/A')
 
             if not id_kunjungan:
                 return JsonResponse({'status': 'error', 'message': 'Kunjungan wajib diisi!'}, status=400)
 
-            # Cek apakah kunjungan ada di tabel KUNJUNGAN
+            # Cek apakah kunjungan ada di tabel KUNJUNGAN dan ambil catatan existing
             cursor.execute(
-                "SELECT nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan FROM KUNJUNGAN WHERE id_kunjungan = %s",
+                "SELECT nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan, catatan FROM KUNJUNGAN WHERE id_kunjungan = %s",
                 [id_kunjungan]
             )
             kunjungan_data = cursor.fetchone()
@@ -202,17 +193,12 @@ def perawatan_create(request):
                 return JsonResponse({'status': 'error', 'message': 'Kunjungan tidak ditemukan!'}, status=404)
 
             # Ambil data kunjungan
-            nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan = kunjungan_data
+            nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan, catatan = kunjungan_data
 
-            # Format catatan
-            if jenis_perawatan != 'N/A' and catatan:
-                catatan = f"Jenis: {jenis_perawatan}; Catatan: {catatan}"
-            elif jenis_perawatan != 'N/A':
-                catatan = f"Jenis: {jenis_perawatan}; Catatan: -"
-            else:
-                catatan = f"Jenis: N/A; Catatan: {catatan or '-'}"
+            # Gunakan catatan input jika ada, jika tidak gunakan catatan dari kunjungan
+            catatan_medis = catatan_input if catatan_input else (catatan if catatan else '-')
 
-            # Update catatan di KUNJUNGAN (langsung update tanpa pengecekan catatan sudah ada)
+            # Update catatan di KUNJUNGAN dengan catatan murni (replace)
             cursor.execute(
                 """
                 UPDATE KUNJUNGAN 
@@ -224,7 +210,7 @@ def perawatan_create(request):
                 AND no_perawat_hewan = %s 
                 AND no_dokter_hewan = %s
                 """,
-                [catatan, id_kunjungan, nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan]
+                [catatan_medis, id_kunjungan, nama_hewan, no_identitas_klien, no_front_desk, no_perawat_hewan, no_dokter_hewan]
             )
 
             # Cek apakah sudah ada entri di KUNJUNGAN_KEPERAWATAN
@@ -270,14 +256,10 @@ def perawatan_create(request):
 
 @login_required
 def perawatan_update(request, id_kunjungan):
-    # Coba ambil role dari session (jika dashboard menyimpannya)
     user_role = request.session.get('role')  # Ganti 'role' dengan kunci session yang benar jika diketahui
-
-    # Jika tidak ada di session, tentukan role berdasarkan tabel PEGAWAI
     if not user_role:
         try:
             with connection.cursor() as cursor:
-                # Cek apakah pengguna adalah dokter
                 cursor.execute(
                     "SELECT 1 FROM PEGAWAI p JOIN DOKTER_HEWAN d ON p.no_pegawai = d.no_dokter_hewan WHERE p.email_user = %s",
                     [request.user.email]
@@ -286,7 +268,6 @@ def perawatan_update(request, id_kunjungan):
                 if is_dokter:
                     user_role = 'dokter_hewan'
                 else:
-                    # Cek apakah pengguna adalah front desk
                     cursor.execute(
                         "SELECT 1 FROM PEGAWAI p JOIN FRONT_DESK f ON p.no_pegawai = f.no_front_desk WHERE p.email_user = %s",
                         [request.user.email]
@@ -295,7 +276,6 @@ def perawatan_update(request, id_kunjungan):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Default ke klien
                         user_role = 'klien'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
@@ -317,32 +297,34 @@ def perawatan_update(request, id_kunjungan):
             catatan = request.POST.get('catatan', '')
             jenis_perawatan = request.POST.get('jenis_perawatan', 'N/A')
 
-            if jenis_perawatan != 'N/A' and catatan:
-                catatan = f"Jenis: {jenis_perawatan}; Catatan: {catatan}"
-            elif jenis_perawatan != 'N/A':
-                catatan = f"Jenis: {jenis_perawatan}; Catatan: -"
-            else:
-                catatan = f"Jenis: N/A; Catatan: {catatan or '-'}"
-
+            # Hanya gunakan catatan murni yang diinput, tanpa format tambahan
             cursor.execute(
                 "UPDATE KUNJUNGAN SET catatan = %s WHERE id_kunjungan = %s",
-                [catatan, str(id_kunjungan)]
+                [catatan or '-', str(id_kunjungan)]
             )
 
-            return JsonResponse({'status': 'success', 'message': 'Catatan berhasil diperbarui!'}, status=200)
+            # Update kode_perawatan di KUNJUNGAN_KEPERAWATAN jika ada perubahan jenis perawatan
+            if jenis_perawatan != 'N/A':
+                kode_perawatan = jenis_perawatan.split(' - ')[0]
+                cursor.execute(
+                    """
+                    UPDATE KUNJUNGAN_KEPERAWATAN 
+                    SET kode_perawatan = %s 
+                    WHERE id_kunjungan = %s
+                    """,
+                    [kode_perawatan, str(id_kunjungan)]
+                )
+
+            return JsonResponse({'status': 'success', 'message': 'Perawatan berhasil diperbarui!'}, status=200)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 @login_required
 def perawatan_delete(request, id_kunjungan):
-    # Coba ambil role dari session (jika dashboard menyimpannya)
     user_role = request.session.get('role')  # Ganti 'role' dengan kunci session yang benar jika diketahui
-
-    # Jika tidak ada di session, tentukan role berdasarkan tabel PEGAWAI
     if not user_role:
         try:
             with connection.cursor() as cursor:
-                # Cek apakah pengguna adalah dokter
                 cursor.execute(
                     "SELECT 1 FROM PEGAWAI p JOIN DOKTER_HEWAN d ON p.no_pegawai = d.no_dokter_hewan WHERE p.email_user = %s",
                     [request.user.email]
@@ -351,7 +333,6 @@ def perawatan_delete(request, id_kunjungan):
                 if is_dokter:
                     user_role = 'dokter_hewan'
                 else:
-                    # Cek apakah pengguna adalah front desk
                     cursor.execute(
                         "SELECT 1 FROM PEGAWAI p JOIN FRONT_DESK f ON p.no_pegawai = f.no_front_desk WHERE p.email_user = %s",
                         [request.user.email]
@@ -360,7 +341,6 @@ def perawatan_delete(request, id_kunjungan):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Default ke klien
                         user_role = 'klien'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
@@ -383,16 +363,6 @@ def perawatan_delete(request, id_kunjungan):
             # Hapus dari KUNJUNGAN_KEPERAWATAN
             cursor.execute(
                 "DELETE FROM KUNJUNGAN_KEPERAWATAN WHERE id_kunjungan = %s",
-                [str(id_kunjungan)]
-            )
-
-            # Set catatan di KUNJUNGAN menjadi NULL
-            cursor.execute(
-                """
-                UPDATE KUNJUNGAN 
-                SET catatan = NULL 
-                WHERE id_kunjungan = %s
-                """,
                 [str(id_kunjungan)]
             )
 

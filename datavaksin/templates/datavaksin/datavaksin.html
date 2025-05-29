@@ -2,15 +2,11 @@
 {% load static %} {# Jika menggunakan FontAwesome, pastikan staticfiles sudah di-load #}
 
 {% block content %}
-<div class="flex min-h-screen bg-white">
-    <!-- Sidebar -->
-    <div class="w-64 bg-gray-100 p-4 flex-shrink-0">
-        {% include "navbar/sidebar.html" %}
-    </div>
-    
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
             <!-- Pesan Feedback -->
             {% if messages %}
                 <div class="mb-6"> {# Memberi jarak bawah jika ada pesan #}
