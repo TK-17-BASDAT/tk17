@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Kunjungan - PetClinic{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r shadow-sm">
+        {% include 'navbar/sidebar.html' %}
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-semibold text-primary">Daftar Kunjungan</h1>
+            {% if request.session.user_role == 'front_desk' %}
+                <button type="button" id="create-kunjungan-btn" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                    + Buat Kunjungan Baru
+                </button>
+            {% endif %}
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <p class="text-{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- List Kunjungan -->
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="table-auto w-full border-separate border-spacing-0">
+                <thead class="bg-secondary text-white">
+                    {% if request.session.user_role == 'front_desk' %}
+                        <tr>
+                            <th class="px-4 py-3 text-left">ID Kunjungan</th>
+                            <th class="px-4 py-3 text-left">ID Klien</th>
+                            <th class="px-4 py-3 text-left">Nama Hewan</th>
+                            <th class="px-4 py-3 text-left">Metode</th>
+                            <th class="px-4 py-3 text-left">Waktu Mulai</th>
+                            <th class="px-4 py-3 text-left">Waktu Akhir</th>
+                            <th class="px-4 py-3 text-left">Rekam Medis</th>
+                            <th class="px-4 py-3 text-left">Action</th>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <th class="px-4 py-3 text-left">Nama Hewan</th>
+                            <th class="px-4 py-3 text-left">Metode</th>
+                            <th class="px-4 py-3 text-left">Waktu Mulai</th>
+                            <th class="px-4 py-3 text-left">Waktu Akhir</th>
+                            <th class="px-4 py-3 text-left">Rekam Medis</th>
+                        </tr>
+                    {% endif %}
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for kunjungan in kunjungans %}
+                        <tr>
+                            {% if request.session.user_role == 'front_desk' %}
+                                <td class="px-4 py-3">{{ kunjungan.id_kunjungan }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.no_identitas_klien }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.nama_hewan }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.tipe_kunjungan }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.timestamp_awal|date:"d-m-Y H:i" }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.timestamp_akhir|date:"d-m-Y H:i" }}</td>
+                                <td class="px-4 py-3">
+                                    <button type="button" data-id="{{ kunjungan.id_kunjungan }}" class="lihat-rekam-btn px-3 py-1 bg-secondary/30 text-black rounded hover:bg-gray-100 transition">
+                                        Lihat Rekam Medis
+                                    </button>
+                                </td>
+                                <td class="px-4 py-3 space-x-2">
+                                    <button type="button" data-id="{{ kunjungan.id_kunjungan }}" class="update-kunjungan-btn px-3 py-1 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                        Update
+                                    </button>
+                                    <button type="button" data-id="{{ kunjungan.id_kunjungan }}" class="delete-kunjungan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                        Hapus
+                                    </button>
+                                </td>
+                            {% else %}
+                                <td class="px-4 py-3">{{ kunjungan.nama_hewan }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.tipe_kunjungan }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.timestamp_awal|date:"d-m-Y H:i" }}</td>
+                                <td class="px-4 py-3">{{ kunjungan.timestamp_akhir|date:"d-m-Y H:i" }}</td>
+                                <td class="px-4 py-3">
+                                    <button type="button" data-id="{{ kunjungan.id_kunjungan }}" class="lihat-rekam-btn px-3 py-1 bg-secondary/30 text-black rounded hover:bg-gray-100 transition">
+                                        Lihat Rekam Medis
+                                    </button>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{% if request.session.user_role == 'front_desk' %}8{% else %}5{% endif %}" class="px-4 py-3 text-center text-gray-500">Tidak ada data kunjungan.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Create Kunjungan Modal -->
+        {% if request.session.user_role == 'front_desk' %}
+            <div id="create-kunjungan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-primary">Buat Kunjungan Baru</h2>
+                    </div>
+                    <form method="post" id="create-kunjungan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="no_identitas_klien" class="block text-sm font-medium text-gray-700">ID Klien</label>
+                            <select name="no_identitas_klien" id="no_identitas_klien" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih ID Klien</option>
+                                {% for klien in kliens %}
+                                    <option value="{{ klien.no_identitas }}">{{ klien.no_identitas }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="nama_hewan" class="block text-sm font-medium text-gray-700">Nama Hewan</label>
+                            <select name="nama_hewan" id="nama_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Nama Hewan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="no_dokter_hewan" class="block text-sm font-medium text-gray-700">Email Dokter</label>
+                            <select name="no_dokter_hewan" id="no_dokter_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Dokter</option>
+                                {% for dokter in dokters %}
+                                    <option value="{{ dokter.no_dokter_hewan }}">{{ dokter.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="no_perawat_hewan" class="block text-sm font-medium text-gray-700">Email Perawat</label>
+                            <select name="no_perawat_hewan" id="no_perawat_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Perawat</option>
+                                {% for perawat in perawats %}
+                                    <option value="{{ perawat.no_perawat_hewan }}">{{ perawat.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="tipe_kunjungan" class="block text-sm font-medium text-gray-700">Metode</label>
+                            <select name="tipe_kunjungan" id="tipe_kunjungan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih metode</option>
+                                <option value="Janji Temu">Janji Temu</option>
+                                <option value="Walk-In">Walk-In</option>
+                                <option value="Darurat">Darurat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="timestamp_awal" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
+                            <input type="datetime-local" name="timestamp_awal" id="timestamp_awal" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label for="timestamp_akhir" class="block text-sm font-medium text-gray-700">Waktu Akhir</label>
+                            <input type="datetime-local" name="timestamp_akhir" id="timestamp_akhir" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                Create
+                            </button>
+                            <button type="button" id="create-cancel-button" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Kunjungan Modal -->
+            <div id="update-kunjungan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-primary">Update Kunjungan</h2>
+                    </div>
+                    <form method="post" id="update-kunjungan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_kunjungan" id="update_id_kunjungan">
+                        <div>
+                            <label for="update_no_identitas_klien" class="block text-sm font-medium text-gray-700">ID Klien</label>
+                            <select name="no_identitas_klien" id="update_no_identitas_klien" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled>Pilih ID Klien</option>
+                                {% for klien in kliens %}
+                                    <option value="{{ klien.no_identitas }}">{{ klien.no_identitas }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_nama_hewan" class="block text-sm font-medium text-gray-700">Nama Hewan</label>
+                            <select name="nama_hewan" id="update_nama_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled>Pilih Nama Hewan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_no_dokter_hewan" class="block text-sm font-medium text-gray-700">Email Dokter</label>
+                            <select name="no_dokter_hewan" id="update_no_dokter_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled>Pilih Dokter</option>
+                                {% for dokter in dokters %}
+                                    <option value="{{ dokter.no_dokter_hewan }}">{{ dokter.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_no_perawat_hewan" class="block text-sm font-medium text-gray-700">Email Perawat</label>
+                            <select name="no_perawat_hewan" id="update_no_perawat_hewan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled>Pilih Perawat</option>
+                                {% for perawat in perawats %}
+                                    <option value="{{ perawat.no_perawat_hewan }}">{{ perawat.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_tipe_kunjungan" class="block text-sm font-medium text-gray-700">Metode</label>
+                            <select name="tipe_kunjungan" id="update_tipe_kunjungan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled>Pilih metode</option>
+                                <option value="Janji Temu">Janji Temu</option>
+                                <option value="Walk-In">Walk-In</option>
+                                <option value="Darurat">Darurat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_timestamp_awal" class="block text-sm font-medium text-gray-700">Waktu Mulai</label>
+                            <input type="datetime-local" name="timestamp_awal" id="update_timestamp_awal" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div>
+                            <label for="update_timestamp_akhir" class="block text-sm font-medium text-gray-700">Waktu Akhir</label>
+                            <input type="datetime-local" name="timestamp_akhir" id="update_timestamp_akhir" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                Update
+                            </button>
+                            <button type="button" id="update-cancel-button" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Kunjungan Modal -->
+            <div id="delete-kunjungan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <h2 class="text-2xl font-semibold text-primary mb-4">Delete Kunjungan</h2>
+                    <p class="mb-4 text-gray-700" id="delete-kunjungan-message"></p>
+                    <form method="post" id="delete-kunjungan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                Confirm Deletion
+                            </button>
+                            <button type="button" id="delete-cancel-button" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Missing Modal (Rekam Medis Tidak Tersedia) -->
+        <div id="missing-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                <h2 class="text-2xl font-semibold text-red-600 mb-4">Rekam Medis tidak Tersedia</h2>
+                <p class="mb-6 text-gray-700">Maaf, sepertinya belum ada rekam medis yang dibuat untuk kunjungan ini.</p>
+                <div class="flex justify-end space-x-4">
+                    <button id="missing-create" class="px-6 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                        Buat
+                    </button>
+                    <button id="missing-ok" class="px-6 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail Modal (Rekam Medis) -->
+        <div id="detail-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-primary">Rekam Medis</h2>
+                </div>
+                <div class="space-y-2 text-gray-800 mb-6" id="detail-content">
+                    <!-- Data akan diisi via JavaScript -->
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button id="detail-update" class="px-6 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                        Update
+                    </button>
+                    <button id="detail-close" class="px-6 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Tombol Lihat Rekam Medis
+    document.querySelectorAll('.lihat-rekam-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const idKunjungan = button.getAttribute('data-id');
+            fetch(`/rekam-medis/check/${idKunjungan}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const detailContent = document.getElementById('detail-content');
+                    if (data.exists) {
+                        detailContent.innerHTML = `
+                            <p><span class="font-medium">Suhu Tubuh:</span> ${data.suhu || 'N/A'} °C</p>
+                            <p><span class="font-medium">Berat Badan:</span> ${data.berat_badan || 'N/A'} kg</p>
+                            <p><span class="font-medium">Jenis Perawatan:</span> ${data.jenis_perawatan || 'N/A'}</p>
+                            <p><span class="font-medium">Catatan Medis:</span><br/>${data.catatan || 'N/A'}</p>
+                        `;
+                        document.getElementById('detail-modal').classList.remove('hidden');
+                    } else {
+                        document.getElementById('missing-modal').classList.remove('hidden');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+
+    // Missing Modal Handlers
+    document.getElementById('missing-ok').addEventListener('click', () => {
+        document.getElementById('missing-modal').classList.add('hidden');
+    });
+    document.getElementById('missing-create').addEventListener('click', () => {
+        document.getElementById('missing-modal').classList.add('hidden');
+        window.location.href = `/rekam-medis/create/?id_kunjungan=${document.querySelector('.lihat-rekam-btn[data-id]:focus')?.getAttribute('data-id') || ''}`;
+    });
+
+    // Detail Modal Handlers
+    document.getElementById('detail-close').addEventListener('click', () => {
+        document.getElementById('detail-modal').classList.add('hidden');
+    });
+    document.getElementById('detail-update').addEventListener('click', () => {
+        document.getElementById('detail-modal').classList.add('hidden');
+        window.location.href = `/rekam-medis/update/?id_kunjungan=${document.querySelector('.lihat-rekam-btn[data-id]:focus')?.getAttribute('data-id') || ''}`;
+    });
+
+    // Create Kunjungan Modal Handlers
+    document.getElementById('create-kunjungan-btn')?.addEventListener('click', () => {
+        document.getElementById('create-kunjungan-modal').classList.remove('hidden');
+    });
+    document.getElementById('create-cancel-button')?.addEventListener('click', () => {
+        document.getElementById('create-kunjungan-modal').classList.add('hidden');
+    });
+
+    // Update Kunjungan Modal Handlers
+    document.querySelectorAll('.update-kunjungan-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const idKunjungan = button.getAttribute('data-id');
+            fetch(`/kunjungan/data/${idKunjungan}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('update_id_kunjungan').value = idKunjungan;
+                    document.getElementById('update_no_identitas_klien').value = data.no_identitas_klien;
+                    document.getElementById('update_no_dokter_hewan').value = data.no_dokter_hewan;
+                    document.getElementById('update_no_perawat_hewan').value = data.no_perawat_hewan;
+                    document.getElementById('update_tipe_kunjungan').value = data.tipe_kunjungan;
+                    document.getElementById('update_timestamp_awal').value = new Date(data.timestamp_awal).toISOString().slice(0, 16);
+                    document.getElementById('update_timestamp_akhir').value = new Date(data.timestamp_akhir).toISOString().slice(0, 16);
+
+                    // Update dropdown Nama Hewan berdasarkan ID Klien
+                    fetch(`/kunjungan/get-hewan/?no_identitas_klien=${data.no_identitas_klien}`)
+                        .then(response => response.json())
+                        .then(hewanData => {
+                            const namaHewanSelect = document.getElementById('update_nama_hewan');
+                            namaHewanSelect.innerHTML = '<option value="" disabled>Pilih Nama Hewan</option>';
+                            hewanData.hewan.forEach(hewan => {
+                                const option = document.createElement('option');
+                                option.value = hewan.nama;
+                                option.textContent = hewan.nama;
+                                if (hewan.nama === data.nama_hewan) {
+                                    option.selected = true;
+                                }
+                                namaHewanSelect.appendChild(option);
+                            });
+                            document.getElementById('update-kunjungan-modal').classList.remove('hidden');
+                        });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+    document.getElementById('update-cancel-button')?.addEventListener('click', () => {
+        document.getElementById('update-kunjungan-modal').classList.add('hidden');
+    });
+
+    // Delete Kunjungan Modal Handlers
+    document.querySelectorAll('.delete-kunjungan-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const idKunjungan = button.getAttribute('data-id');
+            document.getElementById('delete-kunjungan-message').innerHTML = `Apakah kamu yakin untuk menghapus KUNJUNGAN dengan ID <span class="font-medium">${idKunjungan}</span>?`;
+            document.getElementById('delete-kunjungan-form').action = `/kunjungan/delete/${idKunjungan}/`;
+            document.getElementById('delete-kunjungan-modal').classList.remove('hidden');
+        });
+    });
+    document.getElementById('delete-cancel-button')?.addEventListener('click', () => {
+        document.getElementById('delete-kunjungan-modal').classList.add('hidden');
+    });
+
+    // Dynamic Nama Hewan for Create
+    document.getElementById('no_identitas_klien')?.addEventListener('change', (e) => {
+        const noIdentitasKlien = e.target.value;
+        fetch(`/kunjungan/get-hewan/?no_identitas_klien=${noIdentitasKlien}`)
+            .then(response => response.json())
+            .then(data => {
+                const namaHewanSelect = document.getElementById('nama_hewan');
+                namaHewanSelect.innerHTML = '<option value="" disabled selected>Pilih Nama Hewan</option>';
+                data.hewan.forEach(hewan => {
+                    const option = document.createElement('option');
+                    option.value = hewan.nama;
+                    option.textContent = hewan.nama;
+                    namaHewanSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // Dynamic Nama Hewan for Update
+    document.getElementById('update_no_identitas_klien')?.addEventListener('change', (e) => {
+        const noIdentitasKlien = e.target.value;
+        fetch(`/kunjungan/get-hewan/?no_identitas_klien=${noIdentitasKlien}`)
+            .then(response => response.json())
+            .then(data => {
+                const namaHewanSelect = document.getElementById('update_nama_hewan');
+                namaHewanSelect.innerHTML = '<option value="" disabled selected>Pilih Nama Hewan</option>';
+                data.hewan.forEach(hewan => {
+                    const option = document.createElement('option');
+                    option.value = hewan.nama;
+                    option.textContent = hewan.nama;
+                    namaHewanSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // Handle Form Submission (Create)
+    document.getElementById('create-kunjungan-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        fetch('/kunjungan/create/', {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('Error submitting form');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Handle Form Submission (Update)
+    document.getElementById('update-kunjungan-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const idKunjungan = document.getElementById('update_id_kunjungan').value;
+        fetch(`/kunjungan/update/${idKunjungan}/`, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('Error submitting form');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Handle Form Submission (Delete)
+    document.getElementById('delete-kunjungan-form')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                console.error('Error submitting form');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+{% endblock %}

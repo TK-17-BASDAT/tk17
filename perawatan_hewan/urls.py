@@ -1,12 +1,13 @@
 from django.urls import path
-from django.views.generic import TemplateView
 from . import views
 
 app_name = 'perawatan_hewan'
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='perawatan_hewan/list.html'), name='list'),
-    path('create/', views.create_perawatan, name='create'),
-    path('update/', views.update_perawatan, name='update'),
-    path('delete/', views.delete_perawatan, name='delete'),
+    path('', views.perawatan_view, name='perawatan_view'),
+    path('create/', views.perawatan_create, name='perawatan_create'),
+    path('update/<uuid:id_kunjungan>/', views.perawatan_update, name='perawatan_update'),
+    path('delete/<uuid:id_kunjungan>/', views.perawatan_delete, name='perawatan_delete'),
+    path('data/<uuid:id_kunjungan>/', views.perawatan_data, name='perawatan_data'),
+    # path('jenis-perawatan/', views.get_jenis_perawatan, name='get_jenis_perawatan'),
 ]
