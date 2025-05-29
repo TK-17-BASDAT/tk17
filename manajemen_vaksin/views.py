@@ -1,6 +1,6 @@
-# manajemen_vaksin views.py
+
 from django.shortcuts import render, redirect
-from django.db import connection, IntegrityError, DatabaseError, transaction # Pastikan DatabaseError diimpor
+from django.db import connection, IntegrityError, DatabaseError, transaction 
 from django.contrib import messages
 from django.urls import reverse
 from datetime import date, datetime
@@ -9,17 +9,17 @@ import uuid
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 
-# --- Pengaturan Locale (Opsional) ---
+
 try:
-    locale.setlocale(locale.LC_TIME, 'id_ID.UTF-8') # Untuk Linux/macOS
+    locale.setlocale(locale.LC_TIME, 'id_ID.UTF-8') 
 except locale.Error:
     try:
-        locale.setlocale(locale.LC_TIME, 'Indonesian_Indonesia.1252') # Untuk Windows
+        locale.setlocale(locale.LC_TIME, 'Indonesian_Indonesia.1252') 
     except locale.Error:
         print("Peringatan: Locale Bahasa Indonesia tidak ditemukan, menggunakan locale default.")
         pass
 
-# --- Helper Functions ---
+
 def format_tanggal_indonesia(tanggal_obj):
     if isinstance(tanggal_obj, datetime):
         tanggal_obj = tanggal_obj.date()
@@ -39,70 +39,102 @@ def dictfetchone(cursor):
     row = cursor.fetchone()
     return dict(zip(columns, row)) if row else None
 
-# --- Views ---
-def vaccination_list_view(request):
-    vaccinations_data = []
-    kunjungan_options_for_create = []
-    vaksin_options = []
 
-    try:
-        with connection.cursor() as cursor:
-            query_existing_vaccinations = """
-                SELECT
-                    k.id_kunjungan,
-                    k.timestamp_awal,
-                    k.kode_vaksin,
-                    v.nama AS nama_vaksin,
-                    h.nama AS nama_hewan_display
-                FROM PETCLINIC.KUNJUNGAN k
-                JOIN PETCLINIC.VAKSIN v ON k.kode_vaksin = v.kode
-                JOIN PETCLINIC.HEWAN h ON k.nama_hewan = h.nama AND k.no_identitas_klien = h.no_identitas_klien
-                WHERE k.kode_vaksin IS NOT NULL
-                ORDER BY k.timestamp_awal DESC;
-            """
-            cursor.execute(query_existing_vaccinations)
-            for row in dictfetchall(cursor):
-                vaccinations_data.append({
-                    "kunjungan_id": str(row['id_kunjungan']),
-                    "timestamp_awal": row['timestamp_awal'],
-                    "tanggal_kunjungan_formatted": format_tanggal_indonesia(row['timestamp_awal']),
-                    "vaksin_id": row['kode_vaksin'],
-                    "vaksin_nama": row['nama_vaksin'],
-                    "display_kunjungan": f"{str(row['id_kunjungan'])[:8]}... - {row['nama_hewan_display']}"
-                })
+class VaccinationListView(LoginRequiredMixin, View): 
+    login_url = '/auth/login/'
+    template_name = 'manajemen_vaksin/vaksin.html'
 
-            query_kunjungan_no_vaksin = """
-                SELECT
-                    k.id_kunjungan,
-                    h.nama as nama_hewan_display,
-                    k.timestamp_awal
-                FROM PETCLINIC.KUNJUNGAN k
-                JOIN PETCLINIC.HEWAN h ON k.nama_hewan = h.nama AND k.no_identitas_klien = h.no_identitas_klien
-                WHERE k.kode_vaksin IS NULL
-                ORDER BY k.timestamp_awal DESC;
-            """
-            cursor.execute(query_kunjungan_no_vaksin)
-            for row in dictfetchall(cursor):
-                kunjungan_options_for_create.append({
-                    "id": str(row['id_kunjungan']),
-                    "display_text": f"{str(row['id_kunjungan'])[:8]}... - {row['nama_hewan_display']} ({format_tanggal_indonesia(row['timestamp_awal'])})"
-                })
+    def get(self, request):
+        vaccinations_data = []
+        kunjungan_options_for_create = []
+        vaksin_options = []
 
-            cursor.execute("SELECT kode, nama, stok FROM PETCLINIC.VAKSIN ORDER BY nama;")
-            for row in dictfetchall(cursor):
-                vaksin_options.append({
-                    "id": row['kode'], "nama": row['nama'], "stok": row['stok']
-                })
-    except Exception as e:
-        messages.error(request, f"Gagal memuat data vaksinasi: {e}")
-        print(f"Database error in vaccination_list_view: {e}")
+        
+        no_dokter_login = request.session.get('no_pegawai') 
+        user_role = request.session.get('user_role')
 
-    context = {
-        'vaccinations': vaccinations_data,
-        'kunjungan_options_for_create': kunjungan_options_for_create,
-        'vaksin_options': vaksin_options,
-    }
-    return render(request, 'manajemen_vaksin/vaksin.html', context)
+        
+        if not no_dokter_login or user_role != 'dokter_hewan':
+            
+            
+            
+            
+            
+            
+            messages.error(request, "Hanya dokter hewan yang dapat mengakses halaman ini untuk melihat vaksinasi yang ditanganinya.")
+            return redirect('dashboard:index') 
+
+        try:
+            with connection.cursor() as cursor:
+                
+                query_existing_vaccinations = """
+                    SELECT
+                        k.id_kunjungan, 
+                        k.timestamp_awal,
+                        k.kode_vaksin,
+                        v.nama AS nama_vaksin,
+                        h.nama AS nama_hewan_display 
+                    FROM PETCLINIC.KUNJUNGAN k
+                    JOIN PETCLINIC.VAKSIN v ON k.kode_vaksin = v.kode
+                    JOIN PETCLINIC.HEWAN h ON k.nama_hewan = h.nama AND k.no_identitas_klien = h.no_identitas_klien
+                    WHERE k.kode_vaksin IS NOT NULL
+                      AND k.no_dokter_hewan = %s  -- Filter berdasarkan dokter yang login
+                    ORDER BY k.timestamp_awal DESC;
+                """
+                cursor.execute(query_existing_vaccinations, [no_dokter_login])
+                for row in dictfetchall(cursor):
+                    vaccinations_data.append({
+                        "kunjungan_id": str(row['id_kunjungan']),
+                        "timestamp_awal": row['timestamp_awal'],
+                        "tanggal_kunjungan_formatted": format_tanggal_indonesia(row['timestamp_awal']),
+                        "vaksin_id": row['kode_vaksin'],
+                        "vaksin_nama": row['nama_vaksin'],
+                        "display_kunjungan": f"{str(row['id_kunjungan'])[:8]}... - {row['nama_hewan_display']}"
+                    })
+
+                
+                query_kunjungan_no_vaksin = """
+                    SELECT
+                        k.id_kunjungan,
+                        h.nama as nama_hewan_display,
+                        k.timestamp_awal
+                    FROM PETCLINIC.KUNJUNGAN k
+                    JOIN PETCLINIC.HEWAN h ON k.nama_hewan = h.nama AND k.no_identitas_klien = h.no_identitas_klien
+                    WHERE k.kode_vaksin IS NULL
+                      AND k.no_dokter_hewan = %s -- Filter berdasarkan dokter yang login
+                    ORDER BY k.timestamp_awal DESC;
+                """
+                cursor.execute(query_kunjungan_no_vaksin, [no_dokter_login])
+                for row in dictfetchall(cursor):
+                    kunjungan_options_for_create.append({
+                        "id": str(row['id_kunjungan']), 
+                        "display_text": f"{str(row['id_kunjungan'])[:8]}... - {row['nama_hewan_display']} ({format_tanggal_indonesia(row['timestamp_awal'])})"
+                    })
+                
+                
+                cursor.execute("SELECT kode, nama, stok FROM PETCLINIC.VAKSIN ORDER BY nama;")
+                for row in dictfetchall(cursor):
+                    vaksin_options.append({
+                        "id": row['kode'], "nama": row['nama'], "stok": row['stok']
+                    })
+        except Exception as e:
+            messages.error(request, f"Gagal memuat data vaksinasi: {e}")
+            print(f"Database error in vaccination_list_view (filtered by doctor): {e}")
+
+        context = {
+            'vaccinations': vaccinations_data,
+            'kunjungan_options_for_create': kunjungan_options_for_create,
+            'vaksin_options': vaksin_options,
+        }
+        return render(request, self.template_name, context)
+
+
+
+
+
+
+
+
 
 
 def vaccination_create_view(request):
@@ -115,21 +147,21 @@ def vaccination_create_view(request):
             return redirect('manajemen_vaksin:vaccination_list')
 
         try:
-            # Tidak perlu cek stok di sini lagi, biarkan trigger yang handle
-            # with connection.cursor() as cursor:
-            #     cursor.execute("SELECT stok, nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [vaksin_kode_to_add])
-            #     vaksin_info = dictfetchone(cursor)
-            #     if not vaksin_info:
-            #         messages.error(request, f"Vaksin dengan kode {vaksin_kode_to_add} tidak ditemukan.")
-            #         return redirect('manajemen_vaksin:vaccination_list')
-            #     if vaksin_info['stok'] <= 0: # Validasi stok di sisi aplikasi DIHAPUS
-            #         messages.error(request, f"Stok vaksin '{vaksin_info['nama']}' (Kode: {vaksin_kode_to_add}) habis.")
-            #         return redirect('manajemen_vaksin:vaccination_list')
             
-            # Langsung lakukan operasi database, biarkan trigger yang bekerja
-            with transaction.atomic(): # Pastikan operasi update KUNJUNGAN dan VAKSIN (oleh trigger) atomik
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            with transaction.atomic(): 
                 with connection.cursor() as cursor:
-                    # Cek dulu apakah kunjungan memang belum ada vaksinnya
+                    
                     cursor.execute("SELECT kode_vaksin, id_kunjungan FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [kunjungan_id_to_update])
                     kunjungan_status = dictfetchone(cursor)
                     if not kunjungan_status:
@@ -144,21 +176,21 @@ def vaccination_create_view(request):
                     cursor.execute(sql_update_kunjungan, [vaksin_kode_to_add, kunjungan_id_to_update])
 
                     if cursor.rowcount > 0:
-                        # Pengurangan stok sekarang ditangani oleh trigger, jadi tidak perlu query UPDATE VAKSIN di sini
-                        # Cukup tampilkan pesan sukses
-                        # Ambil nama vaksin untuk pesan sukses
+                        
+                        
+                        
                         cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [vaksin_kode_to_add])
                         vaksin_nama_for_msg = dictfetchone(cursor)['nama'] if cursor.rowcount > 0 else vaksin_kode_to_add
                         messages.success(request, f"Vaksin '{vaksin_nama_for_msg}' berhasil ditambahkan ke kunjungan {kunjungan_id_to_update[:8]}...")
                     else:
                         messages.error(request, f"Gagal mengupdate kunjungan {kunjungan_id_to_update[:8]}.... Kunjungan mungkin tidak ditemukan atau sudah memiliki vaksin.")
         
-        except (IntegrityError, DatabaseError) as e: # Tangkap error dari DB, termasuk dari trigger
-            # Pesan error dari trigger (RAISE EXCEPTION) akan ada di e
+        except (IntegrityError, DatabaseError) as e: 
+            
             error_message = str(e)
-            # Cek apakah pesan mengandung format error stok dari trigger
+            
             if "tidak mencukupi untuk vaksinasi" in error_message or "Vaksin dengan kode" in error_message and "tidak ditemukan" in error_message :
-                messages.error(request, error_message) # Tampilkan pesan error dari trigger
+                messages.error(request, error_message) 
             else:
                 messages.error(request, f"Gagal menambahkan vaksinasi: {error_message}")
             print(f"Error creating vaccination: {error_message}")
@@ -180,11 +212,11 @@ def vaccination_update_view(request, kunjungan_id):
             return redirect('manajemen_vaksin:vaccination_list')
         
         try:
-            # Tidak perlu cek stok di sini lagi, biarkan trigger yang handle
+            
             with transaction.atomic():
                 with connection.cursor() as cursor:
-                    # Dapatkan kode vaksin lama (trigger akan mengembalikan stoknya)
-                    # dan pastikan kunjungan ada
+                    
+                    
                     cursor.execute("SELECT kode_vaksin FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [kunjungan_id])
                     kunjungan_data = dictfetchone(cursor)
                     
@@ -198,11 +230,11 @@ def vaccination_update_view(request, kunjungan_id):
                         messages.info(request, "Tidak ada perubahan vaksin.")
                         return redirect('manajemen_vaksin:vaccination_list')
 
-                    # Langsung update, trigger akan menangani stok lama dan baru
+                    
                     cursor.execute("UPDATE PETCLINIC.KUNJUNGAN SET kode_vaksin = %s WHERE id_kunjungan = %s", [new_vaksin_kode, kunjungan_id])
 
                     if cursor.rowcount > 0:
-                        # Ambil nama vaksin baru untuk pesan
+                        
                         cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [new_vaksin_kode])
                         vaksin_nama_for_msg = dictfetchone(cursor)['nama'] if cursor.rowcount > 0 else new_vaksin_kode
                         messages.success(request, f"Vaksinasi untuk kunjungan {str(kunjungan_id)[:8]}... berhasil diupdate ke '{vaksin_nama_for_msg}'.")
@@ -230,7 +262,7 @@ def vaccination_delete_view(request, kunjungan_id):
         try:
             with transaction.atomic():
                 with connection.cursor() as cursor:
-                    # 1. Dapatkan kode vaksin yang akan dihapus (opsional, untuk info)
+                    
                     cursor.execute("SELECT kode_vaksin FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [kunjungan_id])
                     kunjungan_data = dictfetchone(cursor)
 
@@ -244,7 +276,7 @@ def vaccination_delete_view(request, kunjungan_id):
                         messages.warning(request, f"Kunjungan {str(kunjungan_id)[:8]}... tidak memiliki data vaksinasi untuk dihapus.")
                         return redirect('manajemen_vaksin:vaccination_list')
 
-                    # Operasi utama: Set kode_vaksin ke NULL. Trigger akan menangani pengembalian stok.
+                    
                     cursor.execute("UPDATE PETCLINIC.KUNJUNGAN SET kode_vaksin = NULL WHERE id_kunjungan = %s", [kunjungan_id])
 
                     if cursor.rowcount > 0:
@@ -253,8 +285,8 @@ def vaccination_delete_view(request, kunjungan_id):
                         messages.warning(request, f"Tidak ada data vaksinasi yang dibatalkan untuk kunjungan {str(kunjungan_id)[:8]}....")
 
         except DatabaseError as e:
-            # Error dari trigger seharusnya tidak terjadi di sini kecuali ada masalah dengan trigger itu sendiri
-            # saat mengembalikan stok (misal vaksinnya terhapus dari tabel VAKSIN secara bersamaan)
+            
+            
             error_message = str(e)
             if "ERROR:" in error_message:
                 error_message = error_message.split("ERROR:", 1)[1].split("CONTEXT:",1)[0].split("DETAIL:",1)[0].strip()

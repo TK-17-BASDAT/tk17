@@ -8,7 +8,7 @@
     <main class="flex-1 ml-64 overflow-y-auto">
         <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
             <div class="w-full bg-white rounded-xl shadow-md p-8">
-            <!-- Pesan Feedback -->
+            
             {% if messages %}
                 <div class="mb-6">
                     {% for message in messages %}
@@ -28,7 +28,7 @@
                 <h1 class="text-2xl font-semibold text-gray-800">List Vaccine for My Pet's</h1>
             </div>
 
-            <!-- Filter Form -->
+            
             <form method="GET" action="{% url 'manajemen_vaksin:client_vaccination_history' %}" class="mb-6 bg-gray-50 p-4 rounded-md">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4 items-end">
                     <div>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
             </form>
-            <!-- End Filter Form -->
+            
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left border-collapse border border-gray-200">

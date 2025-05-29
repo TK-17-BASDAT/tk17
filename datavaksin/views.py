@@ -1,10 +1,10 @@
-# datavaksin/views.py
+
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
 from django.contrib import messages
-from django.db import connection, IntegrityError, DatabaseError # Untuk eksekusi SQL dan error DB
+from django.db import connection, IntegrityError, DatabaseError 
 
-# Helper functions (tetap berguna)
+
 def dictfetchall(cursor):
     columns = [col[0] for col in cursor.description]
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
@@ -17,11 +17,11 @@ def dictfetchone(cursor):
     return None
 
 def vaccine_data_list_view(request):
-    vaksin_list_processed = [] # Ubah nama variabel agar jelas
+    vaksin_list_processed = [] 
     try:
         with connection.cursor() as cursor:
-            # Query untuk mengambil data vaksin DAN informasi apakah sudah digunakan
-            # Menggunakan LEFT JOIN dan COUNT untuk mengecek penggunaan
+            
+            
             query_vaksin_usage = """
                 SELECT
                     v.kode,
@@ -41,19 +41,19 @@ def vaccine_data_list_view(request):
                 ORDER BY
                     v.kode;
             """
-            # Alternatif menggunakan EXISTS (seringkali lebih efisien untuk cek keberadaan)
-            # query_vaksin_usage = """
-            #     SELECT
-            #         v.kode,
-            #         v.nama,
-            #         v.harga,
-            #         v.stok,
-            #         EXISTS (SELECT 1 FROM PETCLINIC.KUNJUNGAN k WHERE k.kode_vaksin = v.kode) AS sudah_digunakan
-            #     FROM
-            #         PETCLINIC.VAKSIN v
-            #     ORDER BY
-            #         v.kode;
-            # """
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             cursor.execute(query_vaksin_usage)
             vaksin_list_raw = dictfetchall(cursor)
 
@@ -63,7 +63,7 @@ def vaccine_data_list_view(request):
                     'nama': vaksin_data['nama'],
                     'harga': vaksin_data['harga'],
                     'stok': vaksin_data['stok'],
-                    'sudah_digunakan': vaksin_data['sudah_digunakan'] # Boolean True/False
+                    'sudah_digunakan': vaksin_data['sudah_digunakan'] 
                 })
 
     except DatabaseError as e:
@@ -85,7 +85,7 @@ def vaccine_data_create_view(request):
 
         errors = []
         if not kode: errors.append("ID Vaksin tidak boleh kosong.")
-        # ... (validasi lainnya) ...
+        
         if not nama: errors.append("Nama Vaksin tidak boleh kosong.")
         harga = None
         if not harga_str:
@@ -129,7 +129,7 @@ def vaccine_data_create_view(request):
     return redirect('datavaksin:vaccine_data_list')
 
 def vaccine_data_update_view(request, kode_vaksin):
-    # Cek dulu apakah vaksin ada
+    
     current_vaksin = None
     try:
         with connection.cursor() as cursor:
@@ -180,7 +180,7 @@ def vaccine_data_update_view(request, kode_vaksin):
 
 
 def vaccine_stock_update_view(request, kode_vaksin):
-    # ... (sama seperti versi SQL langsung sebelumnya) ...
+    
     current_vaksin = None
     try:
         with connection.cursor() as cursor:
@@ -226,21 +226,21 @@ def vaccine_stock_update_view(request, kode_vaksin):
 
 
 def vaccine_data_delete_view(request, kode_vaksin):
-    # ... (sama seperti versi SQL langsung sebelumnya) ...
-    # Pengecekan apakah vaksin digunakan di KUNJUNGAN sebelum delete akan lebih baik dilakukan di sini juga,
-    # selain hanya mengandalkan IntegrityError.
+    
+    
+    
     if request.method == 'POST':
         nama_vaksin_temp = kode_vaksin
         try:
             with connection.cursor() as cursor:
-                # Cek dulu apakah vaksin digunakan
+                
                 cursor.execute("SELECT 1 FROM PETCLINIC.KUNJUNGAN WHERE kode_vaksin = %s LIMIT 1", [kode_vaksin])
                 is_used = cursor.fetchone()
                 if is_used:
                     messages.error(request, f"Vaksin dengan ID '{kode_vaksin}' tidak dapat dihapus karena sudah digunakan dalam data kunjungan.")
                     return redirect('datavaksin:vaccine_data_list')
 
-                # Jika tidak digunakan, baru delete
+                
                 cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
                 vaksin_row = cursor.fetchone()
                 if vaksin_row:
@@ -252,7 +252,7 @@ def vaccine_data_delete_view(request, kode_vaksin):
                 else:
                     messages.success(request, f"Vaksin '{nama_vaksin_temp}' (ID: {kode_vaksin}) berhasil dihapus.")
         
-        except IntegrityError as e: # Seharusnya tidak terjadi jika pengecekan 'is_used' sudah dilakukan
+        except IntegrityError as e: 
              messages.error(request, f"Gagal menghapus vaksin '{nama_vaksin_temp}'. Constraint violation. Detail: {e}")
         except DatabaseError as e:
             messages.error(request, f"Gagal menghapus vaksin '{nama_vaksin_temp}': {e}")
@@ -263,7 +263,7 @@ def vaccine_data_delete_view(request, kode_vaksin):
 
 
 def get_vaccine_details_json(request, kode_vaksin):
-    # ... (sama seperti versi SQL langsung sebelumnya) ...
+    
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT kode, nama, harga, stok FROM PETCLINIC.VAKSIN WHERE kode = %s", [kode_vaksin])
