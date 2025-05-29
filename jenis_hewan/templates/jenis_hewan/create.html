@@ -1,6 +1,13 @@
 <form method="post" action="{% url 'jenis_hewan:create' %}">
     {% csrf_token %}
     <h2 class="text-xl font-semibold mb-4">Create New Animal Type</h2>
+    
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      {{ error }}
+    </div>
+    {% endif %}
+    
     <div>
       <label class="block text-gray-700">Nama Jenis</label>
       <input name="nama_jenis" type="text"
@@ -14,5 +21,4 @@
         Create
       </button>
     </div>
-  </form>
-  
+</form>

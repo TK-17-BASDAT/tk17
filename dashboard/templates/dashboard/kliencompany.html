@@ -1,97 +1,118 @@
 {% extends "base.html" %}
+{% load static %} 
+{% load i18n %}
 
 {% block content %}
 
 <div class="flex">
   {% include "navbar/sidebar.html" %}
-  <main class="bg-gray-50 flex-1 ml-64 p-6">
-    <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
+  <main class="bg-gray-300 flex-1 ml-64 p-6">
+    <div class="bg-gray-300 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
 
       <div class="w-full max-w-4xl bg-white rounded-xl shadow-md p-8">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
           <div>
-            <h1 class="text-2xl font-semibold text-gray-800">Profile Perusahaan</h1>
+            <h1 class="text-2xl font-semibold text-primary">Profile Klien Perusahaan</h1>
           </div>
           <div class="flex gap-3">
-            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</button>
-            <button onclick="toggleEditMode()" class="bg-teal-800 hover:bg-teal-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
+            <a href="{% url 'dashboard:change_password' %}" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Update Password</a>
+            <button onclick="toggleEditMode()" class="bg-accent hover:bg-accent2 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Profile</button>
           </div>
         </div>
+
+        <!-- Display Messages -->
+        {% if messages %}
+          <div class="mb-4">
+            {% for message in messages %}
+              <div class="p-3 rounded-lg
+                {% if message.tags == 'success' %} bg-accent2 border border-accent2 text-white
+                {% elif message.tags == 'error' %} bg-accent border border-accent text-white
+                {% else %} bg-secondary border border-secondary text-white
+                {% endif %}" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% if error_message %}
+          <div class="mb-4 p-3 rounded-lg bg-red-100 border border-red-400 text-red-700" role="alert">
+            {{ error_message }}
+          </div>
+        {% endif %}
     
+        {% if user_data %}
         <!-- View Mode -->
         <div id="view-mode">
             <div class="grid grid-cols-[auto,1fr] gap-x-8 gap-y-4 items-start">
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Identitas</div>
-            <div class="text-gray-800">95af4880-90c7-4749-9f94-05afbe92a196</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nomor Identitas</div>
+            <div class="text-gray-800">{{ user_data.no_identitas }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Email</div>
-            <div class="text-gray-800">perusahaan_petcare@gmail.com</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Email</div>
+            <div class="text-gray-800">{{ user_data.email }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nama Perusahaan</div>
-            <div class="text-gray-800">PetCare Indonesia</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nama Perusahaan</div>
+            <div class="text-gray-800">{{ user_data.nama_perusahaan }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Tanggal Pendaftaran</div>
-            <div class="text-gray-800">26 Januari 2025</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Tanggal Pendaftaran</div>
+            <div class="text-gray-800">{{ user_data.tanggal_registrasi|date:"d F Y" }}</div> {# Format tanggal #}
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Alamat</div>
-            <div class="text-gray-800">Jl. Melati Indah No. 26, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Alamat</div>
+            <div class="text-gray-800">{{ user_data.alamat }}</div>
         
-            <div class="text-sm text-black-600 font-semibold text-left pr-4">Nomor Telepon</div>
-            <div class="text-gray-800">081234567896</div>
+            <div class="text-sm text-primary font-semibold text-left pr-4">Nomor Telepon</div>
+            <div class="text-gray-800">{{ user_data.nomor_telepon }}</div>
             </div>
         </div>
       
     
         <!-- Edit Mode -->
-        <form id="edit-mode" class="hidden mt-4" onsubmit="event.preventDefault(); saveChanges();">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form id="edit-mode" class="hidden mt-4" method="POST" action="{% url 'dashboard:kliencompany' %}">
+          {% csrf_token %} {# Jangan lupa CSRF token untuk POST form #}
+          <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
             <!-- Non-editable Fields -->
             <div>
                 <p class="text-sm text-gray-600 font-medium">Nomor Identitas</p>
-                <p class="text-gray-800">95af4880-90c7-4749-9f94-05afbe92a196</p>
+                <p class="text-gray-800">{{ user_data.no_identitas }}</p>
             </div>
             <div>
                 <p class="text-sm text-gray-600 font-medium">Email</p>
-                <p class="text-gray-800">perusahaan_petcare@gmail.com</p>
+                <p class="text-gray-800">{{ user_data.email }}</p>
             </div>
               
             <!-- Editable Fields -->
+            <div>
+              <label for="nama_perusahaan" class="text-sm font-medium text-primary">Nama Perusahaan</label>
+              <input type="text" id="nama_perusahaan" name="nama_perusahaan" value="{{ user_data.nama_perusahaan}}" class="mt-1 w-full border rounded-lg px-3 py-2" required>
+            <div>
+              <label class="text-sm font-medium text-primary">Tanggal Pendaftaran</label>
+              <input type="text" value="{{ user_data.tanggal_registrasi|date:"d F Y" }}" disabled class="mt-1 w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-500">
+            </div>
             <div class="sm:col-span-2">
-              <label class="text-sm font-medium text-gray-600">Nama Perusahaan</label>
-              <input type="text" value="PetCare Indonesia" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="alamat" class="text-sm font-medium text-primary">Alamat</label>
+              <textarea id="alamat" name="alamat" rows="3" class="mt-1 w-full border rounded-lg px-3 py-2" required>{{ user_data.alamat }}</textarea>
             </div>
             <div>
-              <label class="text-sm font-medium text-gray-600">Tanggal Pendaftaran</label>
-              <input type="text" value="26 Januari 2025" disabled class="mt-1 w-full border rounded-lg px-3 py-2 bg-gray-100 text-gray-500">
-            </div>
-            <div class="sm:col-span-2">
-              <label class="text-sm font-medium text-gray-600">Alamat</label>
-              <textarea rows="3" class="mt-1 w-full border rounded-lg px-3 py-2">Jl. Melati Indah No. 26, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</textarea>
-            </div>
-            <div>
-              <label class="text-sm font-medium text-gray-600">Nomor Telepon</label>
-              <input type="text" value="081234567896" class="mt-1 w-full border rounded-lg px-3 py-2">
+              <label for="nomor_telepon" class="text-sm font-medium text-primary">Nomor Telepon</label>
+              <input type="text" id="nomor_telepon" name="nomor_telepon" value="{{ user_data.nomor_telepon }}" class="mt-1 w-full border rounded-lg px-3 py-2" required>
             </div>
           </div>
     
           <!-- Action Buttons -->
           <div class="mt-6 flex gap-3">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
-            <button type="button" onclick="toggleEditMode()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
+            <button type="submit" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Perubahan</button>
+            <button type="button" onclick="toggleEditMode()" class="bg-gray-300 hover:bg-gray-400 text-primary px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
           </div>
         </form>
+        {% else %}
+          <p class="text-center text-gray-600">Data profil tidak tersedia atau gagal dimuat.</p>
+        {% endif %}
       </div>
     
       <script>
         function toggleEditMode() {
           document.getElementById('view-mode').classList.toggle('hidden');
           document.getElementById('edit-mode').classList.toggle('hidden');
-        }
-    
-        function saveChanges() {
-          alert("Perubahan berhasil disimpan (simulasi saja)!");
-          toggleEditMode();
         }
       </script>
     </div>

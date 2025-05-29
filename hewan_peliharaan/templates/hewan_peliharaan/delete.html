@@ -1,15 +1,23 @@
 <form method="post" action="{% url 'hewan_peliharaan:delete' id %}">
   {% csrf_token %}
-  <h2 class="text-xl font-semibold text-red-600 mb-4">Delete Pet</h2>
-  <p>
-    Apakah kamu yakin untuk menghapus Hewan Peliharaan <strong>{{ nama_hewan }}</strong> milik <strong>{{ nama_pemilik }}</strong>?
+  <h2 class="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h2>
+  
+  {% if error %}
+  <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    {{ error }}
+  </div>
+  {% endif %}
+  
+  <p class="mb-4">
+    Are you sure you want to delete pet <strong>{{ nama_hewan }}</strong> owned by <strong>{{ nama_pemilik }}</strong>?
   </p>
-  <div class="mt-6 flex justify-end space-x-3">
-    <button type="button" class="btn-cancel bg-gray-200 px-4 py-2 rounded">
+  
+  <div class="flex justify-end space-x-3">
+    <button type="button" class="btn-cancel bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition">
       Cancel
     </button>
-    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
-      Confirm Deletion
+    <button type="submit" class="bg-accent hover:bg-accent2 text-white px-4 py-2 rounded transition">
+      Delete
     </button>
   </div>
 </form>

@@ -1,73 +1,107 @@
 {% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 
 {% block content %}
-<div class="flex min-h-screen bg-gray-100">
-    <!-- Sidebar -->
-    <div class="w-64 bg-white shadow-md">
-        {% include "navbar/sidebar.html" %}
-    </div>
-    
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold">List Client</h1>
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
+            <!-- Pesan Feedback -->
+            {% if messages %}
+                {# ... messages block ... #}
+            {% endif %}
+
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h1 class="text-2xl font-semibold text-gray-800">List Client</h1>
+                {# Tombol Tambah Klien jika ada #}
             </div>
 
-            <div class="mb-4 flex justify-between items-center">
-                <div class="relative">
-                    <input type="text" placeholder="Search" class="border rounded pl-10 pr-4 py-2 w-64">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+            <!-- Search Bar and Filter Form -->
+            <form method="GET" action="{% url 'dataklien:client_list' %}" class="mb-6">
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <div class="relative flex-grow w-full sm:w-auto">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </span>
+                        <input 
+                            type="text" 
+                            name="search_query" 
+                            placeholder="Cari berdasarkan nama atau email..." 
+                            class="border rounded-md pl-10 pr-4 py-2 w-full text-sm focus:ring-slate-500 focus:border-slate-500"
+                            value="{{ request.GET.search_query|default:'' }}" {# Untuk mempertahankan nilai search #}
+                        >
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label for="jenis_klien_filter" class="text-sm text-gray-700 whitespace-nowrap">Jenis Klien:</label>
+                        <select 
+                            name="jenis_klien" 
+                            id="jenis_klien_filter" 
+                            class="border rounded-md px-3 py-2 text-sm focus:ring-slate-500 focus:border-slate-500 w-full sm:w-auto"
+                        >
+                            <option value="" {% if not request.GET.jenis_klien %}selected{% endif %}>Semua</option>
+                            <option value="Individu" {% if request.GET.jenis_klien == 'Individu' %}selected{% endif %}>Individu</option>
+                            <option value="Perusahaan" {% if request.GET.jenis_klien == 'Perusahaan' %}selected{% endif %}>Perusahaan</option>
+                        </select>
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm w-full sm:w-auto"
+                    >
+                        Cari
+                    </button>
+                     <a href="{% url 'dataklien:client_list' %}" class="text-sm text-gray-600 hover:text-slate-800 whitespace-nowrap ml-2">Reset Filter</a>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span>Client Name</span>
-                    <select class="border rounded px-3 py-1">
-                        <option>All</option>
-                        <option>Individu</option>
-                        <option>Perusahaan</option>
-                    </select>
-                </div>
-            </div>
+            </form>
+            <!-- End Search Bar and Filter Form -->
+
 
             <div class="overflow-x-auto">
-                <table class="min-w-full text-center border">
-                    <thead class="bg-gray-100">
+                <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
+                    {# ... isi tabel sama seperti sebelumnya ... #}
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-2 px-4 border">No</th>
-                            <th class="py-2 px-4 border">Email</th>
-                            <th class="py-2 px-4 border">Nama</th>
-                            <th class="py-2 px-4 border">Jenis</th>
-                            <th class="py-2 px-4 border">Action</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">No</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Email</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Nama</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Jenis</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border">
-                            <td class="py-2 px-4 border">1</td>
-                            <td class="py-2 px-4 border">client1@example.com</td>
-                            <td class="py-2 px-4 border">Client 1</td>
-                            <td class="py-2 px-4 border">Individu</td>
-                            <td class="py-2 px-4 border">
-                                <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                            </td>
-                        </tr>
-                        <tr class="border">
-                            <td class="py-2 px-4 border">2</td>
-                            <td class="py-2 px-4 border">client2@example.com</td>
-                            <td class="py-2 px-4 border">Client 2</td>
-                            <td class="py-2 px-4 border">Perusahaan</td>
-                            <td class="py-2 px-4 border">
-                                <button onclick="openDetailModal('perusahaan')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                            </td>
-                        </tr>
-                        <tr class="border">
-                            <td class="py-2 px-4 border">3</td>
-                            <td class="py-2 px-4 border">client3@example.com</td>
-                            <td class="py-2 px-4 border">Client 3</td>
-                            <td class="py-2 px-4 border">Individu</td>
-                            <td class="py-2 px-4 border">
-                                <button onclick="openDetailModal('individu')" class="bg-slate-900 text-white px-3 py-1 rounded">Detail</button>
-                            </td>
-                        </tr>
+                    <tbody class="bg-white">
+                        {% if client_list %}
+                            {% for client in client_list %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 border-b border-gray-200">{{ forloop.counter }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">{{ client.email }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">{{ client.nama_display }}</td>
+                                <td class="py-3 px-4 border-b border-gray-200">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                        {% if client.jenis_klien == 'Individu' %} bg-blue-100 text-blue-800 
+                                        {% elif client.jenis_klien == 'Perusahaan' %} bg-green-100 text-green-800 
+                                        {% else %} bg-gray-100 text-gray-800 {% endif %}">
+                                        {{ client.jenis_klien }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 border-b border-gray-200 text-center">
+                                    <button onclick="openDetailModal('{{ client.no_identitas }}', '{{ client.jenis_klien }}')" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-1.5 rounded-md text-xs font-medium">
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="py-4 px-4 border-b border-gray-200 text-center text-gray-500">
+                                    {% if request.GET.search_query or request.GET.jenis_klien %}
+                                        Tidak ada klien yang cocok dengan kriteria pencarian.
+                                    {% else %}
+                                        Belum ada data klien.
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -76,164 +110,238 @@
 </div>
 
 <!-- Modal Detail Individu -->
-<div id="detailModalIndividu" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <h2 class="text-2xl font-semibold mb-4">Detail Client</h2>
+<div id="detailModalIndividu" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50 p-4 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-in-out scale-95 opacity-0" 
+         onclick="event.stopPropagation()"> {# Mencegah modal tertutup saat klik di dalam konten modal #}
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Detail Klien Individu</h2>
+            <button onclick="closeModal('detailModalIndividu')" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+        </div>
         
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3 mb-6 text-sm">
             <div>
-                <h3 class="font-semibold">Nomor Identitas</h3>
-                <p>123</p>
+                <label class="font-medium text-gray-500">Nomor Identitas:</label>
+                <p id="individuNoIdentitas" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Nama Lengkap</h3>
-                <p>Rizki Maulana</p>
+                <label class="font-medium text-gray-500">Nama Lengkap:</label>
+                <p id="individuNamaLengkap" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Alamat</h3>
-                <p>Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</p>
+                <label class="font-medium text-gray-500">Alamat:</label>
+                <p id="individuAlamat" class="text-gray-800 mt-0.5 whitespace-pre-wrap"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Nomor Telepon</h3>
-                <p>081234567890</p>
+                <label class="font-medium text-gray-500">Nomor Telepon:</label>
+                <p id="individuNomorTelepon" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Email</h3>
-                <p>client1@example.com</p>
+                <label class="font-medium text-gray-500">Email:</label>
+                <p id="individuEmail" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Tanggal Registrasi sebagai klien</h3>
-                <p>29 Januari 2025</p>
+                <label class="font-medium text-gray-500">Tanggal Registrasi:</label>
+                <p id="individuTanggalRegistrasi" class="text-gray-800 mt-0.5"></p>
             </div>
         </div>
 
-        <h3 class="text-xl font-semibold mb-4">Daftar Hewan Peliharaan</h3>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-center border">
-                <thead class="bg-gray-100">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Daftar Hewan Peliharaan</h3>
+        <div class="overflow-x-auto border rounded-md">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-4 border">No</th>
-                        <th class="py-2 px-4 border">Nama</th>
-                        <th class="py-2 px-4 border">Jenis</th>
-                        <th class="py-2 px-4 border">Tanggal Lahir</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">No</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">Nama</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">Jenis</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600 text-center">Tanggal Lahir</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">1</td>
-                        <td class="py-2 px-4 border">Luna</td>
-                        <td class="py-2 px-4 border">Kucing</td>
-                        <td class="py-2 px-4 border">2022-05-14</td>
-                    </tr>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">2</td>
-                        <td class="py-2 px-4 border">Max</td>
-                        <td class="py-2 px-4 border">Anjing</td>
-                        <td class="py-2 px-4 border">2021-11-03</td>
-                    </tr>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">3</td>
-                        <td class="py-2 px-4 border">Coco</td>
-                        <td class="py-2 px-4 border">Kelinci</td>
-                        <td class="py-2 px-4 border">2023-01-27</td>
-                    </tr>
+                <tbody id="individuHewanTableBody" class="bg-white">
+                    <tr><td colspan="4" class="py-3 px-3 border-b text-center text-gray-500">Memuat data hewan...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="flex justify-end mt-6">
-            <button onclick="closeModal('detailModalIndividu')" class="border border-gray-300 px-4 py-2 rounded">Tutup</button>
+        <div class="flex justify-end mt-6 pt-4 border-t">
+            <button onclick="closeModal('detailModalIndividu')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Tutup</button>
         </div>
     </div>
 </div>
 
 <!-- Modal Detail Perusahaan -->
-<div id="detailModalPerusahaan" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <h2 class="text-2xl font-semibold mb-4">Detail Client</h2>
+<div id="detailModalPerusahaan" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-60 z-50 p-4 transition-opacity duration-300 ease-in-out">
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-in-out scale-95 opacity-0"
+         onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Detail Klien Perusahaan</h2>
+             <button onclick="closeModal('detailModalPerusahaan')" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times fa-lg"></i>
+            </button>
+        </div>
         
-        <div class="space-y-4 mb-6">
+        <div class="space-y-3 mb-6 text-sm">
             <div>
-                <h3 class="font-semibold">Nomor Identitas</h3>
-                <p>123</p>
+                <label class="font-medium text-gray-500">Nomor Identitas:</label>
+                <p id="perusahaanNoIdentitas" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Nama Perusahaan</h3>
-                <p>PT Hewan Perkasa</p>
+                <label class="font-medium text-gray-500">Nama Perusahaan:</label>
+                <p id="perusahaanNamaPerusahaan" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Alamat</h3>
-                <p>Jl. Melati Indah No. 23, Kel. Sukamaju, Kec. Cibinong, Kab. Bogor, Jawa Barat, 16914</p>
+                <label class="font-medium text-gray-500">Alamat:</label>
+                <p id="perusahaanAlamat" class="text-gray-800 mt-0.5 whitespace-pre-wrap"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Nomor Telepon</h3>
-                <p>081234567890</p>
+                <label class="font-medium text-gray-500">Nomor Telepon:</label>
+                <p id="perusahaanNomorTelepon" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Email</h3>
-                <p>client2@example.com</p>
+                <label class="font-medium text-gray-500">Email:</label>
+                <p id="perusahaanEmail" class="text-gray-800 mt-0.5"></p>
             </div>
             <div>
-                <h3 class="font-semibold">Tanggal Registrasi sebagai klien</h3>
-                <p>29 Januari 2025</p>
+                <label class="font-medium text-gray-500">Tanggal Registrasi:</label>
+                <p id="perusahaanTanggalRegistrasi" class="text-gray-800 mt-0.5"></p>
             </div>
-            
         </div>
 
-        <h3 class="text-xl font-semibold mb-4">Daftar Hewan Peliharaan</h3>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-center border">
-                <thead class="bg-gray-100">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Daftar Hewan Peliharaan</h3>
+        <div class="overflow-x-auto border rounded-md">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-4 border">No</th>
-                        <th class="py-2 px-4 border">Nama</th>
-                        <th class="py-2 px-4 border">Jenis</th>
-                        <th class="py-2 px-4 border">Tanggal Lahir</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">No</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">Nama</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600">Jenis</th>
+                        <th class="py-2 px-3 border-b font-medium text-gray-600 text-center">Tanggal Lahir</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">1</td>
-                        <td class="py-2 px-4 border">Luna</td>
-                        <td class="py-2 px-4 border">Kucing</td>
-                        <td class="py-2 px-4 border">2022-05-14</td>
-                    </tr>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">2</td>
-                        <td class="py-2 px-4 border">Max</td>
-                        <td class="py-2 px-4 border">Anjing</td>
-                        <td class="py-2 px-4 border">2021-11-03</td>
-                    </tr>
-                    <tr class="border">
-                        <td class="py-2 px-4 border">3</td>
-                        <td class="py-2 px-4 border">Coco</td>
-                        <td class="py-2 px-4 border">Kelinci</td>
-                        <td class="py-2 px-4 border">2023-01-27</td>
-                    </tr>
+                <tbody id="perusahaanHewanTableBody" class="bg-white">
+                     <tr><td colspan="4" class="py-3 px-3 border-b text-center text-gray-500">Memuat data hewan...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="flex justify-end mt-6">
-            <button onclick="closeModal('detailModalPerusahaan')" class="border border-gray-300 px-4 py-2 rounded">Tutup</button>
+        <div class="flex justify-end mt-6 pt-4 border-t">
+            <button onclick="closeModal('detailModalPerusahaan')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Tutup</button>
         </div>
     </div>
 </div>
 
 <script>
-    function openDetailModal(type) {
-        if (type === 'individu') {
-            document.getElementById('detailModalIndividu').classList.remove('hidden');
-            document.getElementById('detailModalIndividu').classList.add('flex');
+
+    const clientDetailUrlTemplate = "/dataklien/details_json/PLACEHOLDER_UUID/";
+
+    function openDetailModal(klienId, jenisKlien) {
+        const individuModal = document.getElementById('detailModalIndividu');
+        const perusahaanModal = document.getElementById('detailModalPerusahaan');
+        
+
+        const individuHewanTableBody = document.getElementById('individuHewanTableBody');
+        const perusahaanHewanTableBody = document.getElementById('perusahaanHewanTableBody');
+        if (individuHewanTableBody) individuHewanTableBody.innerHTML = '<tr><td colspan="4" class="py-3 px-3 border-b text-center text-gray-500">Memuat data hewan...</td></tr>';
+        if (perusahaanHewanTableBody) perusahaanHewanTableBody.innerHTML = '<tr><td colspan="4" class="py-3 px-3 border-b text-center text-gray-500">Memuat data hewan...</td></tr>';
+
+        const actualClientDetailURL = clientDetailUrlTemplate.replace('PLACEHOLDER_UUID', klienId);
+
+        fetch(actualClientDetailURL)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert('Error dari server: ' + data.error);
+                    return;
+                }
+
+                let targetModal;
+                if (data.jenis_klien === 'Individu') {
+                    targetModal = individuModal;
+                    document.getElementById('individuNoIdentitas').textContent = data.no_identitas || '-';
+                    document.getElementById('individuNamaLengkap').textContent = data.nama_lengkap || '-';
+                    document.getElementById('individuAlamat').textContent = data.alamat || '-';
+                    document.getElementById('individuNomorTelepon').textContent = data.nomor_telepon || '-';
+                    document.getElementById('individuEmail').textContent = data.email || '-';
+                    document.getElementById('individuTanggalRegistrasi').textContent = data.tanggal_registrasi || '-';
+                    populateHewanTable('individuHewanTableBody', data.hewan_peliharaan);
+                } else if (data.jenis_klien === 'Perusahaan') {
+                    targetModal = perusahaanModal;
+                    document.getElementById('perusahaanNoIdentitas').textContent = data.no_identitas || '-';
+                    document.getElementById('perusahaanNamaPerusahaan').textContent = data.nama_perusahaan || '-';
+                    document.getElementById('perusahaanAlamat').textContent = data.alamat || '-';
+                    document.getElementById('perusahaanNomorTelepon').textContent = data.nomor_telepon || '-';
+                    document.getElementById('perusahaanEmail').textContent = data.email || '-';
+                    document.getElementById('perusahaanTanggalRegistrasi').textContent = data.tanggal_registrasi || '-';
+                    populateHewanTable('perusahaanHewanTableBody', data.hewan_peliharaan);
+                } else {
+                    alert('Jenis klien tidak diketahui dari data server.');
+                    return;
+                }
+
+                if (targetModal) {
+                    targetModal.classList.remove('hidden');
+                    targetModal.classList.add('flex');
+                    void targetModal.offsetWidth; 
+                    targetModal.querySelector('.bg-white').classList.remove('scale-95', 'opacity-0');
+                    targetModal.querySelector('.bg-white').classList.add('scale-100', 'opacity-100');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching client details:', error);
+                alert('Gagal memuat detail klien. Periksa konsol untuk detail.');
+            });
+    }
+
+    function populateHewanTable(tableBodyId, hewanList) {
+        const tableBody = document.getElementById(tableBodyId);
+        if (!tableBody) return;
+        tableBody.innerHTML = ''; 
+
+        if (hewanList && hewanList.length > 0) {
+            hewanList.forEach((hewan, index) => {
+                const row = tableBody.insertRow();
+                row.className = 'hover:bg-gray-50';
+                row.insertCell(0).outerHTML = `<td class="py-2 px-3 border-b border-gray-200">${index + 1}</td>`;
+                row.insertCell(1).outerHTML = `<td class="py-2 px-3 border-b border-gray-200 text-left">${hewan.nama || '-'}</td>`;
+                row.insertCell(2).outerHTML = `<td class="py-2 px-3 border-b border-gray-200 text-left">${hewan.nama_jenis || '-'}</td>`;
+                row.insertCell(3).outerHTML = `<td class="py-2 px-3 border-b border-gray-200 text-center">${hewan.tanggal_lahir || '-'}</td>`;
+            });
         } else {
-            document.getElementById('detailModalPerusahaan').classList.remove('hidden');
-            document.getElementById('detailModalPerusahaan').classList.add('flex');
+            tableBody.innerHTML = '<tr><td colspan="4" class="py-3 px-3 border-b border-gray-200 text-center text-gray-500">Tidak ada data hewan peliharaan.</td></tr>';
         }
     }
 
     function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
-</script>
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const modalContent = modalElement.querySelector('.bg-white');
+            if (modalContent) {
+                modalContent.classList.add('scale-95', 'opacity-0');
+                modalContent.classList.remove('scale-100', 'opacity-100');
+            }
 
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                modalElement.classList.remove('flex');
+            }, 300); 
+        }
+    }
+
+
+    window.addEventListener('click', function(event) {
+        const modals = ['detailModalIndividu', 'detailModalPerusahaan'];
+        for (const modalId of modals) {
+            const modalElement = document.getElementById(modalId);
+            if (modalElement && event.target === modalElement) { 
+                closeModal(modalId);
+            }
+        }
+    });
+</script>
 {% endblock %}

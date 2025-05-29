@@ -1,65 +1,84 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="flex">
+<div class="flex h-screen overflow-hidden">
   {% include "navbar/sidebar.html" %}
-  <main class="bg-gray-50 flex-1 ml-64 p-6">
-    <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
-      <div class="container mx-auto">
-        <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-semibold">List Hewan Peliharaan</h1>
-          <button id="btn-create"
-                  class="bg-primary text-white px-4 py-2 rounded hover:bg-secondary transition">
-            + Create New Pet
-          </button>
-        </div>
-  
-        <table class="w-full table-auto border-collapse">
-          <thead>
-            <tr class="bg-gray-100">
-              <th class="px-4 py-2 border">No</th>
-              <th class="px-4 py-2 border">Pemilik</th>
-              <th class="px-4 py-2 border">Jenis Hewan</th>
-              <th class="px-4 py-2 border">Nama Hewan</th>
-              <th class="px-4 py-2 border">Tanggal Lahir</th>
-              <th class="px-4 py-2 border">Foto</th>
-              <th class="px-4 py-2 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+  <main class="flex-1 ml-64 overflow-y-auto">
+    <div class="bg-gray-300 min-h-screen p-6 flex font-[Poppins]">
+      <div class="w-full bg-white rounded-xl shadow-md p-8">
+      
+        <div class="container mx-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold">List Hewan Peliharaan</h1>
+            <button id="btn-create"
+                    class="bg-primary text-white px-4 py-2 rounded hover:bg-secondary transition">
+              + Create New Pet
+            </button>
+          </div>
+    
+          <!-- Card Layout -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for hewan in hewan_list %}
-            <tr class="border-b">
-              <td class="px-4 py-2">{{ hewan.counter }}</td>
-              <td class="px-4 py-2">{{ hewan.nama_pemilik }}</td>
-              <td class="px-4 py-2">{{ hewan.jenis_hewan }}</td>
-              <td class="px-4 py-2">{{ hewan.nama_hewan }}</td>
-              <td class="px-4 py-2">{{ hewan.tanggal_lahir_formatted }}</td>
-              <td class="px-4 py-2">
-                <img src="{{ hewan.url_foto }}" class="w-12 h-12 rounded object-cover">
-              </td>
-              <td class="px-4 py-2 space-x-1">
-                <button class="btn-update bg-secondary text-white px-3 py-1 rounded hover:bg-primary transition text-sm"
-                        data-url="{% url 'hewan_peliharaan:update' hewan.id %}">
-                  Update
-                </button>
-                {% if request.session.user_role == 'front_desk' and hewan.can_delete %}
-                <button class="btn-delete bg-accent text-white px-3 py-1 rounded hover:bg-accent2 transition text-sm"
-                        data-url="{% url 'hewan_peliharaan:delete' hewan.id %}">
-                  Delete
-                </button>
-                {% endif %}
-              </td>
-            </tr>
+            <div class="bg-primary text-white rounded-lg shadow-md overflow-hidden">
+              <div class="flex p-4">
+                <!-- Pet Image -->
+                <div class="w-1/3 mr-4">
+                  <img src="{{ hewan.url_foto }}" alt="{{ hewan.nama_hewan }}" 
+                      class="w-full h-40 object-cover rounded-md bg-white">
+                </div>
+                
+                <!-- Pet Details -->
+                <div class="w-2/3 flex flex-col">
+                  <div class="flex-1">
+                    <div class="grid grid-cols-[auto,auto,1fr] gap-x-1 mb-1">
+                      <span class="font-semibold">Nama</span>
+                      <span class="text-right">:</span>
+                      <span class="ml-1">{{ hewan.nama_hewan }}</span>
+                    </div>
+                    <div class="grid grid-cols-[auto,auto,1fr] gap-x-1 mb-1">
+                      <span class="font-semibold">Pemilik</span>
+                      <span class="text-right">:</span>
+                      <span class="ml-1">{{ hewan.nama_pemilik }}</span>
+                    </div>
+                    <div class="grid grid-cols-[auto,auto,1fr] gap-x-1 mb-1">
+                      <span class="font-semibold">Jenis</span>
+                      <span class="text-right">:</span>
+                      <span class="ml-1">{{ hewan.jenis_hewan }}</span>
+                    </div>
+                    <div class="grid grid-cols-[auto,auto,1fr] gap-x-1 mb-1">
+                      <span class="font-semibold">Tanggal Lahir</span>
+                      <span class="text-right">:</span>
+                      <span class="ml-1">{{ hewan.tanggal_lahir_formatted }}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Actions -->
+                  <div class="flex justify-end space-x-2 mt-2">
+                    <button class="btn-update bg-secondary text-white px-4 py-1 rounded hover:bg-primary-dark transition"
+                            data-url="{% url 'hewan_peliharaan:update' hewan.id %}">
+                      Update
+                    </button>
+                    {% if request.session.user_role == 'front_desk' %}
+                    <button class="btn-delete bg-accent text-white px-4 py-1 rounded hover:bg-accent2 transition"
+                            data-url="{% url 'hewan_peliharaan:delete' hewan.id %}">
+                      Delete
+                    </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
             {% empty %}
-            <tr>
-              <td colspan="7" class="px-4 py-2 text-center text-gray-500">No pets found</td>
-            </tr>
+            <div class="col-span-full text-center py-8 text-gray-500">
+              No pets found
+            </div>
             {% endfor %}
-          </tbody>
-        </table>
+          </div>
+
+        </div>
       </div>
   
-      <!-- Modal container -->
+      <!-- Modal container - unchanged -->
       <div id="modal"
           class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
         <div id="modal-content" class="bg-white rounded-lg shadow-xl w-1/3 p-6"></div>
@@ -123,9 +142,7 @@
           }
         });
       });
-        </script>
-      </div>
-
+      </script>
     </div>
   </main>
 </div>

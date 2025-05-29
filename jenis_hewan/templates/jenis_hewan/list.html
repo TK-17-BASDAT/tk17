@@ -1,62 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="flex">
+<div class="flex h-screen overflow-hidden">
     {% include "navbar/sidebar.html" %}
-    <main class="bg-gray-50 flex-1 ml-64 p-6">
-        <div class="bg-gray-50 min-h-screen flex items-center justify-center p-6 font-[Poppins]">
-            <div class="container mx-auto">
-                
-        
-                <div class="flex justify-between items-center mb-6">
-                  <h1 class="text-2xl font-semibold">List Jenis Hewan</h1>
-                  {% if request.session.user_role == 'front_desk' %}
-                  <button id="btn-create"
-                          class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-secondary transition">
-                    + Create New Animal Type
-                  </button>
-                  {% endif %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
+
+                <div class="container mx-auto">
+                    
+            
+                    <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-semibold">List Jenis Hewan</h1>
+                    {% if request.session.user_role == 'front_desk' %}
+                    <button id="btn-create"
+                            class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-secondary transition">
+                        + Create New Animal Type
+                    </button>
+                    {% endif %}
+                    </div>
+            
+                    <table class="w-full table-auto border-collapse">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                        <th class="px-4 py-2 border">No</th>
+                        <th class="px-4 py-2 border">ID Jenis</th>
+                        <th class="px-4 py-2 border">Nama Jenis</th>
+                        <th class="px-4 py-2 border">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for jenis in jenis_hewan_list %}
+                        <tr class="border-b">
+                        <td class="px-4 py-2">{{ forloop.counter }}</td>
+                        <td class="px-4 py-2">{{ jenis.id }}</td>
+                        <td class="px-4 py-2">{{ jenis.nama_jenis }}</td>
+                        <td class="px-4 py-2 space-x-2">
+                            {% if request.session.user_role == 'front_desk' %}
+                            <button class="btn-update bg-secondary text-white px-3 py-1 rounded text-sm hover:bg-primary transition"
+                                    data-url="{% url 'jenis_hewan:update' jenis.id %}">
+                            Update
+                            </button>
+                            {% if jenis.can_delete %}
+                            <button class="btn-delete bg-accent text-white px-3 py-1 rounded text-sm hover:bg-accent2 transition"
+                                    data-url="{% url 'jenis_hewan:delete' jenis.id %}">
+                            Delete
+                            </button>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-gray-500">View Only</span>
+                            {% endif %}
+                        </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                        <td colspan="4" class="px-4 py-2 text-center text-gray-500">No animal types found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
                 </div>
-        
-                <table class="w-full table-auto border-collapse">
-                  <thead>
-                    <tr class="bg-gray-100">
-                      <th class="px-4 py-2 border">No</th>
-                      <th class="px-4 py-2 border">ID Jenis</th>
-                      <th class="px-4 py-2 border">Nama Jenis</th>
-                      <th class="px-4 py-2 border">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for jenis in jenis_hewan_list %}
-                    <tr class="border-b">
-                      <td class="px-4 py-2">{{ forloop.counter }}</td>
-                      <td class="px-4 py-2">{{ jenis.id }}</td>
-                      <td class="px-4 py-2">{{ jenis.nama_jenis }}</td>
-                      <td class="px-4 py-2 space-x-2">
-                        {% if request.session.user_role == 'front_desk' %}
-                        <button class="btn-update bg-secondary text-white px-3 py-1 rounded text-sm hover:bg-primary transition"
-                                data-url="{% url 'jenis_hewan:update' jenis.id %}">
-                          Update
-                        </button>
-                        {% if jenis.can_delete %}
-                        <button class="btn-delete bg-accent text-white px-3 py-1 rounded text-sm hover:bg-accent2 transition"
-                                data-url="{% url 'jenis_hewan:delete' jenis.id %}">
-                          Delete
-                        </button>
-                        {% endif %}
-                        {% else %}
-                        <span class="text-gray-500">View Only</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                      <td colspan="4" class="px-4 py-2 text-center text-gray-500">No animal types found</td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
             </div>
         
             <!-- Modal -->
@@ -87,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = '';
     }
 
-    // Only setup interactive elements if user is front desk
+    // Only setup interactive elements if user is front_desk
     if (userRole === 'front_desk') {
         // Create button
         const createBtn = document.getElementById('btn-create');
@@ -129,7 +132,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(json.success){
                     location.reload();
                 } else {
+                    // Error occurred, display the updated form with errors
                     content.innerHTML = json.html;
+                    
+                    // Highlight error messages
+                    const errorDiv = content.querySelector('.bg-red-100');
+                    if (errorDiv) {
+                      errorDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    }
                 }
             });
         });
