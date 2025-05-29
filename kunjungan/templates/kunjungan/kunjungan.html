@@ -405,7 +405,7 @@
 </script>
 
 <script>
-    // Tombol Lihat Rekam Medis
+    
     let currentIdKunjungan = null;
     document.querySelectorAll('.lihat-rekam-btn').forEach(button => {
         button.addEventListener('click', async () => {
@@ -415,13 +415,13 @@
                 const data = await response.json();
                 
                 if (data.exists) {
-                    // Tampilkan data rekam medis
+                    
                     document.getElementById('detail-suhu').textContent = data.suhu + ' °C';
                     document.getElementById('detail-berat').textContent = data.berat_badan + ' kg';
                     document.getElementById('detail-catatan').textContent = data.catatan || 'Tidak ada catatan';
                     document.getElementById('detail-modal').classList.remove('hidden');
                 } else {
-                    // Tampilkan modal peringatan
+                    
                     document.getElementById('missing-modal').classList.remove('hidden');
                 }
             } catch (error) {
@@ -432,7 +432,7 @@
     });
 
 
-    // Missing Modal Handlers
+    
     document.getElementById('missing-ok').addEventListener('click', () => {
         document.getElementById('missing-modal').classList.add('hidden');
     });
@@ -443,14 +443,14 @@
                 alert('ID Kunjungan tidak ditemukan. Silakan coba lagi.');
                 return;
             }
-            document.getElementById('create_id_kunjungan').value = currentIdKunjungan; // Gunakan id_kunjungan dari tombol yang diklik
+            document.getElementById('create_id_kunjungan').value = currentIdKunjungan; 
             document.getElementById('create-rekam-medis-modal').classList.remove('hidden');
         } else {
             alert('Hanya dokter yang dapat membuat rekam medis.');
         }
     });
 
-    // Detail Modal Handlers
+    
     document.getElementById('detail-close').addEventListener('click', () => {
         document.getElementById('detail-modal').classList.add('hidden');
     });
@@ -462,7 +462,7 @@
                 return;
             }
             try {
-                // Fix this URL - add /kunjungan/ prefix
+                
                 const response = await fetch(`/kunjungan/rekam-medis/check/${currentIdKunjungan}/`);
                 const data = await response.json();
                 document.getElementById('update_id_kunjungan').value = currentIdKunjungan;
@@ -479,7 +479,7 @@
         }
     });
 
-    // Create Rekam Medis Handlers
+    
     document.getElementById('create-rekam-cancel').addEventListener('click', () => {
         document.getElementById('create-rekam-medis-modal').classList.add('hidden');
     });
@@ -489,7 +489,7 @@
             const form = e.target;
             const idKunjungan = document.getElementById('create_id_kunjungan').value;
             try {
-                // Fix this URL - add /kunjungan/ prefix
+                
                 const response = await fetch(`/kunjungan/rekam-medis/create/${idKunjungan}/`, {
                     method: 'POST',
                     body: new FormData(form),
@@ -514,7 +514,7 @@
         }
     });
 
-    // Update Rekam Medis Handlers
+    
     document.getElementById('update-rekam-cancel').addEventListener('click', () => {
         document.getElementById('update-rekam-medis-modal').classList.add('hidden');
     });
@@ -524,7 +524,7 @@
             const form = e.target;
             const idKunjungan = document.getElementById('update_id_kunjungan').value;
             try {
-                // Fix this URL - add /kunjungan/ prefix
+                
                 const response = await fetch(`/kunjungan/rekam-medis/update/${idKunjungan}/`, {
                     method: 'POST',
                     body: new FormData(form),
@@ -549,7 +549,7 @@
         }
     });
 
-    // Create Kunjungan Modal Handlers
+    
     document.getElementById('create-kunjungan-btn')?.addEventListener('click', () => {
         document.getElementById('create-kunjungan-modal').classList.remove('hidden');
     });
@@ -557,7 +557,7 @@
         document.getElementById('create-kunjungan-modal').classList.add('hidden');
     });
 
-    // Handle Form Submission (Create Kunjungan)
+    
     document.getElementById('create-kunjungan-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (userRole === 'front_desk') {
@@ -588,7 +588,7 @@
         }
     });
 
-    // Update Kunjungan Modal Handlers
+    
     document.querySelectorAll('.update-kunjungan-btn').forEach(button => {
         button.addEventListener('click', async () => {
             if (userRole === 'front_desk') {
@@ -635,7 +635,7 @@
         document.getElementById('update-kunjungan-modal').classList.add('hidden');
     });
 
-    // Handle Form Submission (Update Kunjungan)
+    
     document.getElementById('update-kunjungan-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (userRole === 'front_desk') {
@@ -667,7 +667,7 @@
         }
     });
 
-    // Delete Kunjungan Modal Handlers
+    
     document.querySelectorAll('.delete-kunjungan-btn').forEach(button => {
         button.addEventListener('click', () => {
             if (userRole === 'front_desk') {
@@ -685,7 +685,7 @@
         document.getElementById('delete-kunjungan-modal').classList.add('hidden');
     });
 
-    // Handle Form Submission (Delete Kunjungan)
+    
     document.getElementById('delete-kunjungan-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (userRole === 'front_desk') {
@@ -716,7 +716,7 @@
         }
     });
 
-    // Dynamic Nama Hewan for Create
+    
     document.getElementById('no_identitas_klien')?.addEventListener('change', async (e) => {
         const noIdentitasKlien = e.target.value;
         try {
@@ -739,7 +739,7 @@
         }
     });
 
-    // Dynamic Nama Hewan for Update
+    
     document.getElementById('update_no_identitas_klien')?.addEventListener('change', async (e) => {
         const noIdentitasKlien = e.target.value;
         try {
