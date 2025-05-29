@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %} {# Jika kamu menggunakan i18n, jika tidak, bisa dihapus #}
+
+{% block content %}
+<div class="flex min-h-screen bg-gray-100">
+
+    {% include "navbar/sidebar.html" %}
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-64 p-6 overflow-auto"> {# Sesuaikan ml-64 jika lebar sidebar berbeda #}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Pesan Feedback (jika ada) -->
+            {% if messages %}
+                <div class="mb-6">
+                    {% for message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg
+                        {% if message.tags == 'success' %} bg-green-100 text-green-700 border border-green-300 {% endif %}
+                        {% if message.tags == 'error' %} bg-red-100 text-red-700 border border-red-300 {% endif %}
+                        {% if message.tags == 'warning' %} bg-yellow-100 text-yellow-700 border border-yellow-300 {% endif %}
+                        {% if message.tags == 'info' %} bg-blue-100 text-blue-700 border border-blue-300 {% endif %}"
+                        role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h1 class="text-2xl font-semibold text-gray-800">Daftar Kunjungan Pasien</h1>
+                {# Tambahkan tombol 'Tambah Kunjungan' jika perlu #}
+                {# <a href="#" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm">
+                    Tambah Kunjungan Baru
+                </a> #}
+            </div>
+
+            <!-- Filter Form (Opsional, jika kamu mau menambahkan filter untuk kunjungan) -->
+            {#
+            <form method="GET" action="{% url 'kunjungan:list_all_kunjungan' %}" class="mb-6 bg-gray-50 p-4 rounded-md">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-4 items-end">
+                    <div>
+                        <label for="filter_hewan" class="block text-sm font-medium text-gray-700 mb-1">Filter Hewan</label>
+                        <input type="text" name="hewan" id="filter_hewan" value="{{ request.GET.hewan }}" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" placeholder="Nama Hewan">
+                    </div>
+                    <div>
+                        <label for="filter_klien" class="block text-sm font-medium text-gray-700 mb-1">Filter Klien</label>
+                        <input type="text" name="klien" id="filter_klien" value="{{ request.GET.klien }}" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" placeholder="Nama Klien">
+                    </div>
+                    <div class="flex gap-2 col-span-1 md:col-span-1 lg:col-span-2 justify-start sm:justify-end">
+                        <button type="submit" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm">
+                            Filter
+                        </button>
+                        <a href="{% url 'kunjungan:list_all_kunjungan' %}" class="w-full sm:w-auto text-center bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-md text-sm">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+            #}
+            <!-- End Filter Form -->
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">ID Kunjungan</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Hewan</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Jenis</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Foto</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Klien</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Dokter</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Tipe</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Waktu Awal</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% if kunjungan_list %}
+                            {% for item_kunjungan in kunjungan_list %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.id_kunjungan|slice:":8" }}...</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.nama_hewan }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.jenis_hewan }}</td>
+                                <td class="py-3 px-4">
+                                    {% if item_kunjungan.foto_hewan %}
+                                        <img src="{{ item_kunjungan.foto_hewan }}" alt="Foto {{ item_kunjungan.nama_hewan }}" class="h-10 w-10 rounded-full object-cover">
+                                    {% else %}
+                                        <span class="text-gray-400">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.nama_klien }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.email_dokter }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.tipe_kunjungan }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ item_kunjungan.timestamp_awal|date:"d M Y, H:i" }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap text-center">
+                                    <button type="button"
+                                            class="lihat-rekam-medis-btn bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-md text-xs"
+                                            data-url="{% url 'kunjungan:rekam_medis_detail' id_kunjungan=item_kunjungan.id_kunjungan nama_hewan=item_kunjungan.nama_hewan no_identitas_klien=item_kunjungan.no_identitas_klien no_front_desk=item_kunjungan.no_front_desk no_perawat_hewan=item_kunjungan.no_perawat_hewan no_dokter_hewan=item_kunjungan.no_dokter_hewan %}">
+                                        Lihat Rekam Medis
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="py-4 px-4 text-center text-gray-500">
+                                    Belum ada data kunjungan.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Structure -->
+<div id="rekamMedisModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50 hidden">
+    <div class="relative mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="absolute top-0 right-0 pt-4 pr-4">
+            <button type="button" class="modal-close-button text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+            </button>
+        </div>
+        <div id="modalBodyContent" class="mt-3">
+            <!-- Konten akan dimuat di sini oleh JavaScript -->
+            <p class="text-center text-gray-500">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('rekamMedisModal');
+    const modalBody = document.getElementById('modalBodyContent');
+    const closeButtons = modal.querySelectorAll('.modal-close-button'); // Menangani semua tombol close
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        // Optional: Disable body scroll when modal is open
+        // document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>'; // Reset konten
+        // Optional: Enable body scroll when modal is closed
+        // document.body.style.overflow = 'auto';
+    }
+
+    document.querySelectorAll('.lihat-rekam-medis-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.dataset.url;
+            modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>'; // Tampilkan loading
+            openModal();
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    // Cari elemen dengan class 'container' atau elemen root form Anda
+                    const formContainer = doc.querySelector('.container'); // Sesuaikan jika nama class berbeda di rekam_medis_form.html
+
+                    if (formContainer) {
+                        modalBody.innerHTML = ''; // Kosongkan dulu
+                        // Salin child nodes dari formContainer ke modalBody
+                        // Ini untuk menghindari menyalin tag <body> atau <head> jika ada di response
+                        while (formContainer.firstChild) {
+                            modalBody.appendChild(formContainer.firstChild);
+                        }
+                    } else {
+                        modalBody.innerHTML = '<p class="text-center text-red-500">Gagal memuat konten form.</p>';
+                        console.error("Konten form tidak ditemukan dalam response atau selector salah:", html);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching rekam medis:', error);
+                    modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan: ${error.message}.</p>`;
+                });
+        });
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', closeModal);
+    });
+
+    // Close modal when clicking outside of the modal-content
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) { // Jika klik dilakukan pada backdrop modal
+            closeModal();
+        }
+    });
+
+    // Menangani submit form di dalam modal dengan AJAX
+    // Ini penting agar halaman tidak reload dan pengguna tetap di modal
+    modalBody.addEventListener('submit', function(event) {
+        if (event.target.tagName === 'FORM') {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const actionUrl = form.action;
+
+            // Tampilkan indikator loading di tombol submit jika ada
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton ? submitButton.innerHTML : '';
+            if (submitButton) {
+                submitButton.innerHTML = 'Menyimpan...';
+                submitButton.disabled = true;
+            }
+
+            fetch(actionUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    // Django CSRF token harus diambil dari form yang di-load
+                    'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.text()) // Asumsi response adalah HTML (form lagi, atau pesan)
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newFormContainer = doc.querySelector('.container'); // Atau selector yang sesuai
+
+                if (newFormContainer) {
+                    modalBody.innerHTML = '';
+                     while (newFormContainer.firstChild) {
+                        modalBody.appendChild(newFormContainer.firstChild);
+                    }
+                    // Cek apakah ada pesan sukses atau error dari backend yang bisa ditampilkan
+                    // Jika form valid dan disimpan, mungkin ada baiknya ada pesan sukses
+                    // atau tutup modal dan refresh daftar utama.
+                    // Contoh: jika ada elemen dengan id 'form-success-message'
+                    // const successMessage = modalBody.querySelector('#form-success-message');
+                    // if (successMessage) {
+                    //    setTimeout(closeModal, 2000); // Tutup setelah 2 detik
+                    //    location.reload(); // Refresh daftar utama
+                    // }
+                } else {
+                    // Jika tidak ada .container, mungkin itu pesan error sederhana
+                    modalBody.innerHTML = html;
+                }
+
+                if (submitButton) {
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan saat mengirim form: ${error.message}</p>`;
+                if (submitButton) {
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                }
+            });
+        }
+    });
+
+});
+</script>
+{% endblock %}

@@ -139,7 +139,7 @@
       </li>
       {% elif request.session.user_role == 'dokter_hewan' %}
       <li>
-        {% url 'kunjungan:list' as kunjungan_url %}
+        {% url 'kunjungan:list_all_kunjungan' as kunjungan_url %}
         <a href="{{ kunjungan_url }}" class="flex items-center px-3 py-2 rounded hover:bg-secondary transition-colors">
           <i class="fas fa-calendar-alt w-5 {% if request.path == kunjungan_url %}text-accent{% else %}text-white{% endif %}"></i>
           <span class="ml-3 {% if request.path == kunjungan_url %}text-accent font-medium{% else %}text-white{% endif %}">Daftar Kunjungan</span>
