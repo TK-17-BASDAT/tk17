@@ -37,11 +37,31 @@ def kunjungan_view(request):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Default ke klien
-                        user_role = 'klien'
+                        # Check if user is klien_individu
+                        cursor.execute(
+                            "SELECT 1 FROM KLIEN k JOIN INDIVIDU i ON k.no_identitas = i.no_identitas_klien WHERE k.email = %s",
+                            [request.user.email]
+                        )
+                        is_individu = cursor.fetchone() is not None
+                        
+                        if is_individu:
+                            user_role = 'klien_individu'
+                        else:
+                            # Check if user is klien_perusahaan
+                            cursor.execute(
+                                "SELECT 1 FROM KLIEN k JOIN PERUSAHAAN p ON k.no_identitas = p.no_identitas_klien WHERE k.email = %s",
+                                [request.user.email]
+                            )
+                            is_perusahaan = cursor.fetchone() is not None
+                            
+                            if is_perusahaan:
+                                user_role = 'klien_perusahaan'
+                            else:
+                                # If user doesn't match any known role
+                                user_role = 'unknown'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
-            user_role = 'klien'
+            user_role = 'klien_individu'
 
     # Simpan role ke session
     request.session['user_role'] = user_role
@@ -87,8 +107,8 @@ def kunjungan_view(request):
         print(f"Error fetching data: {str(e)}")
         kunjungans = []
 
-    # Filter kunjungan untuk klien
-    if user_role == 'klien':
+    # Filter kunjungan untuk klien (both individual and company)
+    if user_role == 'klien_individu' or user_role == 'klien_perusahaan':
         try:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT no_identitas FROM KLIEN WHERE email = %s", [request.user.email])
