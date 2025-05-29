@@ -161,6 +161,40 @@ def rekam_medis_view(request, id_kunjungan, nama_hewan, no_identitas_klien,
 def tambah_kunjungan_view(request):
     """View untuk menampilkan form tambah kunjungan baru"""
     
+    # Pastikan user sudah login
+    if not request.user.is_authenticated:
+        from django.contrib.auth.decorators import login_required
+        return redirect('login')  # Sesuaikan dengan nama URL login Anda
+    
+    # Ambil data front desk dari user yang sedang login
+    query_current_front_desk = """
+    SELECT 
+        fd.no_front_desk,
+        u_fd.email as email_front_desk,
+        COALESCE(i_fd.nama_depan || ' ' || i_fd.nama_belakang, p_fd.nama_perusahaan) AS nama_front_desk
+    FROM FRONT_DESK fd
+    JOIN PEGAWAI peg_fd ON fd.no_front_desk = peg_fd.no_pegawai 
+    JOIN "user" u_fd ON peg_fd.email_user = u_fd.email
+    JOIN KLIEN kl_fd ON u_fd.email = kl_fd.email
+    LEFT JOIN INDIVIDU i_fd ON kl_fd.no_identitas = i_fd.no_identitas_klien
+    LEFT JOIN PERUSAHAAN p_fd ON kl_fd.no_identitas = p_fd.no_identitas_klien
+    WHERE u_fd.email = 'someone@example.com';
+    """
+    
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query_current_front_desk, [request.user.email])
+            current_front_desk = dictfetchone(cursor)
+    except Exception as e:
+        from django.contrib import messages
+        messages.error(request, f'Error: Anda tidak terdaftar sebagai Front Desk. {str(e)}')
+        return redirect('dashboard')  # Redirect ke halaman yang sesuai
+    
+    if not current_front_desk:
+        from django.contrib import messages
+        messages.error(request, 'Anda tidak memiliki akses sebagai Front Desk.')
+        return redirect('dashboard')  # Redirect ke halaman yang sesuai
+    
     # Query untuk mendapatkan data dropdown
     query_klien = """
     SELECT 
@@ -172,61 +206,55 @@ def tambah_kunjungan_view(request):
     ORDER BY nama_klien;
     """
     
-    # PERBAIKAN: Join melalui KLIEN table untuk mendapatkan email
     query_dokter = """
     SELECT DISTINCT ON (u.email)
         dh.no_dokter_hewan,
         u.email as email_dokter,
         u.nomor_telepon as telepon_dokter,
-        CONCAT(u.alamat, ' (', u.nomor_telepon, ')') as info_kontak
+        COALESCE(i.nama_depan || ' ' || i.nama_belakang, p_company.nama_perusahaan) AS nama_dokter
     FROM DOKTER_HEWAN dh
     JOIN TENAGA_MEDIS tm ON dh.no_dokter_hewan = tm.no_tenaga_medis
     JOIN PEGAWAI p ON tm.no_tenaga_medis = p.no_pegawai
     JOIN "user" u ON p.email_user = u.email
+    JOIN KLIEN kl ON u.email = kl.email
+    LEFT JOIN INDIVIDU i ON kl.no_identitas = i.no_identitas_klien
+    LEFT JOIN PERUSAHAAN p_company ON kl.no_identitas = p_company.no_identitas_klien
     ORDER BY u.email;
     """
     
-    # PERBAIKAN: Join melalui KLIEN table untuk mendapatkan email
     query_perawat = """
     SELECT DISTINCT ON (u.email)
         ph.no_perawat_hewan,
         u.email as email_perawat,
         u.nomor_telepon as telepon_perawat,
-        CONCAT(u.alamat, ' (', u.nomor_telepon, ')') as info_kontak
+        COALESCE(i.nama_depan || ' ' || i.nama_belakang, p_company.nama_perusahaan) AS nama_perawat
     FROM PERAWAT_HEWAN ph
     JOIN TENAGA_MEDIS tm ON ph.no_perawat_hewan = tm.no_tenaga_medis
     JOIN PEGAWAI p ON tm.no_tenaga_medis = p.no_pegawai
     JOIN "user" u ON p.email_user = u.email
+    JOIN KLIEN kl ON u.email = kl.email
+    LEFT JOIN INDIVIDU i ON kl.no_identitas = i.no_identitas_klien
+    LEFT JOIN PERUSAHAAN p_company ON kl.no_identitas = p_company.no_identitas_klien
     ORDER BY u.email;
     """
-    
-    # PERBAIKAN: Join melalui KLIEN table untuk mendapatkan email
-    query_front_desk = """
-    SELECT 
-        fd.no_front_desk,
-        u_fd.email as email_front_desk,
-        COALESCE(i_fd.nama_depan || ' ' || i_fd.nama_belakang, p_fd.nama_perusahaan) AS nama_front_desk
-    FROM FRONT_DESK fd
-    JOIN PEGAWAI peg_fd ON fd.no_front_desk = peg_fd.no_pegawai 
-    JOIN "user" u_fd ON peg_fd.email_user = u_fd.email
-    JOIN KLIEN kl_fd ON u_fd.email = kl_fd.email
-    LEFT JOIN INDIVIDU i_fd ON kl_fd.no_identitas = i_fd.no_identitas_klien
-    LEFT JOIN PERUSAHAAN p_fd ON kl_fd.no_identitas = p_fd.no_identitas_klien
-    ORDER BY nama_front_desk;
-    """
 
-    with connection.cursor() as cursor:
-        cursor.execute(query_klien)
-        klien_list = dictfetchall(cursor)
-        
-        cursor.execute(query_dokter)
-        dokter_list = dictfetchall(cursor)
-        
-        cursor.execute(query_perawat)
-        perawat_list = dictfetchall(cursor)
-        
-        cursor.execute(query_front_desk)
-        front_desk_list = dictfetchall(cursor)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(query_klien)
+            klien_list = dictfetchall(cursor)
+            
+            cursor.execute(query_dokter)
+            dokter_list = dictfetchall(cursor)
+            
+            cursor.execute(query_perawat)
+            perawat_list = dictfetchall(cursor)
+    except Exception as e:
+        from django.contrib import messages
+        messages.error(request, f'Error loading dropdown data: {str(e)}')
+        return render(request, 'kunjungan/tambah_kunjungan_form.html', {
+            'klien_list': [], 'dokter_list': [], 'perawat_list': [],
+            'current_front_desk': current_front_desk
+        })
 
     # Untuk AJAX request mendapatkan hewan berdasarkan klien
     if request.method == 'GET' and request.GET.get('klien_id'):
@@ -237,28 +265,68 @@ def tambah_kunjungan_view(request):
         WHERE h.no_identitas_klien = %s
         ORDER BY nama;
         """
-        with connection.cursor() as cursor:
-            cursor.execute(query_hewan, [klien_id])
-            hewan_list = dictfetchall(cursor)
-        
-        from django.http import JsonResponse
-        return JsonResponse({'hewan_list': hewan_list})
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query_hewan, [klien_id])
+                hewan_list = dictfetchall(cursor)
+            
+            from django.http import JsonResponse
+            return JsonResponse({'hewan_list': hewan_list})
+        except Exception as e:
+            from django.http import JsonResponse
+            return JsonResponse({'error': str(e), 'hewan_list': []})
 
     if request.method == 'POST':
+        # Debug: Print all POST data
+        print("POST Data received:")
+        for key, value in request.POST.items():
+            print(f"  {key}: {value}")
+        
         # Ambil data dari form
         klien_id = request.POST.get('klien')
         nama_hewan = request.POST.get('nama_hewan')
         dokter_id = request.POST.get('dokter')
         perawat_id = request.POST.get('perawat')
-        front_desk_id = request.POST.get('front_desk')
+        # front_desk_id diambil dari user yang sedang login
+        front_desk_id = current_front_desk['no_front_desk']
         tipe_kunjungan = request.POST.get('tipe_kunjungan')
         waktu_mulai = request.POST.get('waktu_mulai')
         waktu_akhir = request.POST.get('waktu_akhir', None)
+
+        # Validation
+        required_fields = {
+            'klien': klien_id,
+            'nama_hewan': nama_hewan,
+            'dokter': dokter_id,
+            'perawat': perawat_id,
+            'tipe_kunjungan': tipe_kunjungan,
+            'waktu_mulai': waktu_mulai
+        }
+        
+        missing_fields = [field for field, value in required_fields.items() if not value]
+        
+        if missing_fields:
+            from django.contrib import messages
+            messages.error(request, f'Field berikut harus diisi: {", ".join(missing_fields)}')
+            context = {
+                'klien_list': klien_list,
+                'dokter_list': dokter_list,
+                'perawat_list': perawat_list,
+                'current_front_desk': current_front_desk,
+            }
+            return render(request, 'kunjungan/tambah_kunjungan_form.html', context)
 
         try:
             # Generate UUID untuk id_kunjungan
             import uuid
             id_kunjungan = str(uuid.uuid4())
+            
+            print(f"Attempting to insert kunjungan with ID: {id_kunjungan}")
+            print(f"Front desk ID (from login): {front_desk_id}")
+            
+            # Convert empty waktu_akhir to None
+            if waktu_akhir == '':
+                waktu_akhir = None
             
             # Insert kunjungan baru
             query_insert = """
@@ -269,12 +337,21 @@ def tambah_kunjungan_view(request):
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
             
+            insert_params = [
+                id_kunjungan, nama_hewan, klien_id,
+                front_desk_id, perawat_id, dokter_id,
+                tipe_kunjungan, waktu_mulai, waktu_akhir
+            ]
+            
+            print(f"Insert parameters: {insert_params}")
+            
             with connection.cursor() as cursor:
-                cursor.execute(query_insert, [
-                    id_kunjungan, nama_hewan, klien_id,
-                    front_desk_id, perawat_id, dokter_id,
-                    tipe_kunjungan, waktu_mulai, waktu_akhir
-                ])
+                cursor.execute(query_insert, insert_params)
+                
+                # Verify insertion
+                cursor.execute("SELECT COUNT(*) FROM KUNJUNGAN WHERE id_kunjungan = %s", [id_kunjungan])
+                count = cursor.fetchone()[0]
+                print(f"Rows inserted: {count}")
             
             from django.contrib import messages
             messages.success(request, f'Kunjungan untuk {nama_hewan} berhasil ditambahkan!')
@@ -282,13 +359,14 @@ def tambah_kunjungan_view(request):
             
         except Exception as e:
             from django.contrib import messages
+            print(f"Database error: {str(e)}")
             messages.error(request, f'Gagal menambahkan kunjungan: {str(e)}')
 
     context = {
         'klien_list': klien_list,
         'dokter_list': dokter_list,
         'perawat_list': perawat_list,
-        'front_desk_list': front_desk_list,
+        'current_front_desk': current_front_desk,
     }
     
     return render(request, 'kunjungan/tambah_kunjungan_form.html', context)
