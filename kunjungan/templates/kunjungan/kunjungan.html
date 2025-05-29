@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %} {# Jika kamu menggunakan i18n, jika tidak, bisa dihapus #}
 
 {% block content %}
 <div class="flex min-h-screen bg-gray-100">
@@ -27,10 +28,12 @@
 
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 class="text-2xl font-semibold text-gray-800">Daftar Kunjungan Pasien</h1>
-                {# Tambahkan tombol 'Tambah Kunjungan' jika perlu #}
-                {# <a href="#" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm">
+                <!-- Tambahkan tombol 'Tambah Kunjungan' -->
+                <button type="button" 
+                        class="tambah-kunjungan-btn bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-sm"
+                        data-url="{% url 'kunjungan:tambah_kunjungan' %}">
                     Tambah Kunjungan Baru
-                </a> #}
+                </button>
             </div>
 
             <!-- Filter Form (Opsional, jika kamu mau menambahkan filter untuk kunjungan) -->
@@ -133,72 +136,176 @@
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('rekamMedisModal');
     const modalBody = document.getElementById('modalBodyContent');
-    const closeButtons = modal.querySelectorAll('.modal-close-button'); // Menangani semua tombol close
+    const closeButtons = modal.querySelectorAll('.modal-close-button');
 
     function openModal() {
         modal.classList.remove('hidden');
-        // Optional: Disable body scroll when modal is open
-        // document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
     }
 
     function closeModal() {
         modal.classList.add('hidden');
-        modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>'; // Reset konten
-        // Optional: Enable body scroll when modal is closed
-        // document.body.style.overflow = 'auto';
+        modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
+        document.body.style.overflow = 'auto'; // Restore scroll
     }
 
+    // Add click event to all "Lihat Rekam Medis" buttons
     document.querySelectorAll('.lihat-rekam-medis-btn').forEach(button => {
         button.addEventListener('click', function() {
+            console.log('Button clicked'); // Debug log
             const url = this.dataset.url;
-            modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>'; // Tampilkan loading
+            console.log('URL:', url); // Debug log
+            
+            modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
             openModal();
 
             fetch(url)
                 .then(response => {
+                    console.log('Response status:', response.status); // Debug log
                     if (!response.ok) {
-                        throw new Error(HTTP error! status: ${response.status});
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.text();
                 })
                 .then(html => {
+                    console.log('HTML received'); // Debug log
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-                    // Cari elemen dengan class 'container' atau elemen root form Anda
-                    const formContainer = doc.querySelector('.container'); // Sesuaikan jika nama class berbeda di rekam_medis_form.html
+                    
+                    // Try multiple selectors in case .container doesn't exist
+                    const formContainer = doc.querySelector('.container') || 
+                                        doc.querySelector('form') || 
+                                        doc.querySelector('body') ||
+                                        doc.documentElement;
 
                     if (formContainer) {
-                        modalBody.innerHTML = ''; // Kosongkan dulu
-                        // Salin child nodes dari formContainer ke modalBody
-                        // Ini untuk menghindari menyalin tag <body> atau <head> jika ada di response
-                        while (formContainer.firstChild) {
-                            modalBody.appendChild(formContainer.firstChild);
+                        console.log('Container found'); // Debug log
+                        modalBody.innerHTML = '';
+                        
+                        // If it's the body or html, get the inner content
+                        if (formContainer.tagName === 'BODY' || formContainer.tagName === 'HTML') {
+                            modalBody.innerHTML = formContainer.innerHTML;
+                        } else {
+                            // Clone and append children
+                            const clone = formContainer.cloneNode(true);
+                            modalBody.appendChild(clone);
                         }
                     } else {
-                        modalBody.innerHTML = '<p class="text-center text-red-500">Gagal memuat konten form.</p>';
-                        console.error("Konten form tidak ditemukan dalam response atau selector salah:", html);
+                        console.log('Container not found, using full HTML'); // Debug log
+                        modalBody.innerHTML = html;
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching rekam medis:', error);
-                    modalBody.innerHTML = <p class="text-center text-red-500">Terjadi kesalahan: ${error.message}.</p>;
+                    console.error('Fetch error:', error); // Debug log
+                    modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan: ${error.message}</p>`;
                 });
         });
     });
 
+    document.querySelectorAll('.tambah-kunjungan-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const url = this.dataset.url;
+            console.log('Tambah Kunjungan clicked, URL:', url);
+            
+            modalBody.innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
+            openModal();
+
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    console.log('HTML received for tambah kunjungan');
+                    
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Coba berbagai selector
+                    let formContainer = doc.querySelector('.container');
+                    if (!formContainer) {
+                        formContainer = doc.querySelector('div');
+                    }
+                    if (!formContainer) {
+                        formContainer = doc.body;
+                    }
+
+                    if (formContainer) {
+                        modalBody.innerHTML = formContainer.innerHTML;
+                        
+                        // Re-attach event listeners untuk form yang baru dimuat
+                        const cancelButton = modalBody.querySelector('.modal-close-button-secondary');
+                        if (cancelButton) {
+                            cancelButton.addEventListener('click', closeModal);
+                        }
+                        
+                        // Re-attach script untuk dropdown hewan (karena innerHTML tidak menjalankan script)
+                        const klienSelect = modalBody.querySelector('#klien');
+                        const hewanSelect = modalBody.querySelector('#nama_hewan');
+                        
+                        if (klienSelect && hewanSelect) {
+                            klienSelect.addEventListener('change', function() {
+                                const klienId = this.value;
+                                
+                                if (klienId) {
+                                    hewanSelect.disabled = true;
+                                    hewanSelect.innerHTML = '<option value="">Loading...</option>';
+                                    
+                                    fetch(`${url}?klien_id=${klienId}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            hewanSelect.innerHTML = '<option value="">Pilih Hewan</option>';
+                                            data.hewan_list.forEach(hewan => {
+                                                hewanSelect.innerHTML += `<option value="${hewan.nama}">${hewan.nama}</option>`;
+                                            });
+                                            hewanSelect.disabled = false;
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            hewanSelect.innerHTML = '<option value="">Error loading data</option>';
+                                            hewanSelect.disabled = false;
+                                        });
+                                } else {
+                                    hewanSelect.innerHTML = '<option value="">Pilih klien terlebih dahulu</option>';
+                                    hewanSelect.disabled = true;
+                                }
+                            });
+                        }
+                    } else {
+                        modalBody.innerHTML = '<p class="text-center text-red-500">Gagal memuat form tambah kunjungan.</p>';
+                        console.error("Form container tidak ditemukan");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching tambah kunjungan:', error);
+                    modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan: ${error.message}</p>`;
+                });
+        });
+    });
+
+    // Close button handlers
     closeButtons.forEach(button => {
         button.addEventListener('click', closeModal);
     });
 
-    // Close modal when clicking outside of the modal-content
+    // Close when clicking outside modal
     modal.addEventListener('click', function(event) {
-        if (event.target === modal) { // Jika klik dilakukan pada backdrop modal
+        if (event.target === modal) {
             closeModal();
         }
     });
 
-    // Menangani submit form di dalam modal dengan AJAX
-    // Ini penting agar halaman tidak reload dan pengguna tetap di modal
+    // Handle dynamically added close buttons
+    modalBody.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal-close-button-secondary')) {
+            closeModal();
+        }
+    });
+
+    // Handle form submission in modal
     modalBody.addEventListener('submit', function(event) {
         if (event.target.tagName === 'FORM') {
             event.preventDefault();
@@ -206,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(form);
             const actionUrl = form.action;
 
-            // Tampilkan indikator loading di tombol submit jika ada
+            // Show loading state
             const submitButton = form.querySelector('button[type="submit"]');
             const originalButtonText = submitButton ? submitButton.innerHTML : '';
             if (submitButton) {
@@ -218,43 +325,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    // Django CSRF token harus diambil dari form yang di-load
                     'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
                 }
             })
-            .then(response => response.text()) // Asumsi response adalah HTML (form lagi, atau pesan)
+            .then(response => response.text())
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newFormContainer = doc.querySelector('.container'); // Atau selector yang sesuai
+                const newFormContainer = doc.querySelector('.container') || doc.querySelector('form') || doc.querySelector('body');
 
                 if (newFormContainer) {
                     modalBody.innerHTML = '';
-                     while (newFormContainer.firstChild) {
-                        modalBody.appendChild(newFormContainer.firstChild);
-                    }
-                    // Cek apakah ada pesan sukses atau error dari backend yang bisa ditampilkan
-                    // Jika form valid dan disimpan, mungkin ada baiknya ada pesan sukses
-                    // atau tutup modal dan refresh daftar utama.
-                    // Contoh: jika ada elemen dengan id 'form-success-message'
-                    // const successMessage = modalBody.querySelector('#form-success-message');
-                    // if (successMessage) {
-                    //    setTimeout(closeModal, 2000); // Tutup setelah 2 detik
-                    //    location.reload(); // Refresh daftar utama
-                    // }
+                    const clone = newFormContainer.cloneNode(true);
+                    modalBody.appendChild(clone);
                 } else {
-                    // Jika tidak ada .container, mungkin itu pesan error sederhana
                     modalBody.innerHTML = html;
                 }
 
+                // Restore button state
                 if (submitButton) {
                     submitButton.innerHTML = originalButtonText;
                     submitButton.disabled = false;
                 }
             })
             .catch(error => {
-                console.error('Error submitting form:', error);
-                modalBody.innerHTML = <p class="text-center text-red-500">Terjadi kesalahan saat mengirim form: ${error.message}</p>;
+                console.error('Form submit error:', error);
+                modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan saat mengirim form: ${error.message}</p>`;
+                
                 if (submitButton) {
                     submitButton.innerHTML = originalButtonText;
                     submitButton.disabled = false;
@@ -262,7 +359,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-
 });
 </script>
 {% endblock %}
