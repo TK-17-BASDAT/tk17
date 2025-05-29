@@ -460,20 +460,6 @@ def delete_hewan_peliharaan(request, id):
             messages.error(request, "Pet not found!")
             return redirect('hewan_peliharaan:list')
         
-        
-        cursor.execute(
-            """
-            SELECT COUNT(*) FROM petclinic.kunjungan 
-            WHERE nama_hewan = %s AND no_identitas_klien = %s
-            """,
-            [nama_hewan, no_identitas_klien]
-        )
-        visit_count = cursor.fetchone()[0]
-        
-        if visit_count > 0:
-            messages.error(request, "Cannot delete a pet with visits!")
-            return redirect('hewan_peliharaan:list')
-        
         context = {
             'id': id,  
             'nama_hewan': hewan[0],
@@ -498,9 +484,22 @@ def delete_hewan_peliharaan(request, id):
             return redirect('hewan_peliharaan:list')
             
         except Exception as e:
-            messages.error(request, f"Failed to delete pet: {str(e)}")
+            error_message = str(e)
+            # Check if this is our custom trigger error about active visits
+            if "masih memiliki kunjungan aktif" in error_message:
+                # This is our trigger error, extract it directly
+                messages.error(request, error_message)
+            else:
+                # Generic database error
+                messages.error(request, f"Failed to delete pet: {error_message}")
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                context = {
+                    'id': id,
+                    'nama_hewan': nama_hewan,
+                    'nama_pemilik': hewan[5],
+                    'error': error_message
+                }
                 html = render_to_string('hewan_peliharaan/delete.html', context, request)
                 return JsonResponse({'success': False, 'html': html})
     

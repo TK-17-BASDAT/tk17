@@ -3,15 +3,11 @@
 {% load i18n %}
 
 {% block content %}
-<div class="flex min-h-screen bg-gray-100">
-    <!-- Sidebar -->
-    <div class="w-64 bg-white shadow-md flex-shrink-0">
-        {% include "navbar/sidebar.html" %}
-    </div>
-    
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
             <!-- Pesan Feedback -->
             {% if messages %}
                 {# ... messages block ... #}
@@ -64,13 +60,13 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
                     {# ... isi tabel sama seperti sebelumnya ... #}
-                    <thead class="bg-gray-50">
+                    <thead class="bg-primary text-white">
                         <tr>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">No</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Email</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Nama</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Jenis</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">No</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">Email</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">Nama</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">Jenis</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium  text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">

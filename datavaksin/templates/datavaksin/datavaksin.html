@@ -2,15 +2,11 @@
 {% load static %} {# Jika menggunakan FontAwesome, pastikan staticfiles sudah di-load #}
 
 {% block content %}
-<div class="flex min-h-screen bg-white">
-    <!-- Sidebar -->
-    <div class="w-64 bg-gray-100 p-4 flex-shrink-0">
-        {% include "navbar/sidebar.html" %}
-    </div>
-    
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
             <!-- Pesan Feedback -->
             {% if messages %}
                 <div class="mb-6"> {# Memberi jarak bawah jika ada pesan #}
@@ -36,14 +32,14 @@
 
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left border-collapse border border-gray-200"> {# Text-left untuk konsistensi #}
-                    <thead class="bg-gray-50">
+                    <thead class="bg-primary text-white">
                         <tr>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">No</th> {# No. bisa di tengah #}
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">ID Vaksin</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Nama Vaksin</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-right">Harga</th> {# Harga bisa rata kanan #}
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Stok</th> {# Stok bisa di tengah #}
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium  text-center">No</th> {# No. bisa di tengah #}
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">ID Vaksin</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium ">Nama Vaksin</th>
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium  text-right">Harga</th> {# Harga bisa rata kanan #}
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium  text-center">Stok</th> {# Stok bisa di tengah #}
+                            <th class="py-3 px-4 border-b border-gray-200 font-medium  text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white">

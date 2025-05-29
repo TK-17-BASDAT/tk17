@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-{% load i18n %} {# Jika kamu menggunakan i18n, jika tidak, bisa dihapus #}
 
 {% block content %}
 <div class="flex min-h-screen bg-gray-100">
@@ -158,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(HTTP error! status: ${response.status});
                     }
                     return response.text();
                 })
@@ -182,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error fetching rekam medis:', error);
-                    modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan: ${error.message}.</p>`;
+                    modalBody.innerHTML = <p class="text-center text-red-500">Terjadi kesalahan: ${error.message}.</p>;
                 });
         });
     });
@@ -255,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error submitting form:', error);
-                modalBody.innerHTML = `<p class="text-center text-red-500">Terjadi kesalahan saat mengirim form: ${error.message}</p>`;
+                modalBody.innerHTML = <p class="text-center text-red-500">Terjadi kesalahan saat mengirim form: ${error.message}</p>;
                 if (submitButton) {
                     submitButton.innerHTML = originalButtonText;
                     submitButton.disabled = false;

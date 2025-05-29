@@ -99,7 +99,7 @@
       <!-- Perawatan Hewan (dokter only) -->
       {% if request.session.user_role == 'dokter_hewan' %}
       <li>
-        {% url 'perawatan_hewan:list' as perawatan_url %}
+        {% url 'perawatan_hewan:perawatan_view' as perawatan_url %}
         <a href="{{ perawatan_url }}" class="flex items-center px-3 py-2 rounded hover:bg-secondary transition-colors">
           <i class="fas fa-stethoscope w-5 {% if request.path == perawatan_url %}text-accent{% else %}text-white{% endif %}"></i>
           <span class="ml-3 {% if request.path == perawatan_url %}text-accent font-medium{% else %}text-white{% endif %}">Perawatan Hewan</span>
@@ -123,7 +123,7 @@
       <!-- Kunjungan -->
       {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
       <li>
-        {% url 'kunjungan:list' as kunjungan_url %}
+        {% url 'kunjungan:kunjungan_view' as kunjungan_url %}
         <a href="{{ kunjungan_url }}" class="flex items-center px-3 py-2 rounded hover:bg-secondary transition-colors">
           <i class="fas fa-calendar-alt w-5 {% if request.path == kunjungan_url %}text-accent{% else %}text-white{% endif %}"></i>
           <span class="ml-3 {% if request.path == kunjungan_url %}text-accent font-medium{% else %}text-white{% endif %}">Daftar Kunjungan</span>
@@ -131,7 +131,7 @@
       </li>
       {% elif request.session.user_role == 'front_desk' %}
       <li>
-        {% url 'kunjungan:list' as kunjungan_url %}
+        {% url 'kunjungan:kunjungan_view' as kunjungan_url %}
         <a href="{{ kunjungan_url }}" class="flex items-center px-3 py-2 rounded hover:bg-secondary transition-colors">
           <i class="fas fa-calendar-check w-5 {% if request.path == kunjungan_url %}text-accent{% else %}text-white{% endif %}"></i>
           <span class="ml-3 {% if request.path == kunjungan_url %}text-accent font-medium{% else %}text-white{% endif %}">Kelola Kunjungan</span>
