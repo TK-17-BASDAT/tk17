@@ -1,7 +1,7 @@
 # tk17/kunjungan/views.py
 from django.shortcuts import render, redirect
 from django.db import connection
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 import uuid # Jika kamu menggunakan tipe UUID di Python, meskipun di query bisa string
 
 # Helper function untuk mengubah hasil query cursor menjadi list of dictionaries
@@ -23,6 +23,7 @@ def dictfetchone(cursor):
     return None
 
 def list_kunjungan_view(request):
+    """View untuk menampilkan daftar kunjungan (READ - accessible to all roles)"""
     query = """
     SELECT
         k.id_kunjungan,
@@ -53,14 +54,33 @@ def list_kunjungan_view(request):
     
     ORDER BY k.timestamp_awal DESC;
     """
+    
     with connection.cursor() as cursor:
         cursor.execute(query)
         kunjungan_list = dictfetchall(cursor)
+        
+        # Filter data if user is klien (both individu and perusahaan)
+        user_role = request.session.get('user_role')
+        if user_role in ['klien_individu', 'klien_perusahaan']:
+            try:
+                with connection.cursor() as filter_cursor:
+                    filter_cursor.execute("SELECT no_identitas FROM KLIEN WHERE email = %s", [request.user.email])
+                    klien_id = filter_cursor.fetchone()
+                    if klien_id:
+                        # Filter to only show visits for this client
+                        kunjungan_list = [k for k in kunjungan_list if k['no_identitas_klien'] == klien_id[0]]
+            except Exception as e:
+                print(f"Error filtering kunjungan: {str(e)}")
 
     return render(request, 'kunjungan/kunjungan.html', {'kunjungan_list': kunjungan_list})
 
 def rekam_medis_view(request, id_kunjungan, nama_hewan, no_identitas_klien,
                        no_front_desk, no_perawat_hewan, no_dokter_hewan):
+    """View untuk menampilkan dan mengupdate rekam medis (READ for all, CREATE/UPDATE for dokter_hewan)"""
+    # For POST requests (create/update), check if user is dokter_hewan
+    if request.method == 'POST' and request.session.get('user_role') != 'dokter_hewan':
+        return HttpResponseForbidden("Hanya dokter hewan yang dapat membuat atau mengubah rekam medis")
+    
     # Kunci komposit untuk identifikasi kunjungan unik
     kunjungan_pk_tuple = (
         str(id_kunjungan), # Pastikan string untuk parameter query SQL
@@ -155,11 +175,15 @@ def rekam_medis_view(request, id_kunjungan, nama_hewan, no_identitas_klien,
         'no_front_desk_url': no_front_desk,
         'no_perawat_hewan_url': no_perawat_hewan,
         'no_dokter_hewan_url': no_dokter_hewan,
+        'is_dokter': request.session.get('user_role') == 'dokter_hewan',  # Add flag to template
     }
     return render(request, 'kunjungan/rekam_medis_form.html', context)
 
 def tambah_kunjungan_view(request):
-    """View untuk menampilkan form tambah kunjungan baru"""
+    """View untuk menampilkan form tambah kunjungan baru (CREATE - only front_desk)"""
+    # Check if user is front_desk
+    if request.session.get('user_role') != 'front_desk':
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk membuat kunjungan baru")
     
     # Query untuk mendapatkan data dropdown
     query_klien = """
@@ -241,7 +265,6 @@ def tambah_kunjungan_view(request):
             cursor.execute(query_hewan, [klien_id])
             hewan_list = dictfetchall(cursor)
         
-        from django.http import JsonResponse
         return JsonResponse({'hewan_list': hewan_list})
 
     if request.method == 'POST':
@@ -292,3 +315,96 @@ def tambah_kunjungan_view(request):
     }
     
     return render(request, 'kunjungan/tambah_kunjungan_form.html', context)
+
+def delete_kunjungan_view(request, id_kunjungan):
+    """View untuk menghapus kunjungan (DELETE - only front_desk)"""
+    # Check if user is front_desk
+    if request.session.get('user_role') != 'front_desk':
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk menghapus kunjungan")
+    
+    if request.method == 'POST':
+        try:
+            with connection.cursor() as cursor:
+                # You might need to handle the composite primary key here
+                cursor.execute("DELETE FROM KUNJUNGAN WHERE id_kunjungan = %s", [id_kunjungan])
+            
+            from django.contrib import messages
+            messages.success(request, "Kunjungan berhasil dihapus")
+            
+        except Exception as e:
+            from django.contrib import messages
+            messages.error(request, f"Gagal menghapus kunjungan: {str(e)}")
+            
+    return redirect('kunjungan:list_all_kunjungan')
+
+def update_kunjungan_view(request, id_kunjungan):
+    """View untuk mengupdate kunjungan yang sudah ada (UPDATE - only front_desk)"""
+    # Check if user is front_desk
+    if request.session.get('user_role') != 'front_desk':
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk mengubah kunjungan")
+    
+    if request.method == 'POST':
+        # Get all form data
+        klien_id = request.POST.get('klien')
+        nama_hewan = request.POST.get('nama_hewan')
+        dokter_id = request.POST.get('dokter')
+        perawat_id = request.POST.get('perawat')
+        front_desk_id = request.POST.get('front_desk')
+        tipe_kunjungan = request.POST.get('tipe_kunjungan')
+        waktu_mulai = request.POST.get('waktu_mulai')
+        waktu_akhir = request.POST.get('waktu_akhir', None)
+        
+        try:
+            with connection.cursor() as cursor:
+                # Update without any animal-client validation constraints
+                query_update = """
+                UPDATE KUNJUNGAN
+                SET nama_hewan = %s, 
+                    no_identitas_klien = %s,
+                    no_front_desk = %s, 
+                    no_perawat_hewan = %s, 
+                    no_dokter_hewan = %s,
+                    tipe_kunjungan = %s, 
+                    timestamp_awal = %s, 
+                    timestamp_akhir = %s
+                WHERE id_kunjungan = %s;
+                """
+                cursor.execute(query_update, [
+                    nama_hewan, klien_id, 
+                    front_desk_id, perawat_id, dokter_id,
+                    tipe_kunjungan, waktu_mulai, waktu_akhir, 
+                    id_kunjungan
+                ])
+            
+            return JsonResponse({'success': True, 'message': 'Kunjungan berhasil diupdate'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Gagal mengupdate kunjungan: {str(e)}'}, status=500)
+    
+    return Http404("Method not allowed")
+
+def get_kunjungan_details(request, id_kunjungan):
+    """API to get kunjungan details for form pre-filling"""
+    if request.session.get('user_role') != 'front_desk':
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk mengakses data ini")
+    
+    try:
+        with connection.cursor() as cursor:
+            query = """
+            SELECT 
+                id_kunjungan, nama_hewan, no_identitas_klien,
+                no_front_desk, no_perawat_hewan, no_dokter_hewan,
+                tipe_kunjungan, timestamp_awal, timestamp_akhir
+            FROM KUNJUNGAN
+            WHERE id_kunjungan = %s
+            """
+            cursor.execute(query, [id_kunjungan])
+            kunjungan = dictfetchone(cursor)
+            
+            if not kunjungan:
+                return JsonResponse({"error": "Kunjungan not found"}, status=404)
+                
+            return JsonResponse(kunjungan)
+            
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
