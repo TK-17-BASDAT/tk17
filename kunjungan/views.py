@@ -6,20 +6,20 @@ from django.contrib import messages
 from django.http import JsonResponse, Http404
 from django.db import connection
 
-# Helper untuk cek role
+
 def is_front_desk(user):
     return user.groups.filter(name='FrontDesk').exists()
 
 @login_required
 def kunjungan_view(request):
-    # Coba ambil role dari session (jika dashboard menyimpannya)
-    user_role = request.session.get('role')  # Ganti 'role' dengan kunci session yang benar jika diketahui
+    
+    user_role = request.session.get('role')  
 
-    # Jika tidak ada di session, tentukan role berdasarkan tabel PEGAWAI
+    
     if not user_role:
         try:
             with connection.cursor() as cursor:
-                # Cek apakah pengguna adalah dokter
+                
                 cursor.execute(
                     "SELECT 1 FROM PEGAWAI p JOIN DOKTER_HEWAN d ON p.no_pegawai = d.no_dokter_hewan WHERE p.email_user = %s",
                     [request.user.email]
@@ -28,7 +28,7 @@ def kunjungan_view(request):
                 if is_dokter:
                     user_role = 'dokter_hewan'
                 else:
-                    # Cek apakah pengguna adalah front desk
+                    
                     cursor.execute(
                         "SELECT 1 FROM PEGAWAI p JOIN FRONT_DESK f ON p.no_pegawai = f.no_front_desk WHERE p.email_user = %s",
                         [request.user.email]
@@ -37,7 +37,7 @@ def kunjungan_view(request):
                     if is_front_desk:
                         user_role = 'front_desk'
                     else:
-                        # Check if user is klien_individu
+                        
                         cursor.execute(
                             "SELECT 1 FROM KLIEN k JOIN INDIVIDU i ON k.no_identitas = i.no_identitas_klien WHERE k.email = %s",
                             [request.user.email]
@@ -47,7 +47,7 @@ def kunjungan_view(request):
                         if is_individu:
                             user_role = 'klien_individu'
                         else:
-                            # Check if user is klien_perusahaan
+                            
                             cursor.execute(
                                 "SELECT 1 FROM KLIEN k JOIN PERUSAHAAN p ON k.no_identitas = p.no_identitas_klien WHERE k.email = %s",
                                 [request.user.email]
@@ -57,13 +57,13 @@ def kunjungan_view(request):
                             if is_perusahaan:
                                 user_role = 'klien_perusahaan'
                             else:
-                                # If user doesn't match any known role
+                                
                                 user_role = 'unknown'
         except Exception as e:
             print(f"Error checking role: {str(e)}")
             user_role = 'klien_individu'
 
-    # Simpan role ke session
+    
     request.session['user_role'] = user_role
     request.session.modified = True
 
@@ -107,7 +107,7 @@ def kunjungan_view(request):
         print(f"Error fetching data: {str(e)}")
         kunjungans = []
 
-    # Filter kunjungan untuk klien (both individual and company)
+    
     if user_role == 'klien_individu' or user_role == 'klien_perusahaan':
         try:
             with connection.cursor() as cursor:
@@ -130,7 +130,7 @@ def kunjungan_view(request):
 def kunjungan_create(request):
     if request.method == 'POST':
         with connection.cursor() as cursor:
-            # Ambil no_front_desk dari user yang login
+            
             cursor.execute("SELECT p.no_pegawai, p.email_user FROM PEGAWAI p JOIN FRONT_DESK fd ON fd.no_front_desk = p.no_pegawai WHERE email_user = %s", [request.user.email])
             no_front_desk = cursor.fetchone()
             if not no_front_desk:
@@ -159,7 +159,7 @@ def kunjungan_create(request):
 def kunjungan_update(request, id_kunjungan):
     if request.method == 'POST':
         with connection.cursor() as cursor:
-            # Ambil no_front_desk dari user yang login
+            
             cursor.execute("SELECT p.no_pegawai, p.email_user FROM PEGAWAI p JOIN FRONT_DESK fd ON fd.no_front_desk = p.no_pegawai WHERE email_user = %s", [request.user.email])
             no_front_desk = cursor.fetchone()
             if not no_front_desk:
@@ -224,7 +224,7 @@ def rekam_medis_check(request, id_kunjungan):
             result = cursor.fetchone()
             print(f"Query result: {result}")
             if result:
-                # Periksa apakah rekam medis sudah ada (suhu dan berat_badan tidak null)
+                
                 exists = result[0] is not None and result[1] is not None
                 return JsonResponse({
                     'exists': exists,
@@ -239,14 +239,14 @@ def rekam_medis_check(request, id_kunjungan):
 
 @login_required
 def rekam_medis_create(request, id_kunjungan):
-    # Gunakan session role untuk otorisasi
+    
     if request.session.get('user_role') != 'dokter_hewan':
         return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat membuat rekam medis!'}, status=403)
 
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
-                # Cek apakah rekam medis sudah ada
+                
                 cursor.execute(
                     "SELECT suhu, berat_badan FROM KUNJUNGAN WHERE id_kunjungan = %s",
                     [id_kunjungan]
@@ -254,10 +254,10 @@ def rekam_medis_create(request, id_kunjungan):
                 result = cursor.fetchone()
                 if not result:
                     return JsonResponse({'status': 'error', 'message': 'Kunjungan tidak ditemukan!'}, status=404)
-                if result[0] is not None and result[1] is not None:  # Jika suhu dan berat_badan sudah ada
+                if result[0] is not None and result[1] is not None:  
                     return JsonResponse({'status': 'error', 'message': 'Rekam medis untuk kunjungan ini sudah ada!'}, status=400)
 
-                # Ambil data dari form
+                
                 try:
                     suhu = float(request.POST.get('suhu'))
                     berat_badan = float(request.POST.get('berat_badan'))
@@ -267,11 +267,11 @@ def rekam_medis_create(request, id_kunjungan):
                     return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus berupa angka!'}, status=400)
                 catatan = request.POST.get('catatan', '')
 
-                # Validasi data
+                
                 if not all([suhu, berat_badan]):
                     return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
 
-                # Simpan ke tabel KUNJUNGAN (sesuai skema)
+                
                 cursor.execute(
                     "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
                     [suhu, berat_badan, catatan, id_kunjungan]
@@ -283,14 +283,14 @@ def rekam_medis_create(request, id_kunjungan):
 
 @login_required
 def rekam_medis_update(request, id_kunjungan):
-    # Gunakan session role untuk otorisasi
+    
     if request.session.get('user_role') != 'dokter_hewan':
         return JsonResponse({'status': 'error', 'message': 'Hanya dokter yang dapat memperbarui rekam medis!'}, status=403)
 
     if request.method == 'POST':
         try:
             with connection.cursor() as cursor:
-                # Cek apakah rekam medis ada
+                
                 cursor.execute(
                     "SELECT suhu, berat_badan FROM KUNJUNGAN WHERE id_kunjungan = %s",
                     [id_kunjungan]
@@ -299,7 +299,7 @@ def rekam_medis_update(request, id_kunjungan):
                 if not result or result[0] is None or result[1] is None:
                     return JsonResponse({'status': 'error', 'message': 'Rekam medis tidak ditemukan!'}, status=400)
 
-                # Ambil data dari form
+                
                 try:
                     suhu = float(request.POST.get('suhu'))
                     berat_badan = float(request.POST.get('berat_badan'))
@@ -309,11 +309,11 @@ def rekam_medis_update(request, id_kunjungan):
                     return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan harus berupa angka!'}, status=400)
                 catatan = request.POST.get('catatan', '')
 
-                # Validasi data
+                
                 if not all([suhu, berat_badan]):
                     return JsonResponse({'status': 'error', 'message': 'Suhu dan berat badan wajib diisi!'}, status=400)
 
-                # Update data di tabel KUNJUNGAN
+                
                 cursor.execute(
                     "UPDATE KUNJUNGAN SET suhu = %s, berat_badan = %s, catatan = %s WHERE id_kunjungan = %s",
                     [suhu, berat_badan, catatan, id_kunjungan]
@@ -324,7 +324,7 @@ def rekam_medis_update(request, id_kunjungan):
     return JsonResponse({'status': 'error', 'message': 'Metode tidak diizinkan!'}, status=405)
 
 
-# AJAX untuk dropdown dinamis Nama Hewan
+
 def get_hewan_by_klien(request):
     no_identitas_klien = request.GET.get('no_identitas_klien')
     hewan = []

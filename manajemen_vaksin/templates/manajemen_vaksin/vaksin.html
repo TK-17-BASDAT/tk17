@@ -98,15 +98,14 @@
             </div>
             <div class="mb-6">
                 <label for="createVaksin" class="block text-sm font-medium text-gray-700 mb-1">Pilih Vaksin</label>
-                <select id="createVaksin" name="vaksin_id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" required>
-                     <option value="" disabled selected>-- Pilih Vaksin --</option>
-                    {% for vaksin_opt in vaksin_options %} {# Ganti nama variabel loop agar tidak konflik #}
-                        <option value="{{ vaksin_opt.id }}" {% if vaksin_opt.stok <= 0 %}disabled title="Stok habis"{% endif %}>
+                <select id="createVaksin" name="vaksin_id" class="w-full ..." required>
+                    <option value="" disabled selected>-- Pilih Vaksin --</option>
+                    {% for vaksin_opt in vaksin_options %}
+                        <option value="{{ vaksin_opt.id }}"> {# HAPUS atribut disabled dari sini #}
                             {{ vaksin_opt.id }} - {{ vaksin_opt.nama }} [Stok: {{ vaksin_opt.stok }}]
                         </option>
                     {% endfor %}
                 </select>
-                <p class="text-xs text-gray-500 mt-1">*Vaksin dengan stok [0] tidak dapat dipilih.</p>
             </div>
             <div class="flex justify-end gap-2 pt-4 border-t">
                 <button type="button" onclick="closeModal('createModal')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">Batal</button>
@@ -132,9 +131,9 @@
             <div class="mb-6">
                 <label for="updateVaksin" class="block text-sm font-medium text-gray-700 mb-1">Pilih Vaksin Baru</label>
                 <select id="updateVaksin" name="vaksin_id" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-slate-500 focus:border-slate-500" required>
-                     <option value="" disabled>-- Pilih Vaksin Baru --</option>
-                    {% for vaksin_opt_upd in vaksin_options %} {# Ganti nama variabel loop #}
-                        <option value="{{ vaksin_opt_upd.id }}" {% if vaksin_opt_upd.stok <= 0 %}disabled title="Stok habis"{% endif %}>
+                     <option value="" disabled selected>-- Pilih Vaksin Baru --</option> {# Tambahkan 'selected' untuk opsi default #}
+                    {% for vaksin_opt_upd in vaksin_options %}
+                        <option value="{{ vaksin_opt_upd.id }}">  {# Atribut 'disabled' dan 'title' dihapus #}
                             {{ vaksin_opt_upd.id }} - {{ vaksin_opt_upd.nama }} [Stok: {{ vaksin_opt_upd.stok }}]
                         </option>
                     {% endfor %}
