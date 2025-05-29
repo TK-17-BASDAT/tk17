@@ -3,73 +3,76 @@
 {% load i18n %}
 
 {% block content %}
-<div class="flex bg-gray-100 min-h-screen"> {# Ubah bg utama ke gray-100 untuk kontras #}
-    <!-- Sidebar -->
-    <div class="w-64 bg-white shadow-md p-4 flex-shrink-0"> 
-        {% include "navbar/sidebar.html" %} 
-    </div>
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
 
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-auto">
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <!-- Pesan Feedback -->
-            {% if messages %}
-                <div class="mb-6">
-                    {% for message in messages %}
-                    <div class="p-4 mb-4 text-sm rounded-lg 
-                        {% if message.tags == 'success' %} bg-green-100 text-green-700 border border-green-300 {% endif %}
-                        {% if message.tags == 'error' %} bg-red-100 text-red-700 border border-red-300 {% endif %}
-                        {% if message.tags == 'warning' %} bg-yellow-100 text-yellow-700 border border-yellow-300 {% endif %}
-                        {% if message.tags == 'info' %} bg-blue-100 text-blue-700 border border-blue-300 {% endif %}"
-                        role="alert">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold text-gray-800">List Data Vaksinasi Kunjungan</h1>
-                <button onclick="openCreateModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm">
-                    <i class="fas fa-plus-circle"></i> Tambah Vaksinasi
-                </button>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">No</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Kunjungan (ID - Hewan)</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Tanggal Kunjungan</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Vaksin Diberikan</th>
-                            <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white">
-                        {% if vaccinations %}
-                            {% for vac in vaccinations %}
-                            <tr class="hover:bg-gray-50" id="vaccination-row-{{ vac.kunjungan_id }}">
-                                <td class="py-3 px-4 border-b border-gray-200">{{ forloop.counter }}</td>
-                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.display_kunjungan }}</td>
-                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.tanggal_kunjungan_formatted }}</td>
-                                <td class="py-3 px-4 border-b border-gray-200">{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}</td>
-                                <td class="py-3 px-4 border-b border-gray-200 text-center flex justify-center gap-1 md:gap-2">
-                                    <button onclick="openUpdateModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-md text-xs font-medium">Update</button>
-                                    <button onclick="openDeleteModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">Delete</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="py-4 px-4 border-b border-gray-200 text-center text-gray-500">Belum ada data vaksinasi.</td>
-                            </tr>
+                <!-- Main Content -->
+                <div class="flex-1 p-6 overflow-auto">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <!-- Pesan Feedback -->
+                        {% if messages %}
+                            <div class="mb-6">
+                                {% for message in messages %}
+                                <div class="p-4 mb-4 text-sm rounded-lg 
+                                    {% if message.tags == 'success' %} bg-green-100 text-green-700 border border-green-300 {% endif %}
+                                    {% if message.tags == 'error' %} bg-red-100 text-red-700 border border-red-300 {% endif %}
+                                    {% if message.tags == 'warning' %} bg-yellow-100 text-yellow-700 border border-yellow-300 {% endif %}
+                                    {% if message.tags == 'info' %} bg-blue-100 text-blue-700 border border-blue-300 {% endif %}"
+                                    role="alert">
+                                    {{ message }}
+                                </div>
+                                {% endfor %}
+                            </div>
                         {% endif %}
-                    </tbody>
-                </table>
+
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-2xl font-semibold text-gray-800">List Data Vaksinasi Kunjungan</h1>
+                            <button onclick="openCreateModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus-circle"></i> Tambah Vaksinasi
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-sm text-left border-collapse border border-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">No</th>
+                                        <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Kunjungan (ID - Hewan)</th>
+                                        <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Tanggal Kunjungan</th>
+                                        <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600">Vaksin Diberikan</th>
+                                        <th class="py-3 px-4 border-b border-gray-200 font-medium text-gray-600 text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white">
+                                    {% if vaccinations %}
+                                        {% for vac in vaccinations %}
+                                        <tr class="hover:bg-gray-50" id="vaccination-row-{{ vac.kunjungan_id }}">
+                                            <td class="py-3 px-4 border-b border-gray-200">{{ forloop.counter }}</td>
+                                            <td class="py-3 px-4 border-b border-gray-200">{{ vac.display_kunjungan }}</td>
+                                            <td class="py-3 px-4 border-b border-gray-200">{{ vac.tanggal_kunjungan_formatted }}</td>
+                                            <td class="py-3 px-4 border-b border-gray-200">{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}</td>
+                                            <td class="py-3 px-4 border-b border-gray-200 text-center flex justify-center gap-1 md:gap-2">
+                                                <button onclick="openUpdateModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }}')" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-md text-xs font-medium">Update</button>
+                                                <button onclick="openDeleteModal('{{ vac.kunjungan_id }}', '{{ vac.vaksin_id }} - {{ vac.vaksin_nama }}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium">Delete</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="py-4 px-4 border-b border-gray-200 text-center text-gray-500">Belum ada data vaksinasi.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 </div>
 
 <!-- Modal Create -->
