@@ -107,7 +107,7 @@ def vaccination_list_view(request):
 
 def vaccination_create_view(request):
     if request.method == 'POST':
-        kunjungan_id_to_update = request.POST.get('kunjungan_id')
+        kunjungan_id_to_update = request.POST.get('kunjungan_id') 
         vaksin_kode_to_add = request.POST.get('vaksin_id')
 
         if not kunjungan_id_to_update or not vaksin_kode_to_add:
@@ -115,54 +115,57 @@ def vaccination_create_view(request):
             return redirect('manajemen_vaksin:vaccination_list')
 
         try:
-            # Transaksi tidak lagi diperlukan di sini jika trigger menangani semua secara atomik
-            # Namun, tetap baik untuk jaga-jaga jika ada operasi lain di masa depan
-            with transaction.atomic():
+            # Tidak perlu cek stok di sini lagi, biarkan trigger yang handle
+            # with connection.cursor() as cursor:
+            #     cursor.execute("SELECT stok, nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [vaksin_kode_to_add])
+            #     vaksin_info = dictfetchone(cursor)
+            #     if not vaksin_info:
+            #         messages.error(request, f"Vaksin dengan kode {vaksin_kode_to_add} tidak ditemukan.")
+            #         return redirect('manajemen_vaksin:vaccination_list')
+            #     if vaksin_info['stok'] <= 0: # Validasi stok di sisi aplikasi DIHAPUS
+            #         messages.error(request, f"Stok vaksin '{vaksin_info['nama']}' (Kode: {vaksin_kode_to_add}) habis.")
+            #         return redirect('manajemen_vaksin:vaccination_list')
+            
+            # Langsung lakukan operasi database, biarkan trigger yang bekerja
+            with transaction.atomic(): # Pastikan operasi update KUNJUNGAN dan VAKSIN (oleh trigger) atomik
                 with connection.cursor() as cursor:
-                    # Validasi 1: Cek apakah kunjungan ada dan belum ada vaksin
-                    # (Ini bisa dipertahankan sebagai validasi sisi aplikasi sebelum ke DB)
-                    cursor.execute("SELECT kode_vaksin, (SELECT nama FROM PETCLINIC.VAKSIN WHERE kode=%s LIMIT 1) as nama_vaksin_request FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [vaksin_kode_to_add, kunjungan_id_to_update])
+                    # Cek dulu apakah kunjungan memang belum ada vaksinnya
+                    cursor.execute("SELECT kode_vaksin, id_kunjungan FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [kunjungan_id_to_update])
                     kunjungan_status = dictfetchone(cursor)
-
                     if not kunjungan_status:
                         messages.error(request, f"Kunjungan dengan ID {kunjungan_id_to_update} tidak ditemukan.")
                         return redirect('manajemen_vaksin:vaccination_list')
                     if kunjungan_status.get('kode_vaksin') is not None:
-                        messages.warning(request, f"Kunjungan {kunjungan_id_to_update[:8]}... sudah memiliki data vaksin.")
+                        messages.warning(request, f"Kunjungan {str(kunjungan_status['id_kunjungan'])[:8]}... sudah memiliki data vaksin.")
                         return redirect('manajemen_vaksin:vaccination_list')
 
-                    # Operasi utama: Update Kunjungan. Trigger akan menangani stok.
-                    sql_update_kunjungan = "UPDATE PETCLINIC.KUNJUNGAN SET kode_vaksin = %s WHERE id_kunjungan = %s"
-                    params_update_kunjungan = [vaksin_kode_to_add, kunjungan_id_to_update]
 
-                    cursor.execute(sql_update_kunjungan, params_update_kunjungan)
+                    sql_update_kunjungan = "UPDATE PETCLINIC.KUNJUNGAN SET kode_vaksin = %s WHERE id_kunjungan = %s"
+                    cursor.execute(sql_update_kunjungan, [vaksin_kode_to_add, kunjungan_id_to_update])
 
                     if cursor.rowcount > 0:
+                        # Pengurangan stok sekarang ditangani oleh trigger, jadi tidak perlu query UPDATE VAKSIN di sini
+                        # Cukup tampilkan pesan sukses
                         # Ambil nama vaksin untuk pesan sukses
                         cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [vaksin_kode_to_add])
-                        vaksin_info = dictfetchone(cursor)
-                        nama_vaksin_display = vaksin_info['nama'] if vaksin_info else vaksin_kode_to_add
-                        messages.success(request, f"Vaksin '{nama_vaksin_display}' berhasil ditambahkan ke kunjungan {kunjungan_id_to_update[:8]}...")
+                        vaksin_nama_for_msg = dictfetchone(cursor)['nama'] if cursor.rowcount > 0 else vaksin_kode_to_add
+                        messages.success(request, f"Vaksin '{vaksin_nama_for_msg}' berhasil ditambahkan ke kunjungan {kunjungan_id_to_update[:8]}...")
                     else:
-                        # Ini seharusnya tidak terjadi jika validasi di atas lolos, kecuali ada race condition
-                        messages.error(request, f"Gagal mengupdate kunjungan {kunjungan_id_to_update[:8]}...")
-
-        except IntegrityError as e:
-            # Misalnya jika ada constraint lain yang dilanggar
-            messages.error(request, f"Gagal menambahkan vaksinasi (Kesalahan Integritas Data): {e}")
-            print(f"DEBUG - IntegrityError in create: {e}")
-        except DatabaseError as e:
-            # Tangkap error dari trigger (misal, stok habis, vaksin tidak ditemukan oleh trigger)
-            # Pesan error dari RAISE EXCEPTION akan ada di e.args[0] atau str(e)
+                        messages.error(request, f"Gagal mengupdate kunjungan {kunjungan_id_to_update[:8]}.... Kunjungan mungkin tidak ditemukan atau sudah memiliki vaksin.")
+        
+        except (IntegrityError, DatabaseError) as e: # Tangkap error dari DB, termasuk dari trigger
+            # Pesan error dari trigger (RAISE EXCEPTION) akan ada di e
             error_message = str(e)
-            if "ERROR:" in error_message: # Coba ekstrak pesan dari trigger
-                error_message = error_message.split("ERROR:", 1)[1].split("CONTEXT:",1)[0].split("DETAIL:",1)[0].strip()
-            messages.error(request, f"Gagal menambahkan vaksinasi: {error_message}")
-            print(f"DEBUG - DatabaseError in create: {e}")
+            # Cek apakah pesan mengandung format error stok dari trigger
+            if "tidak mencukupi untuk vaksinasi" in error_message or "Vaksin dengan kode" in error_message and "tidak ditemukan" in error_message :
+                messages.error(request, error_message) # Tampilkan pesan error dari trigger
+            else:
+                messages.error(request, f"Gagal menambahkan vaksinasi: {error_message}")
+            print(f"Error creating vaccination: {error_message}")
         except Exception as e:
             messages.error(request, f"Terjadi kesalahan tidak terduga: {e}")
-            print(f"DEBUG - Exception in create: {e}")
-
+            print(f"Unexpected error creating vaccination: {e}")
+        
         return redirect('manajemen_vaksin:vaccination_list')
 
     return redirect('manajemen_vaksin:vaccination_list')
@@ -175,47 +178,48 @@ def vaccination_update_view(request, kunjungan_id):
         if not new_vaksin_kode:
             messages.error(request, "Vaksin baru harus dipilih untuk update.")
             return redirect('manajemen_vaksin:vaccination_list')
-
+        
         try:
+            # Tidak perlu cek stok di sini lagi, biarkan trigger yang handle
             with transaction.atomic():
                 with connection.cursor() as cursor:
-                    # 1. Dapatkan kode vaksin lama (opsional, hanya untuk pesan info jika sama)
+                    # Dapatkan kode vaksin lama (trigger akan mengembalikan stoknya)
+                    # dan pastikan kunjungan ada
                     cursor.execute("SELECT kode_vaksin FROM PETCLINIC.KUNJUNGAN WHERE id_kunjungan = %s", [kunjungan_id])
                     kunjungan_data = dictfetchone(cursor)
-
+                    
                     if not kunjungan_data:
                         messages.error(request, f"Kunjungan dengan ID {str(kunjungan_id)[:8]}... tidak ditemukan.")
                         return redirect('manajemen_vaksin:vaccination_list')
-
+                    
                     old_vaksin_kode = kunjungan_data.get('kode_vaksin')
 
                     if old_vaksin_kode == new_vaksin_kode:
                         messages.info(request, "Tidak ada perubahan vaksin.")
                         return redirect('manajemen_vaksin:vaccination_list')
 
-                    # Operasi utama: Update Kunjungan. Trigger akan menangani stok lama dan baru.
+                    # Langsung update, trigger akan menangani stok lama dan baru
                     cursor.execute("UPDATE PETCLINIC.KUNJUNGAN SET kode_vaksin = %s WHERE id_kunjungan = %s", [new_vaksin_kode, kunjungan_id])
 
                     if cursor.rowcount > 0:
-                         # Ambil nama vaksin baru untuk pesan sukses
+                        # Ambil nama vaksin baru untuk pesan
                         cursor.execute("SELECT nama FROM PETCLINIC.VAKSIN WHERE kode = %s", [new_vaksin_kode])
-                        new_vaksin_info = dictfetchone(cursor)
-                        nama_vaksin_display = new_vaksin_info['nama'] if new_vaksin_info else new_vaksin_kode
-                        messages.success(request, f"Vaksinasi untuk kunjungan {str(kunjungan_id)[:8]}... berhasil diupdate ke '{nama_vaksin_display}'.")
+                        vaksin_nama_for_msg = dictfetchone(cursor)['nama'] if cursor.rowcount > 0 else new_vaksin_kode
+                        messages.success(request, f"Vaksinasi untuk kunjungan {str(kunjungan_id)[:8]}... berhasil diupdate ke '{vaksin_nama_for_msg}'.")
                     else:
-                        # Ini mungkin terjadi jika kunjungan_id tidak valid atau tidak ada perubahan
                         messages.warning(request, f"Tidak ada data vaksinasi yang diupdate untuk kunjungan {str(kunjungan_id)[:8]}....")
 
-        except DatabaseError as e:
+        except (IntegrityError, DatabaseError) as e:
             error_message = str(e)
-            if "ERROR:" in error_message:
-                error_message = error_message.split("ERROR:", 1)[1].split("CONTEXT:",1)[0].split("DETAIL:",1)[0].strip()
-            messages.error(request, f"Gagal mengupdate vaksinasi: {error_message}")
-            print(f"DEBUG - DatabaseError in update: {e}")
+            if "tidak mencukupi untuk vaksinasi" in error_message or "Vaksin dengan kode" in error_message and "tidak ditemukan" in error_message or "tidak mencukupi untuk penggantian vaksinasi" in error_message :
+                messages.error(request, error_message)
+            else:
+                messages.error(request, f"Gagal mengupdate vaksinasi: {error_message}")
+            print(f"Error updating vaccination for {kunjungan_id}: {error_message}")
         except Exception as e:
             messages.error(request, f"Terjadi kesalahan tidak terduga saat update: {e}")
-            print(f"DEBUG - Exception in update: {e}")
-
+            print(f"Unexpected error updating vaccination for {kunjungan_id}: {e}")
+        
         return redirect('manajemen_vaksin:vaccination_list')
 
     return redirect('manajemen_vaksin:vaccination_list')
