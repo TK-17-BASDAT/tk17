@@ -1,16 +1,12 @@
+# tk17/kunjungan/urls.py
 from django.urls import path
 from . import views
 
 app_name = 'kunjungan'
 
 urlpatterns = [
-    path('', views.kunjungan_view, name='kunjungan_view'),
-    path('create/', views.kunjungan_create, name='kunjungan_create'),
-    path('update/<uuid:id_kunjungan>/', views.kunjungan_update, name='kunjungan_update'),
-    path('delete/<uuid:id_kunjungan>/', views.kunjungan_delete, name='kunjungan_delete'),
-    path('data/<uuid:id_kunjungan>/', views.kunjungan_data, name='kunjungan_data'),
-    path('get-hewan/', views.get_hewan_by_klien, name='get_hewan_by_klien'),
-    path('rekam-medis/check/<uuid:id_kunjungan>/', views.rekam_medis_check, name='rekam_medis_check'),
-    path('rekam-medis/create/<uuid:id_kunjungan>/', views.rekam_medis_create, name='rekam_medis_create'),
-    path('rekam-medis/update/<uuid:id_kunjungan>/', views.rekam_medis_update, name='rekam_medis_update'),
+    path('', views.list_kunjungan_view, name='list_all_kunjungan'),
+    path('tambah/', views.tambah_kunjungan_view, name='tambah_kunjungan'),
+    path('rekam-medis/<str:id_kunjungan>/<str:nama_hewan>/<str:no_identitas_klien>/<str:no_front_desk>/<str:no_perawat_hewan>/<str:no_dokter_hewan>/', 
+         views.rekam_medis_view, name='rekam_medis_detail'),
 ]
