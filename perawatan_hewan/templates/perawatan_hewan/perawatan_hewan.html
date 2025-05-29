@@ -8,9 +8,9 @@
     <main class="flex-1 ml-64 overflow-y-auto">
         <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
             <div class="w-full bg-white rounded-xl shadow-md p-8">
-    <!-- Main content -->
+    
                 <div class="flex-1 p-8">
-                    <!-- Header -->
+                    
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-3xl font-semibold text-primary">Daftar Perawatan Hewan</h1>
                         {% if request.session.user_role == 'dokter_hewan' %}
@@ -20,7 +20,7 @@
                         {% endif %}
                     </div>
 
-                    <!-- List Perawatan -->
+                    
                     <div class="bg-white rounded-lg shadow overflow-x-auto">
                         <table class="table-auto w-full border-separate border-spacing-0">
                             <thead class="bg-primary text-white">
@@ -70,7 +70,7 @@
                     </div>
 
                     {% if request.session.user_role == 'dokter_hewan' %}
-                        <!-- Create Perawatan Modal -->
+                        
                         <div id="create-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
                             <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
                                 <div class="flex justify-between items-center mb-4">
@@ -121,10 +121,10 @@
                                         <label for="jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
                                         <select name="jenis_perawatan" id="jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                                             <option value="" disabled selected>Pilih Jenis Perawatan</option>
-                                            <option value="TRM001 - Dental Care">TRM001 - Pemeriksaan Umum</option>
-                                            <option value="TRM002 - Vaccination">TRM002 - Vaksinasi</option>
-                                            <option value="TRM003 - Surgery">TRM003 - Dental Care</option>
-                                            <option value="TRM004 - Check-Up">TRM004 - Grooming</option>
+                                            <option value="TRM001 - Pemeriksaan Umum">TRM001 - Pemeriksaan Umum</option>
+                                            <option value="TRM002 - Vaksinasi">TRM002 - Vaksinasi</option>
+                                            <option value="TRM003 - Dental Care">TRM003 - Dental Care</option>
+                                            <option value="TRM004 - Grooming">TRM004 - Grooming</option>
                                             <option value="TRM005 - Sterilisasi">TRM005 - Sterilisasi</option>
                                         </select>
                                     </div>
@@ -144,7 +144,7 @@
                             </div>
                         </div>
 
-                        <!-- Update Perawatan Modal -->
+                        
                         <div id="update-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
                             <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
                                 <div class="flex justify-between items-center mb-4">
@@ -161,10 +161,11 @@
                                         <label for="update_jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
                                         <select name="jenis_perawatan" id="update_jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                                             <option value="" disabled selected>Pilih Jenis Perawatan</option>
-                                            <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
-                                            <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
-                                            <option value="TRM003 - Surgery">TRM003 - Surgery</option>
-                                            <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
+                                            <option value="TRM001 - Pemeriksaan Umum">TRM001 - Pemeriksaan Umum</option>
+                                            <option value="TRM002 - Vaksinasi">TRM002 - Vaksinasi</option>
+                                            <option value="TRM003 - Dental Care">TRM003 - Dental Care</option>
+                                            <option value="TRM004 - Grooming">TRM004 - Grooming</option>
+                                            <option value="TRM005 - Sterilisasi">TRM005 - Sterilisasi</option>
                                         </select>
                                     </div>
                                     <div>
@@ -183,7 +184,7 @@
                             </div>
                         </div>
 
-                        <!-- Delete Confirmation Modal -->
+                        
                         <div id="delete-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
                             <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
                                 <div class="flex justify-between items-center mb-4">
@@ -217,7 +218,7 @@
     const userRole = "{{ request.session.user_role|escapejs }}";
 
     if (userRole === 'dokter_hewan') {
-        // Create Perawatan
+        
         document.getElementById('create-perawatan-btn')?.addEventListener('click', () => {
             document.getElementById('create-perawatan-modal').classList.remove('hidden');
         });
@@ -230,7 +231,7 @@
             document.getElementById('front_desk_display').value = '';
             document.getElementById('dokter_display').value = '';
             document.getElementById('perawat_display').value = '';
-            document.getElementById('create_catatan_lama').value = ''; // Reset catatan lama
+            document.getElementById('create_catatan_lama').value = ''; 
             document.getElementById('jenis_perawatan').value = '';
             document.getElementById('catatan_medis').value = '';
         });
@@ -243,14 +244,14 @@
             const dokterEmail = selectedOption.getAttribute('data-dokter-email');
             const perawatEmail = selectedOption.getAttribute('data-perawat-email');
 
-            // Update display fields
+            
             document.getElementById('id_kunjungan_display').value = idKunjungan || 'N/A';
             document.getElementById('id_klien_display').value = idKlien || 'N/A';
             document.getElementById('front_desk_display').value = frontDeskEmail || 'N/A';
             document.getElementById('dokter_display').value = dokterEmail || 'N/A';
             document.getElementById('perawat_display').value = perawatEmail || 'N/A';
 
-            // Fetch catatan lama dari kunjungan
+            
             if (idKunjungan) {
                 try {
                     const response = await fetch(`/perawatan-hewan/data/${idKunjungan}/`);
@@ -297,7 +298,7 @@
             }
         });
 
-        // Update Perawatan
+        
         document.querySelectorAll('.update-perawatan-btn')?.forEach(button => {
             button.addEventListener('click', async () => {
                 const idKunjungan = button.getAttribute('data-id');
@@ -353,7 +354,7 @@
             }
         });
 
-        // Delete Perawatan
+        
         document.querySelectorAll('.delete-perawatan-btn')?.forEach(button => {
             button.addEventListener('click', () => {
                 const idKunjungan = button.getAttribute('data-id');
