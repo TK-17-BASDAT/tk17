@@ -7,7 +7,7 @@
     <main class="flex-1 ml-64 overflow-y-auto">
         <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
             <div class="w-full bg-white rounded-xl shadow-md p-8">
-            <!-- Pesan Feedback -->
+            
             {% if messages %}
                 <div class="mb-6"> {# Memberi jarak bawah jika ada pesan #}
                 {% for message in messages %}
@@ -77,7 +77,7 @@
         </div>
     </div>
 </div>
-<!-- Modal Create -->
+
 <div id="createModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Create New Vaccine</h2>
@@ -107,11 +107,11 @@
     </div>
 </div>
 
-<!-- Modal Update Info -->
+
 <div id="updateModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Update Vaccine Info</h2>
-        <form method="POST" action="" id="updateVaksinForm"> <!-- Action akan diisi JS -->
+        <form method="POST" action="" id="updateVaksinForm"> 
             {% csrf_token %}
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">ID Vaksin</label>
@@ -133,11 +133,11 @@
     </div>
 </div>
 
-<!-- Modal Update Stock -->
+
 <div id="stockModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md">
         <h2 class="text-xl font-semibold mb-4">Update Vaccine Stock</h2>
-        <form method="POST" action="" id="stockUpdateForm"> <!-- Action akan diisi JS -->
+        <form method="POST" action="" id="stockUpdateForm"> 
             {% csrf_token %}
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">ID Vaksin</label>
@@ -159,11 +159,11 @@
     </div>
 </div>
 
-<!-- Modal Delete -->
+
 <div id="deleteModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-md text-center">
         <h2 class="text-xl font-semibold text-red-500 mb-4">Delete Vaccine</h2>
-        <form method="POST" action="" id="deleteVaksinForm"> <!-- Action akan diisi JS -->
+        <form method="POST" action="" id="deleteVaksinForm"> 
             {% csrf_token %}
             <p class="mb-6 text-sm">Apakah kamu yakin untuk menghapus vaksin <span id="deleteNamaVaksin" class="font-semibold"></span> dengan ID <span id="deleteIDVaksin" class="font-semibold"></span>?</p>
             <div class="flex justify-center gap-2">
@@ -175,7 +175,7 @@
 </div>
 
 <script>
-    // URL dasar dari Django template
+    
     const baseUpdateURL = "{% url 'datavaksin:vaccine_data_update' 'KODE_PLACEHOLDER' %}";
     const baseStockUpdateURL = "{% url 'datavaksin:vaccine_stock_update' 'KODE_PLACEHOLDER' %}";
     const baseDeleteURL = "{% url 'datavaksin:vaccine_data_delete' 'KODE_PLACEHOLDER' %}";
@@ -202,7 +202,7 @@
             })
             .then(data => {
                 if (data.error) {
-                    alert(data.error); // Tampilkan error jika ada dari JSON response
+                    alert(data.error); 
                     return;
                 }
                 document.getElementById('updateIDVaksin').value = data.kode || '';
@@ -249,14 +249,14 @@
         }
     }
 
-    // Tidak ada flag open_create_modal_on_load lagi karena kita redirect dan tampilkan message global
-    // document.addEventListener('DOMContentLoaded', function() { ... });
+    
+    
 
     window.onclick = function(event) {
         const modals = ['createModal', 'updateModal', 'stockModal', 'deleteModal'];
         for (const modalId of modals) {
             const modalElement = document.getElementById(modalId);
-            if (modalElement && event.target == modalElement) { // Pastikan modalElement ada
+            if (modalElement && event.target == modalElement) { 
                 closeModal(modalId);
             }
         }
