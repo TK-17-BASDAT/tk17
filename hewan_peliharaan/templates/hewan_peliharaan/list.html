@@ -16,18 +16,18 @@
             </button>
           </div>
     
-          <!-- Card Layout -->
+          
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for hewan in hewan_list %}
             <div class="bg-primary text-white rounded-lg shadow-md overflow-hidden">
               <div class="flex p-4">
-                <!-- Pet Image -->
+                
                 <div class="w-1/3 mr-4">
                   <img src="{{ hewan.url_foto }}" alt="{{ hewan.nama_hewan }}" 
                       class="w-full h-40 object-cover rounded-md bg-white">
                 </div>
                 
-                <!-- Pet Details -->
+                
                 <div class="w-2/3 flex flex-col">
                   <div class="flex-1">
                     <div class="grid grid-cols-[auto,auto,1fr] gap-x-1 mb-1">
@@ -52,7 +52,7 @@
                     </div>
                   </div>
                   
-                  <!-- Actions -->
+                  
                   <div class="flex justify-end space-x-2 mt-2">
                     <button class="btn-update bg-secondary text-white px-4 py-1 rounded transition"
                             data-url="{% url 'hewan_peliharaan:update' hewan.id %}">
@@ -78,7 +78,7 @@
         </div>
       </div>
   
-      <!-- Modal container - unchanged -->
+      
       <div id="modal"
           class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
         <div id="modal-content" class="bg-white rounded-lg shadow-xl w-1/3 p-6"></div>
@@ -98,24 +98,24 @@
           content.innerHTML = '';
         }
   
-        // Create button
+        
         document.getElementById('btn-create').addEventListener('click', ()=>{
           fetch("{% url 'hewan_peliharaan:create' %}")
             .then(r => r.text())
             .then(openModal);
         });
   
-        // Update buttons
+        
         document.querySelectorAll('.btn-update').forEach(btn=>{
           btn.onclick = ()=> fetch(btn.dataset.url).then(r=>r.text()).then(openModal);
         });
         
-        // Delete buttons (only for front desk)
+        
         document.querySelectorAll('.btn-delete').forEach(btn=>{
           btn.onclick = ()=> fetch(btn.dataset.url).then(r=>r.text()).then(openModal);
         });
   
-        // AJAX form submit
+        
         modal.addEventListener('submit', e=>{
           e.preventDefault();
           const form = e.target,
@@ -135,7 +135,7 @@
           });
         });
   
-        // Cancel/error OK
+        
         modal.addEventListener('click', e=>{
           if(e.target===modal || e.target.classList.contains('btn-cancel')){
             closeModal();

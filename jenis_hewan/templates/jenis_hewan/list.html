@@ -62,7 +62,7 @@
                 </div>
             </div>
         
-            <!-- Modal -->
+            
             <div id="modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
                 <div id="modal-content" class="bg-white rounded-lg shadow-xl w-1/3 p-6"></div>
             </div>
@@ -70,7 +70,7 @@
     </main>
 </div>
 
-<!-- Pass data to JavaScript -->
+
 <input type="hidden" id="user-role" value="{{ request.session.user_role }}">
 <input type="hidden" id="create-url" value="{% url 'jenis_hewan:create' %}">
 
@@ -90,9 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = '';
     }
 
-    // Only setup interactive elements if user is front_desk
+    
     if (userRole === 'front_desk') {
-        // Create button
+        
         const createBtn = document.getElementById('btn-create');
         if (createBtn) {
             const createUrl = document.getElementById('create-url').value;
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // Update & Delete buttons
+        
         document.querySelectorAll('.btn-update').forEach(btn => {
             btn.onclick = () => fetch(btn.dataset.url)
                 .then(r => r.text())
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(openModal);
         });
 
-        // Handle form submissions via AJAX
+        
         modal.addEventListener('submit', e => {
             e.preventDefault();
             const form = e.target,
@@ -132,10 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(json.success){
                     location.reload();
                 } else {
-                    // Error occurred, display the updated form with errors
+                    
                     content.innerHTML = json.html;
                     
-                    // Highlight error messages
+                    
                     const errorDiv = content.querySelector('.bg-red-100');
                     if (errorDiv) {
                       errorDiv.scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Close on cancel or click-outside
+    
     modal.addEventListener('click', e => {
         if(e.target === modal || e.target.classList.contains('btn-cancel')){
             closeModal();

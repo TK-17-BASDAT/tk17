@@ -9,9 +9,6 @@ from django.http import HttpResponseForbidden
 
 
 def role_required(allowed_roles):
-    """
-    Decorator to check if user has the required role
-    """
     def decorator(view_func):
         @login_required
         def wrapped_view(request, *args, **kwargs):
@@ -26,11 +23,6 @@ def role_required(allowed_roles):
 @login_required
 @role_required(['front_desk', 'klien_individu', 'klien_perusahaan'])
 def list_hewan_peliharaan(request):
-    """
-    Display a list of pets
-    - Front Desk Officer can see all pets
-    - Client can only see their own pets
-    """
     user_role = request.session.get('user_role')
     
     
@@ -153,11 +145,6 @@ def list_hewan_peliharaan(request):
 @login_required
 @role_required(['front_desk', 'klien_individu', 'klien_perusahaan'])
 def create_hewan_peliharaan(request):
-    """
-    Create a new pet
-    - Front Desk Officer can create pets for any client
-    - Client can only create pets for themselves
-    """
     user_role = request.session.get('user_role')
     
     
@@ -243,11 +230,6 @@ def create_hewan_peliharaan(request):
 @login_required
 @role_required(['front_desk', 'klien_individu', 'klien_perusahaan'])
 def update_hewan_peliharaan(request, id):
-    """
-    Update an existing pet
-    - Front Desk Officer can update any pet including changing the owner
-    - Client can only update their own pets and cannot change the owner
-    """
     user_role = request.session.get('user_role')
     client_id = None
     
@@ -417,10 +399,6 @@ def update_hewan_peliharaan(request, id):
 @login_required
 @role_required(['front_desk'])
 def delete_hewan_peliharaan(request, id):
-    """
-    Delete a pet - only Front Desk Officers can delete pets
-    Pets can only be deleted if they have no active visits
-    """
     user_role = request.session.get('user_role')
     if user_role != 'front_desk':
         return HttpResponseForbidden("Only Front Desk Officers can delete pets.")
@@ -485,12 +463,12 @@ def delete_hewan_peliharaan(request, id):
             
         except Exception as e:
             error_message = str(e)
-            # Check if this is our custom trigger error about active visits
+            
             if "masih memiliki kunjungan aktif" in error_message:
-                # This is our trigger error, extract it directly
+                
                 messages.error(request, error_message)
             else:
-                # Generic database error
+                
                 messages.error(request, f"Failed to delete pet: {error_message}")
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

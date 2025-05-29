@@ -3,7 +3,7 @@
   <h2 class="text-xl font-semibold mb-4">Update Pet</h2>
 
   {% if user_role == 'front_desk' %}
-  <!-- Only front desk can see and change owner -->
+  
   <div class="mb-4">
     <label class="block text-gray-700">Pemilik</label>
     <select name="pemilik" class="w-full border rounded px-3 py-2" required>
@@ -13,7 +13,7 @@
     </select>
   </div>
   {% else %}
-  <!-- Client users get a hidden field to maintain their owner ID -->
+  
   <input type="hidden" name="pemilik" value="{{ no_identitas_klien }}">
   {% endif %}
 

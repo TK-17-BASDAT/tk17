@@ -84,12 +84,12 @@ def create_jenis_hewan(request):
             
         except Exception as e:
             error_message = str(e)
-            # Check if this is custom trigger error about duplicate jenis
+            
             if "Jenis hewan" in error_message and "sudah terdaftar dengan ID" in error_message:
-                # trigger error, extract it directly
+                
                 messages.error(request, error_message)
             else:
-                # Generic database error
+                
                 messages.error(request, f"Gagal menambahkan jenis hewan: {error_message}")
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

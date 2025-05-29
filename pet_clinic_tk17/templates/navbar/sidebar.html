@@ -1,5 +1,5 @@
 <aside class="fixed inset-y-0 left-0 w-64 bg-primary border-r border-secondary shadow-sm">
-  <!-- Logo dan Identitas Pengguna -->
+  
   <div class="px-6 py-5 border-b-4 border-secondary">
     <a href="{% url 'home' %}" class="block mb-3">
       <h1 class="text-2xl font-bold text-white">PetClinic</h1>
@@ -27,7 +27,7 @@
     </div>
   </div>
   
-  <!-- Menu Header -->
+  
   <div class="px-6 py-4">
     {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
       <h2 class="text-lg font-semibold text-white">Menu Klien</h2>
@@ -42,7 +42,7 @@
   
   <nav class="px-4 py-2">
     <ul class="space-y-1">
-      <!-- Dashboard - different URL for each role -->
+      
       <li>
         {% if request.session.user_role == 'klien_individu' %}
           {% url 'dashboard:klien' as dashboard_url %}
@@ -77,7 +77,7 @@
         {% endif %}
       </li>
       
-      <!-- Kelola/Daftar Jenis Hewan -->
+      
       {% if request.session.user_role == 'front_desk' %}
       <li>
         {% url 'jenis_hewan:list' as jenis_hewan_url %}
@@ -96,7 +96,7 @@
       </li>
       {% endif %}
       
-      <!-- Perawatan Hewan (dokter only) -->
+      
       {% if request.session.user_role == 'dokter_hewan' %}
       <li>
         {% url 'perawatan_hewan:perawatan_view' as perawatan_url %}
@@ -107,7 +107,7 @@
       </li>
       {% endif %}
       
-      <!-- Hewan Peliharaan -->
+      
       {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' or request.session.user_role == 'front_desk' %}
       <li>
         {% url 'hewan_peliharaan:list' as hewan_url %}
@@ -120,7 +120,7 @@
       </li>
       {% endif %}
       
-      <!-- Kunjungan -->
+      
       {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
       <li>
         {% url 'kunjungan:kunjungan_view' as kunjungan_url %}
@@ -147,7 +147,7 @@
       </li>
       {% endif %}
       
-      <!-- Vaksinasi/Vaksin -->
+      
       {% if request.session.user_role == 'klien_individu' or request.session.user_role == 'klien_perusahaan' %}
       <li>
         {% url 'manajemen_vaksin:client_vaccination_history' as vaksin_url %}
@@ -174,7 +174,7 @@
       </li>
       {% endif %}
       
-      <!-- Daftar Klien (front-desk only) -->
+      
       {% if request.session.user_role == 'front_desk' %}
       <li>
         {% url 'dataklien:client_list' as klien_url %}
@@ -185,7 +185,7 @@
       </li>
       {% endif %}
 
-      <!-- Logout - common for all users -->
+      
       <li>
         {% url 'authentication:logout' as logout_url %}
         <a href="{{ logout_url }}" class="flex items-center px-3 py-2 rounded hover:bg-secondary transition-colors">

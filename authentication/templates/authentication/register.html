@@ -7,7 +7,7 @@
     <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6">
       <h2 class="text-2xl font-semibold text-center mb-6">Register Akun</h2>
 
-      <!-- Tabs -->
+      
       <div class="border-b mb-6">
         <nav class="-mb-px flex space-x-4 overflow-x-auto">
           <button data-tab="klien_individu" class="tab-btn pb-2 px-3 text-gray-600 font-medium border-b-2 border-transparent hover:text-accent">
@@ -27,8 +27,8 @@
           </button>
         </nav>
       </div>
-      <!-- Tab Contents -->
-      <div>        <!-- 1. Klien Individu -->
+      
+      <div>        
         <form id="klien_individu" method="post" action="" class="tab-content space-y-4">
           {% csrf_token %}
           <input type="hidden" name="form_type" value="klien_individu">
@@ -72,7 +72,7 @@
           </p>
         </form>
 
-        <!-- 2. Klien Perusahaan -->
+        
         <form id="klien_perusahaan" method="post" action="" class="tab-content hidden space-y-4">
           {% csrf_token %}
           <input type="hidden" name="form_type" value="klien_perusahaan">
@@ -106,7 +106,7 @@
           </p>
         </form>
 
-        <!-- 3. Front-Desk Officer -->
+        
         <form id="frontdesk" method="post" action="" class="tab-content hidden space-y-4">
           {% csrf_token %}
           <input type="hidden" name="form_type" value="front_desk">
@@ -140,11 +140,11 @@
           </p>
         </form>
 
-        <!-- ==== 4. Dokter Hewan ==== -->
+        
         <form id="dokter" method="post" action="" class="tab-content hidden space-y-4">
           {% csrf_token %}
           <input type="hidden" name="form_type" value="dokter_hewan">
-            <!-- Informasi Umum -->
+            
             <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
               <input type="text" name="no_izin_praktik" class="w-full border rounded px-3 py-2" required/>
             </div>            <div><label class="block text-gray-700">Email *</label>
@@ -163,7 +163,7 @@
               <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
             </div>
   
-            <!-- Sertifikat -->
+            
             <div id="dokter-sertifikat-section" class="space-y-2">
               <h3 class="font-medium">Sertifikat</h3>
               <button type="button" onclick="addDokterCert()"
@@ -184,7 +184,7 @@
                   </div>
                 </div>
               </div>
-            </div>            <!-- Jadwal Praktik -->
+            </div>            
             <div id="dokter-jadwal-section" class="space-y-2">
               <h3 class="font-medium">Jadwal Praktik</h3>
               <button type="button" onclick="addDokterSchedule()"
@@ -222,11 +222,11 @@
               </a>
             </p>
           </form>          
-          <!-- ==== 5. Perawat Hewan ==== -->
+          
           <form id="perawat" method="post" action="" class="tab-content hidden space-y-4">
             {% csrf_token %}
             <input type="hidden" name="form_type" value="perawat_hewan">
-            <!-- Informasi Umum -->
+            
             <div><label class="block text-gray-700">Nomor Izin Praktik *</label>
               <input type="text" name="no_izin_praktik" class="w-full border rounded px-3 py-2" required/>
             </div>
@@ -245,7 +245,7 @@
               <textarea name="alamat" class="w-full border rounded px-3 py-2" rows="3" required></textarea>
             </div>
   
-            <!-- Sertifikat -->
+            
             <div id="perawat-sertifikat-section" class="space-y-2">
               <h3 class="font-medium">Sertifikat</h3>
               <button type="button" onclick="addPerawatCert()"
