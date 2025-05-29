@@ -49,7 +49,7 @@
                                 <td class="py-2 px-4 border-b border-gray-200 text-center">{{ forloop.counter }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ vaksin.kode }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ vaksin.nama }}</td>
-                                <td class="py-2 px-4 border-b border-gray-200 text-right">Rp{{ vaksin.harga|floatformat:0 }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200 text-right">Rp<span class="harga-vaksin" data-harga="{{ vaksin.harga }}">{{ vaksin.harga }}</span></td>
                                 <td class="py-2 px-4 border-b border-gray-200 text-center">{{ vaksin.stok }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200 text-center">
                                     <div class="flex justify-center items-center gap-1 md:gap-2">
@@ -249,7 +249,20 @@
         }
     }
 
-    
+    function formatNumberWithDots(number) {
+        if (number === null || number === undefined) return '0'; 
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Format semua harga di tabel
+        document.querySelectorAll('.harga-vaksin').forEach(function(element) {
+            const hargaAsli = parseInt(element.dataset.harga, 10);
+            if (!isNaN(hargaAsli)) {
+                element.textContent = formatNumberWithDots(hargaAsli);
+            }
+        });
+    });
+        
     
 
     window.onclick = function(event) {
