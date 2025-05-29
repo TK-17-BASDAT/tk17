@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Perawatan Hewan - PetClinic{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r shadow-sm">
+        {% include 'navbar/sidebar.html' %}
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-semibold text-primary">Daftar Perawatan Hewan</h1>
+            {% if request.session.user_role == 'dokter_hewan' %}
+                <button type="button" id="create-perawatan-btn" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                    + Create New Treatment
+                </button>
+            {% endif %}
+        </div>
+
+        <!-- List Perawatan -->
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="table-auto w-full border-separate border-spacing-0">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left">ID Kunjungan</th>
+                        <th class="px-4 py-3 text-left">ID Klien</th>
+                        <th class="px-4 py-3 text-left">Nama Hewan</th>
+                        <th class="px-4 py-3 text-left">Email Perawat</th>
+                        <th class="px-4 py-3 text-left">Email Dokter</th>
+                        <th class="px-4 py-3 text-left">Email Front Desk</th>
+                        <th class="px-4 py-3 text-left">Jenis Perawatan</th>
+                        <th class="px-4 py-3 text-left">Catatan Medis</th>
+                        {% if request.session.user_role == 'dokter_hewan' %}
+                            <th class="px-4 py-3 text-left">Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for perawatan in perawatans %}
+                        <tr>
+                            <td class="px-4 py-3">{{ perawatan.id_kunjungan }}</td>
+                            <td class="px-4 py-3">{{ perawatan.no_identitas_klien }}</td>
+                            <td class="px-4 py-3">{{ perawatan.nama_hewan }}</td>
+                            <td class="px-4 py-3">{{ perawatan.perawat_email }}</td>
+                            <td class="px-4 py-3">{{ perawatan.dokter_email }}</td>
+                            <td class="px-4 py-3">{{ perawatan.front_desk_email }}</td>
+                            <td class="px-4 py-3">{{ perawatan.jenis_perawatan|default:'N/A' }}</td>
+                            <td class="px-4 py-3">{{ perawatan.catatan_medis|default:'-' }}</td>
+                            {% if request.session.user_role == 'dokter_hewan' %}
+                                <td class="px-4 py-3 space-x-2">
+                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" data-jenis-perawatan="{{ perawatan.jenis_perawatan|default:'N/A' }}" data-catatan-medis="{{ perawatan.catatan_medis|default:'' }}" class="update-perawatan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                        Update
+                                    </button>
+                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" class="delete-perawatan-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                        Delete
+                                    </button>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{% if request.session.user_role == 'dokter_hewan' %}9{% else %}8{% endif %}" class="px-4 py-3 text-center text-gray-500">Tidak ada data perawatan.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if request.session.user_role == 'dokter_hewan' %}
+            <!-- Create Perawatan Modal -->
+            <div id="create-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-primary">Create New Treatment</h2>
+                    </div>
+                    <form method="post" id="create-perawatan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="id_kunjungan" class="block text-sm font-medium text-gray-700">Kunjungan</label>
+                            <select name="id_kunjungan" id="id_kunjungan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Kunjungan</option>
+                                {% for kunjungan in kunjungans %}
+                                    <option value="{{ kunjungan.id_kunjungan }}"
+                                            data-id-klien="{{ kunjungan.no_identitas_klien }}"
+                                            data-front-desk-email="{{ kunjungan.no_front_desk }}"
+                                            data-dokter-email="{{ kunjungan.no_dokter_hewan }}"
+                                            data-perawat-email="{{ kunjungan.no_perawat_hewan }}">
+                                        Kunjungan {{ kunjungan.id_kunjungan }} - Klien: {{ kunjungan.no_identitas_klien }} - Hewan: {{ kunjungan.nama_hewan }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
+                            <input type="text" id="id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="id_klien_display" class="block text-sm font-medium text-gray-700">ID Klien</label>
+                            <input type="text" id="id_klien_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="front_desk_display" class="block text-sm font-medium text-gray-700">Email Front Desk</label>
+                            <input type="text" id="front_desk_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="dokter_display" class="block text-sm font-medium text-gray-700">Email Dokter Hewan</label>
+                            <input type="text" id="dokter_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="perawat_display" class="block text-sm font-medium text-gray-700">Email Perawat Hewan</label>
+                            <input type="text" id="perawat_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
+                            <select name="jenis_perawatan" id="jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Jenis Perawatan</option>
+                                <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
+                                <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
+                                <option value="TRM003 - Surgery">TRM003 - Surgery</option>
+                                <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis</label>
+                            <textarea name="catatan_medis" id="catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                Create
+                            </button>
+                            <button type="button" id="create-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Update Perawatan Modal -->
+            <div id="update-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-primary">Update Treatment</h2>
+                    </div>
+                    <form method="post" id="update-perawatan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_kunjungan" id="update_id_kunjungan">
+                        <div>
+                            <label for="update_id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
+                            <input type="text" id="update_id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                        </div>
+                        <div>
+                            <label for="update_jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
+                            <select name="jenis_perawatan" id="update_jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                <option value="" disabled selected>Pilih Jenis Perawatan</option>
+                                <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
+                                <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
+                                <option value="TRM003 - Surgery">TRM003 - Surgery</option>
+                                <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="update_catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis</label>
+                            <textarea name="catatan_medis" id="update_catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                Update
+                            </button>
+                            <button type="button" id="update-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="delete-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-2xl font-semibold text-red-500">Delete Treatment</h2>
+                    </div>
+                    <p class="mb-4">
+                        Apakah kamu yakin untuk menghapus Perawatan untuk Kunjungan <span id="delete-id-kunjungan"></span>?
+                    </p>
+                    <form method="post" id="delete-perawatan-form" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="id_kunjungan" id="delete_id_kunjungan">
+                        <div class="flex justify-end space-x-4">
+                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                Confirm Deletion
+                            </button>
+                            <button type="button" id="delete-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+<script>
+    const userRole = "{{ request.session.user_role|escapejs }}";
+
+    if (userRole === 'dokter_hewan') {
+        // Create Perawatan
+        document.getElementById('create-perawatan-btn')?.addEventListener('click', () => {
+            document.getElementById('create-perawatan-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('create-perawatan-cancel')?.addEventListener('click', () => {
+            document.getElementById('create-perawatan-modal').classList.add('hidden');
+            document.getElementById('id_kunjungan').value = '';
+            document.getElementById('id_kunjungan_display').value = '';
+            document.getElementById('id_klien_display').value = '';
+            document.getElementById('front_desk_display').value = '';
+            document.getElementById('dokter_display').value = '';
+            document.getElementById('perawat_display').value = '';
+            document.getElementById('jenis_perawatan').value = '';
+            document.getElementById('catatan_medis').value = '';
+        });
+
+        document.getElementById('id_kunjungan')?.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const idKunjungan = selectedOption.value;
+            const idKlien = selectedOption.getAttribute('data-id-klien');
+            const frontDeskEmail = selectedOption.getAttribute('data-front-desk-email');
+            const dokterEmail = selectedOption.getAttribute('data-dokter-email');
+            const perawatEmail = selectedOption.getAttribute('data-perawat-email');
+
+            document.getElementById('id_kunjungan_display').value = idKunjungan || 'N/A';
+            document.getElementById('id_klien_display').value = idKlien || 'N/A';
+            document.getElementById('front_desk_display').value = frontDeskEmail || 'N/A';
+            document.getElementById('dokter_display').value = dokterEmail || 'N/A';
+            document.getElementById('perawat_display').value = perawatEmail || 'N/A';
+        });
+
+        document.getElementById('create-perawatan-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const jenisPerawatan = document.getElementById('jenis_perawatan').value;
+            const catatanMedis = document.getElementById('catatan_medis').value.trim();
+            const catatan = jenisPerawatan ? `Jenis: ${jenisPerawatan}; Catatan: ${catatanMedis || '-'}` : `Jenis: N/A; Catatan: ${catatanMedis || '-'}`;
+            const formData = new FormData(form);
+            formData.set('catatan', catatan);
+
+            try {
+                const response = await fetch('/perawatan-hewan/create/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('create-perawatan-modal').classList.add('hidden');
+                    window.location.reload();
+                } else {
+                    alert('Gagal mencatat perawatan: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan jaringan saat mencatat perawatan.');
+            }
+        });
+
+        // Update Perawatan
+        document.querySelectorAll('.update-perawatan-btn')?.forEach(button => {
+            button.addEventListener('click', async () => {
+                const idKunjungan = button.getAttribute('data-id');
+                const jenisPerawatan = button.getAttribute('data-jenis-perawatan');
+                const catatanMedis = button.getAttribute('data-catatan-medis');
+                try {
+                    const response = await fetch(`/perawatan-hewan/data/${idKunjungan}/`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        document.getElementById('update_id_kunjungan').value = idKunjungan;
+                        document.getElementById('update_id_kunjungan_display').value = idKunjungan;
+                        document.getElementById('update_jenis_perawatan').value = jenisPerawatan;
+                        document.getElementById('update_catatan_medis').value = catatanMedis;
+                        document.getElementById('update-perawatan-modal').classList.remove('hidden');
+                    } else {
+                        alert('Gagal mengambil data catatan.');
+                    }
+                } catch (error) {
+                    alert('Terjadi kesalahan saat mengambil data catatan.');
+                }
+            });
+        });
+
+        document.getElementById('update-perawatan-cancel')?.addEventListener('click', () => {
+            document.getElementById('update-perawatan-modal').classList.add('hidden');
+        });
+
+        document.getElementById('update-perawatan-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const idKunjungan = document.getElementById('update_id_kunjungan').value;
+            const jenisPerawatan = document.getElementById('update_jenis_perawatan').value;
+            const catatanMedis = document.getElementById('update_catatan_medis').value.trim();
+            const catatan = jenisPerawatan ? `Jenis: ${jenisPerawatan}; Catatan: ${catatanMedis || '-'}` : `Jenis: N/A; Catatan: ${catatanMedis || '-'}`;
+            const formData = new FormData(form);
+            formData.set('catatan', catatan);
+
+            try {
+                const response = await fetch(`/perawatan-hewan/update/${idKunjungan}/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('update-perawatan-modal').classList.add('hidden');
+                    window.location.reload();
+                } else {
+                    alert('Gagal memperbarui catatan: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan jaringan saat memperbarui catatan.');
+            }
+        });
+
+        // Delete Perawatan
+        document.querySelectorAll('.delete-perawatan-btn')?.forEach(button => {
+            button.addEventListener('click', () => {
+                const idKunjungan = button.getAttribute('data-id');
+                document.getElementById('delete_id_kunjungan').value = idKunjungan;
+                document.getElementById('delete-id-kunjungan').textContent = idKunjungan;
+                document.getElementById('delete-perawatan-modal').classList.remove('hidden');
+            });
+        });
+
+        document.getElementById('delete-perawatan-cancel')?.addEventListener('click', () => {
+            document.getElementById('delete-perawatan-modal').classList.add('hidden');
+        });
+
+        document.getElementById('delete-perawatan-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const idKunjungan = document.getElementById('delete_id_kunjungan').value;
+            try {
+                const response = await fetch(`/perawatan-hewan/delete/${idKunjungan}/`, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-CSRFToken': form.querySelector('input[name="csrfmiddlewaretoken"]').value
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('delete-perawatan-modal').classList.add('hidden');
+                    window.location.reload();
+                } else {
+                    alert('Gagal menghapus catatan: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan jaringan saat menghapus catatan.');
+            }
+        });
+    }
+</script>
+{% endblock %}

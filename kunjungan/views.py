@@ -46,7 +46,6 @@ def kunjungan_view(request):
     # Simpan role ke session
     request.session['user_role'] = user_role
     request.session.modified = True
-    print(f"User role set to: {user_role}")
 
     kunjungans = []
     kliens = []
