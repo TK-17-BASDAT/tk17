@@ -3,211 +3,213 @@
 {% block title %}Daftar Perawatan Hewan - PetClinic{% endblock %}
 
 {% block content %}
-<div class="flex min-h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r shadow-sm">
-        {% include 'navbar/sidebar.html' %}
-    </aside>
-
+<div class="flex h-screen overflow-hidden">
+    {% include "navbar/sidebar.html" %}
+    <main class="flex-1 ml-64 overflow-y-auto">
+        <div class="bg-gray-300 min-h-screen flex justify-center p-6 font-[Poppins]">
+            <div class="w-full bg-white rounded-xl shadow-md p-8">
     <!-- Main content -->
-    <main class="flex-1 p-8">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-3xl font-semibold text-primary">Daftar Perawatan Hewan</h1>
-            {% if request.session.user_role == 'dokter_hewan' %}
-                <button type="button" id="create-perawatan-btn" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
-                    + Create New Treatment
-                </button>
-            {% endif %}
-        </div>
-
-        <!-- List Perawatan -->
-        <div class="bg-white rounded-lg shadow overflow-x-auto">
-            <table class="table-auto w-full border-separate border-spacing-0">
-                <thead class="bg-secondary text-white">
-                    <tr>
-                        <th class="px-4 py-3 text-left">ID Kunjungan</th>
-                        <th class="px-4 py-3 text-left">ID Klien</th>
-                        <th class="px-4 py-3 text-left">Nama Hewan</th>
-                        <th class="px-4 py-3 text-left">Email Perawat</th>
-                        <th class="px-4 py-3 text-left">Email Dokter</th>
-                        <th class="px-4 py-3 text-left">Email Front Desk</th>
-                        <th class="px-4 py-3 text-left">Jenis Perawatan</th>
-                        <th class="px-4 py-3 text-left">Catatan Medis</th>
+                <div class="flex-1 p-8">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h1 class="text-3xl font-semibold text-primary">Daftar Perawatan Hewan</h1>
                         {% if request.session.user_role == 'dokter_hewan' %}
-                            <th class="px-4 py-3 text-left">Action</th>
+                            <button type="button" id="create-perawatan-btn" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                + Create New Treatment
+                            </button>
                         {% endif %}
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    {% for perawatan in perawatans %}
-                        <tr>
-                            <td class="px-4 py-3">{{ perawatan.id_kunjungan }}</td>
-                            <td class="px-4 py-3">{{ perawatan.no_identitas_klien }}</td>
-                            <td class="px-4 py-3">{{ perawatan.nama_hewan }}</td>
-                            <td class="px-4 py-3">{{ perawatan.perawat_email }}</td>
-                            <td class="px-4 py-3">{{ perawatan.dokter_email }}</td>
-                            <td class="px-4 py-3">{{ perawatan.front_desk_email }}</td>
-                            <td class="px-4 py-3">{{ perawatan.nama_perawatan|default:'N/A' }}</td>
-                            <td class="px-4 py-3">{{ perawatan.catatan|default:'-' }}</td>
-                            {% if request.session.user_role == 'dokter_hewan' %}
-                                <td class="px-4 py-3 space-x-2">
-                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" data-jenis-perawatan="{{ perawatan.nama_perawatan|default:'N/A' }}" data-catatan-medis="{{ perawatan.catatan|default:'' }}" class="update-perawatan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
-                                        Update
-                                    </button>
-                                    <button type="button" data-id="{{ perawatan.id_kunjungan }}" class="delete-perawatan-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                                        Delete
-                                    </button>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="{% if request.session.user_role == 'dokter_hewan' %}9{% else %}8{% endif %}" class="px-4 py-3 text-center text-gray-500">Tidak ada data perawatan.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% if request.session.user_role == 'dokter_hewan' %}
-            <!-- Create Perawatan Modal -->
-            <div id="create-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-semibold text-primary">Create New Treatment</h2>
                     </div>
-                    <form method="post" id="create-perawatan-form" class="space-y-4">
-                        {% csrf_token %}
-                        <div>
-                            <label for="id_kunjungan" class="block text-sm font-medium text-gray-700">Kunjungan</label>
-                            <select name="id_kunjungan" id="id_kunjungan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                                <option value="" disabled selected>Pilih Kunjungan</option>
-                                {% for kunjungan in kunjungans %}
-                                    <option value="{{ kunjungan.id_kunjungan }}"
-                                            data-id-klien="{{ kunjungan.no_identitas_klien }}"
-                                            data-front-desk-email="{{ kunjungan.no_front_desk }}"
-                                            data-dokter-email="{{ kunjungan.no_dokter_hewan }}"
-                                            data-perawat-email="{{ kunjungan.no_perawat_hewan }}">
-                                        Kunjungan {{ kunjungan.id_kunjungan }} - Klien: {{ kunjungan.no_identitas_klien }} - Hewan: {{ kunjungan.nama_hewan }}
-                                    </option>
+
+                    <!-- List Perawatan -->
+                    <div class="bg-white rounded-lg shadow overflow-x-auto">
+                        <table class="table-auto w-full border-separate border-spacing-0">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">ID Kunjungan</th>
+                                    <th class="px-4 py-3 text-left">ID Klien</th>
+                                    <th class="px-4 py-3 text-left">Nama Hewan</th>
+                                    <th class="px-4 py-3 text-left">Email Perawat</th>
+                                    <th class="px-4 py-3 text-left">Email Dokter</th>
+                                    <th class="px-4 py-3 text-left">Email Front Desk</th>
+                                    <th class="px-4 py-3 text-left">Jenis Perawatan</th>
+                                    <th class="px-4 py-3 text-left">Catatan Medis</th>
+                                    {% if request.session.user_role == 'dokter_hewan' %}
+                                        <th class="px-4 py-3 text-left">Action</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for perawatan in perawatans %}
+                                    <tr>
+                                        <td class="px-4 py-3">{{ perawatan.id_kunjungan }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.no_identitas_klien }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.nama_hewan }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.perawat_email }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.dokter_email }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.front_desk_email }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.nama_perawatan|default:'N/A' }}</td>
+                                        <td class="px-4 py-3">{{ perawatan.catatan|default:'-' }}</td>
+                                        {% if request.session.user_role == 'dokter_hewan' %}
+                                            <td class="px-4 py-3 space-x-2">
+                                                <button type="button" data-id="{{ perawatan.id_kunjungan }}" data-jenis-perawatan="{{ perawatan.nama_perawatan|default:'N/A' }}" data-catatan-medis="{{ perawatan.catatan|default:'' }}" class="update-perawatan-btn px-3 py-1 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                                    Update
+                                                </button>
+                                                <button type="button" data-id="{{ perawatan.id_kunjungan }}" class="delete-perawatan-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="{% if request.session.user_role == 'dokter_hewan' %}9{% else %}8{% endif %}" class="px-4 py-3 text-center text-gray-500">Tidak ada data perawatan.</td>
+                                    </tr>
                                 {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label for="id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
-                            <input type="text" id="id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="id_klien_display" class="block text-sm font-medium text-gray-700">ID Klien</label>
-                            <input type="text" id="id_klien_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="front_desk_display" class="block text-sm font-medium text-gray-700">Email Front Desk</label>
-                            <input type="text" id="front_desk_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="dokter_display" class="block text-sm font-medium text-gray-700">Email Dokter Hewan</label>
-                            <input type="text" id="dokter_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="perawat_display" class="block text-sm font-medium text-gray-700">Email Perawat Hewan</label>
-                            <input type="text" id="perawat_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="create_catatan_lama" class="block text-sm font-medium text-gray-700">Catatan Lama (dari Kunjungan)</label>
-                            <textarea id="create_catatan_lama" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly></textarea>
-                        </div>
-                        <div>
-                            <label for="jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
-                            <select name="jenis_perawatan" id="jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                                <option value="" disabled selected>Pilih Jenis Perawatan</option>
-                                <option value="TRM001 - Dental Care">TRM001 - Pemeriksaan Umum</option>
-                                <option value="TRM002 - Vaccination">TRM002 - Vaksinasi</option>
-                                <option value="TRM003 - Surgery">TRM003 - Dental Care</option>
-                                <option value="TRM004 - Check-Up">TRM004 - Grooming</option>
-                                <option value="TRM005 - Sterilisasi">TRM005 - Sterilisasi</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis Baru</label>
-                            <textarea name="catatan_medis" id="catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
-                        </div>
-                        <div class="flex justify-end space-x-4">
-                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
-                                Create
-                            </button>
-                            <button type="button" id="create-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Update Perawatan Modal -->
-            <div id="update-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-semibold text-primary">Update Treatment</h2>
+                            </tbody>
+                        </table>
                     </div>
-                    <form method="post" id="update-perawatan-form" class="space-y-4">
-                        {% csrf_token %}
-                        <input type="hidden" name="id_kunjungan" id="update_id_kunjungan">
-                        <div>
-                            <label for="update_id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
-                            <input type="text" id="update_id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
-                        </div>
-                        <div>
-                            <label for="update_jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
-                            <select name="jenis_perawatan" id="update_jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                                <option value="" disabled selected>Pilih Jenis Perawatan</option>
-                                <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
-                                <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
-                                <option value="TRM003 - Surgery">TRM003 - Surgery</option>
-                                <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="update_catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis</label>
-                            <textarea name="catatan_medis" id="update_catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
-                        </div>
-                        <div class="flex justify-end space-x-4">
-                            <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
-                                Update
-                            </button>
-                            <button type="button" id="update-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
 
-            <!-- Delete Confirmation Modal -->
-            <div id="delete-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-2xl font-semibold text-red-500">Delete Treatment</h2>
-                    </div>
-                    <p class="mb-4">
-                        Apakah kamu yakin untuk menghapus Perawatan untuk Kunjungan <span id="delete-id-kunjungan"></span>?
-                    </p>
-                    <form method="post" id="delete-perawatan-form" class="space-y-4">
-                        {% csrf_token %}
-                        <input type="hidden" name="id_kunjungan" id="delete_id_kunjungan">
-                        <div class="flex justify-end space-x-4">
-                            <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                                Confirm Deletion
-                            </button>
-                            <button type="button" id="delete-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
-                                Cancel
-                            </button>
+                    {% if request.session.user_role == 'dokter_hewan' %}
+                        <!-- Create Perawatan Modal -->
+                        <div id="create-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-2xl font-semibold text-primary">Create New Treatment</h2>
+                                </div>
+                                <form method="post" id="create-perawatan-form" class="space-y-4">
+                                    {% csrf_token %}
+                                    <div>
+                                        <label for="id_kunjungan" class="block text-sm font-medium text-gray-700">Kunjungan</label>
+                                        <select name="id_kunjungan" id="id_kunjungan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                            <option value="" disabled selected>Pilih Kunjungan</option>
+                                            {% for kunjungan in kunjungans %}
+                                                <option value="{{ kunjungan.id_kunjungan }}"
+                                                        data-id-klien="{{ kunjungan.no_identitas_klien }}"
+                                                        data-front-desk-email="{{ kunjungan.no_front_desk }}"
+                                                        data-dokter-email="{{ kunjungan.no_dokter_hewan }}"
+                                                        data-perawat-email="{{ kunjungan.no_perawat_hewan }}">
+                                                    Kunjungan {{ kunjungan.id_kunjungan }} - Klien: {{ kunjungan.no_identitas_klien }} - Hewan: {{ kunjungan.nama_hewan }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
+                                        <input type="text" id="id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="id_klien_display" class="block text-sm font-medium text-gray-700">ID Klien</label>
+                                        <input type="text" id="id_klien_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="front_desk_display" class="block text-sm font-medium text-gray-700">Email Front Desk</label>
+                                        <input type="text" id="front_desk_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="dokter_display" class="block text-sm font-medium text-gray-700">Email Dokter Hewan</label>
+                                        <input type="text" id="dokter_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="perawat_display" class="block text-sm font-medium text-gray-700">Email Perawat Hewan</label>
+                                        <input type="text" id="perawat_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="create_catatan_lama" class="block text-sm font-medium text-gray-700">Catatan Lama (dari Kunjungan)</label>
+                                        <textarea id="create_catatan_lama" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly></textarea>
+                                    </div>
+                                    <div>
+                                        <label for="jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
+                                        <select name="jenis_perawatan" id="jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                            <option value="" disabled selected>Pilih Jenis Perawatan</option>
+                                            <option value="TRM001 - Dental Care">TRM001 - Pemeriksaan Umum</option>
+                                            <option value="TRM002 - Vaccination">TRM002 - Vaksinasi</option>
+                                            <option value="TRM003 - Surgery">TRM003 - Dental Care</option>
+                                            <option value="TRM004 - Check-Up">TRM004 - Grooming</option>
+                                            <option value="TRM005 - Sterilisasi">TRM005 - Sterilisasi</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis Baru</label>
+                                        <textarea name="catatan_medis" id="catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+                                    </div>
+                                    <div class="flex justify-end space-x-4">
+                                        <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                            Create
+                                        </button>
+                                        <button type="button" id="create-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </form>
+
+                        <!-- Update Perawatan Modal -->
+                        <div id="update-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-2xl font-semibold text-primary">Update Treatment</h2>
+                                </div>
+                                <form method="post" id="update-perawatan-form" class="space-y-4">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id_kunjungan" id="update_id_kunjungan">
+                                    <div>
+                                        <label for="update_id_kunjungan_display" class="block text-sm font-medium text-gray-700">ID Kunjungan</label>
+                                        <input type="text" id="update_id_kunjungan_display" class="mt-1 block w-full border border-gray-300 bg-gray-100 rounded-md p-2" readonly>
+                                    </div>
+                                    <div>
+                                        <label for="update_jenis_perawatan" class="block text-sm font-medium text-gray-700">Jenis Perawatan</label>
+                                        <select name="jenis_perawatan" id="update_jenis_perawatan" required class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                                            <option value="" disabled selected>Pilih Jenis Perawatan</option>
+                                            <option value="TRM001 - Dental Care">TRM001 - Dental Care</option>
+                                            <option value="TRM002 - Vaccination">TRM002 - Vaccination</option>
+                                            <option value="TRM003 - Surgery">TRM003 - Surgery</option>
+                                            <option value="TRM004 - Check-Up">TRM004 - Check-Up</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="update_catatan_medis" class="block text-sm font-medium text-gray-700">Catatan Medis</label>
+                                        <textarea name="catatan_medis" id="update_catatan_medis" class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+                                    </div>
+                                    <div class="flex justify-end space-x-4">
+                                        <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary/80 transition">
+                                            Update
+                                        </button>
+                                        <button type="button" id="update-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Delete Confirmation Modal -->
+                        <div id="delete-perawatan-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+                            <div class="bg-white rounded-lg shadow-lg max-w-lg w-full mx-4 p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-2xl font-semibold text-red-500">Delete Treatment</h2>
+                                </div>
+                                <p class="mb-4">
+                                    Apakah kamu yakin untuk menghapus Perawatan untuk Kunjungan <span id="delete-id-kunjungan"></span>?
+                                </p>
+                                <form method="post" id="delete-perawatan-form" class="space-y-4">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="id_kunjungan" id="delete_id_kunjungan">
+                                    <div class="flex justify-end space-x-4">
+                                        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
+                                            Confirm Deletion
+                                        </button>
+                                        <button type="button" id="delete-perawatan-cancel" class="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary/80 transition">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-        {% endif %}
+        </div>
     </main>
 </div>
 
